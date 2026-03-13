@@ -1,0 +1,53 @@
+#!/bin/sh
+# ─────────────────────────────────────────────────────────────────────────────
+# pre-commit hook  –  runs before every git commit
+#   1. Dart formatter  (dart format)
+#   2. Flutter static analysis  (flutter analyze)
+# ─────────────────────────────────────────────────────────────────────────────
+
+echo ""
+echo "╔══════════════════════════════════════════╗"
+echo "║         Running pre-commit checks        ║"
+echo "╚══════════════════════════════════════════╝"
+
+PASS=true
+
+# ── 1. Dart formatting ────────────────────────────────────────────────────────
+echo ""
+echo "▶ Checking Dart formatting..."
+dart format --set-exit-if-changed .
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "✖ Formatting issues detected."
+  echo "  Run:  dart format ."
+  echo "  Then stage the changes and commit again."
+  PASS=false
+else
+  echo "✔ Formatting OK"
+fi
+
+# ── 2. Flutter analysis ───────────────────────────────────────────────────────
+echo ""
+echo "▶ Running Flutter analyze..."
+flutter analyze
+
+if [ $? -ne 0 ]; then
+  echo ""
+  echo "✖ Analysis issues found. Fix them before committing."
+  PASS=false
+else
+  echo "✔ Analysis OK"
+fi
+
+# ── Result ────────────────────────────────────────────────────────────────────
+echo ""
+if [ "$PASS" = false ]; then
+  echo "✖ Pre-commit checks FAILED. Commit aborted."
+  echo ""
+  exit 1
+fi
+
+echo "✔ All pre-commit checks passed!"
+echo ""
+exit 0
