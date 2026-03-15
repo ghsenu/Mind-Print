@@ -5,12 +5,6 @@ AI-Powered Mental Health Awareness Application
 Production Readiness
 Security Checklist, Testing Strategy & Deployment Plan
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
-
 # 1. Production Readiness Overview
 This document defines the criteria that must be met before MindPrint is considered production-ready for the MVP pilot deployment. It covers security, testing, performance, and deployment requirements.
 

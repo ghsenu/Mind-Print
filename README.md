@@ -1,6 +1,26 @@
 # mind_print
 
-A new Flutter project.
+MindPrint Flutter application.
+
+## Environment and Database Setup
+
+1. Copy `.env.example` to `.env`.
+2. Fill `.env` with your Firebase project values for each target platform.
+3. Install dependencies:
+	- `flutter pub get`
+4. Run the app:
+	- `flutter run`
+
+The app loads `.env` at startup and initializes Firebase + Cloud Firestore.
+
+## Firestore Structure (MVP)
+
+- `users/{userId}`
+- `users/{userId}/journals/{journalId}`
+- `users/{userId}/moodCheckins/{id}`
+- `users/{userId}/predictions/{id}`
+- `users/{userId}/notifications/{id}`
+- `users/{userId}/reports/{id}`
 
 ## Getting Started
 

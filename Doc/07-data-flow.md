@@ -5,11 +5,6 @@ AI-Powered Mental Health Awareness Application
 Data Flow
 End-to-End Data Journey Through the MindPrint System
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
 
 # 1. Data Flow Overview
 This document describes how data moves through MindPrint from user input to storage, AI analysis, and UI display. All data flows are designed to be privacy-preserving, offline-resilient, and asynchronous to ensure a seamless user experience.

@@ -5,11 +5,6 @@ AI-Powered Mental Health Awareness Application
 Flutter App Structure
 Project Architecture, Screen Inventory & Riverpod State Management
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
 
 # 1. Flutter Project Overview
 

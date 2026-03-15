@@ -5,11 +5,7 @@ AI-Powered Mental Health Awareness Application
 Database Schema
 Cloud Firestore Collections, Fields & Security Rules
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
+
 
 # 1. Database Overview
 MindPrint uses Cloud Firestore as its primary NoSQL database. Data is organized in collections and sub-collections following a user-centric document model. All documents are scoped to individual users to ensure privacy and data isolation.

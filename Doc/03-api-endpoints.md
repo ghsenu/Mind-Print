@@ -5,11 +5,7 @@ AI-Powered Mental Health Awareness Application
 API Endpoints
 External AI APIs, Firebase Cloud Functions & Integration Reference
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
+
 
 # 1. API Integration Overview
 MindPrint consumes three categories of APIs: external AI APIs (HuggingFace, AssemblyAI), Firebase Cloud Functions (internal serverless endpoints), and Firebase platform APIs (Auth, Firestore, Storage, FCM). All external API keys are stored as Cloud Function environment variables and are never exposed in client-side Flutter code.

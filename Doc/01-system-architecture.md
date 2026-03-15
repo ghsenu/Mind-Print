@@ -5,11 +5,7 @@ AI-Powered Mental Health Awareness Application
 System Architecture
 Three-Tier Modular Design with API-Based AI Integration
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
+
 
 # 1. Architecture Overview
 MindPrint follows a three-tier modular architecture that separates the Presentation Layer, Business Logic Layer, and Data & Services Layer. This design ensures scalability, maintainability, security, and independent component updates without affecting other layers.
