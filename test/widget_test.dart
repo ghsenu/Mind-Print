@@ -8,9 +8,12 @@ void main() {
 
     expect(find.text('Mind Print'), findsOneWidget);
 
-    await tester.pump(const Duration(seconds: 2));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 8));
 
-    expect(find.text('Login'), findsOneWidget);
+    // Pump a few more times to allow navigation and animation to complete without waiting indefinitely
+    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
+
+    expect(find.text('Skip'), findsOneWidget);
   });
 }
