@@ -1,12 +1,426 @@
 import 'package:flutter/material.dart';
+import 'package:mind_print/features/shared/constants/route_names.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
   @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  int _selectedMood = 2;
+
+  final List<_MoodItem> _moods = const <_MoodItem>[
+    _MoodItem('😞', 'Stressed'),
+    _MoodItem('😱', 'Sad'),
+    _MoodItem('😐', 'Neutral'),
+    _MoodItem('😊', 'Happy'),
+    _MoodItem('😍', 'Overjoyed'),
+  ];
+
+  void _selectNextMood() {
+    setState(() {
+      _selectedMood = (_selectedMood + 1) % _moods.length;
+    });
+  }
+
+  void _selectPreviousMood() {
+    setState(() {
+      _selectedMood = (_selectedMood - 1 + _moods.length) % _moods.length;
+    });
+  }
+
+  void _handleMoodSwipe(DragEndDetails details) {
+    final double velocity = details.primaryVelocity ?? 0;
+    if (velocity < -100) {
+      _selectNextMood();
+    } else if (velocity > 100) {
+      _selectPreviousMood();
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Home dashboard placeholder')),
+    final String moodLabel = _moods[_selectedMood].label;
+
+    return Scaffold(
+      backgroundColor: const Color(0xFFEAF6FF),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          child: Column(
+            children: <Widget>[
+              const SizedBox(height: 12),
+              Row(
+                children: <Widget>[
+                  const CircleAvatar(
+                    radius: 18,
+                    backgroundColor: Color(0xFFFFDAB9),
+                    child: Text('🧑🏽', style: TextStyle(fontSize: 18)),
+                  ),
+                  const SizedBox(width: 8),
+                  const Text(
+                    'Hi, Michael',
+                    style: TextStyle(fontSize: 20, color: Color(0xFF374151)),
+                  ),
+                  const Spacer(),
+                  Container(
+                    height: 42,
+                    width: 42,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.circular(22),
+                      border: Border.all(color: const Color(0xFFD1D5DB)),
+                    ),
+                    child: IconButton(
+                      onPressed:
+                          () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.notifications,
+                          ),
+                      icon: const Icon(
+                        Icons.notifications_none,
+                        color: Color(0xFF4B5563),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 22),
+              const Text(
+                'Good Morning!\nHow are you today?',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 34,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF111827),
+                  height: 1.25,
+                ),
+              ),
+              const SizedBox(height: 18),
+              GestureDetector(
+                behavior: HitTestBehavior.opaque,
+                onHorizontalDragEnd: _handleMoodSwipe,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List<Widget>.generate(_moods.length, (int index) {
+                    final bool isSelected = index == _selectedMood;
+                    return GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _selectedMood = index;
+                        });
+                      },
+                      child: AnimatedScale(
+                        scale: isSelected ? 1.18 : 1.0,
+                        duration: const Duration(milliseconds: 180),
+                        child: SizedBox(
+                          width: 64,
+                          child: Column(
+                            children: <Widget>[
+                              Text(
+                                _moods[index].emoji,
+                                style: const TextStyle(fontSize: 34),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _moods[index].label,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Color(0xFF374151),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                ),
+              ),
+              const SizedBox(height: 18),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFFF1E5),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Icon(
+                      Icons.warning_amber_rounded,
+                      color: Color(0xFFFB923C),
+                      size: 22,
+                    ),
+                    SizedBox(width: 10),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text(
+                            'Predictive Mood Alert',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFFEA580C),
+                            ),
+                          ),
+                          SizedBox(height: 4),
+                          Text(
+                            'A mood dip is predicted for this afternoon. Consider a 5-minute meditation.',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Color(0xFFEA580C),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Text(
+                      'x',
+                      style: TextStyle(
+                        color: Color(0xFFEA580C),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  boxShadow: const <BoxShadow>[
+                    BoxShadow(
+                      color: Color(0x1F000000),
+                      blurRadius: 8,
+                      offset: Offset(0, 3),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Row(
+                      children: <Widget>[
+                        const Text(
+                          "Today's Insight",
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        const Spacer(),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFE9FCEB),
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          child: const Text(
+                            '94% Confidence',
+                            style: TextStyle(
+                              fontSize: 11,
+                              color: Color(0xFF22C55E),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      'Based on your morning check-in, your dominant emotion is',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Color(0xFF4B5563),
+                      ),
+                    ),
+                    const SizedBox(height: 6),
+                    Text(
+                      moodLabel,
+                      style: const TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w700,
+                        color: Color(0xFF374151),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 14),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: _actionCard(
+                      Icons.menu_book_outlined,
+                      'Write\nJournal',
+                      selected: true,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: _actionCard(Icons.mic_none, 'Voice Journal')),
+                ],
+              ),
+              const SizedBox(height: 12),
+              Row(
+                children: <Widget>[
+                  Expanded(
+                    child: _actionCard(Icons.analytics_outlined, 'Analytics'),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: _actionCard(Icons.auto_graph_outlined, 'Activities'),
+                  ),
+                ],
+              ),
+              const Spacer(),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: const <Widget>[
+                    _BottomItem(Icons.home_outlined, 'Home', selected: true),
+                    _BottomItem(
+                      Icons.notifications_none,
+                      'Notifications',
+                      onTapRoute: AppRoutes.notifications,
+                    ),
+                    _CenterStar(),
+                    _BottomItem(Icons.person_outline, 'Profile'),
+                    _BottomItem(Icons.settings_outlined, 'Settings'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _actionCard(IconData icon, String title, {bool selected = false}) {
+    return Container(
+      height: 72,
+      padding: const EdgeInsets.symmetric(horizontal: 12),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: selected ? const Color(0xFF0EA5E9) : const Color(0xFFD1D5DB),
+          width: selected ? 2 : 1,
+        ),
+        boxShadow: const <BoxShadow>[
+          BoxShadow(
+            color: Color(0x1A000000),
+            blurRadius: 5,
+            offset: Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: <Widget>[
+          Icon(icon, color: const Color(0xFF111827), size: 22),
+          const SizedBox(width: 8),
+          Text(
+            title,
+            style: const TextStyle(fontSize: 15, color: Color(0xFF111827)),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _MoodItem {
+  const _MoodItem(this.emoji, this.label);
+
+  final String emoji;
+  final String label;
+}
+
+class _BottomItem extends StatelessWidget {
+  const _BottomItem(
+    this.icon,
+    this.label, {
+    this.selected = false,
+    this.onTapRoute,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final String? onTapRoute;
+
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      onTap:
+          onTapRoute == null
+              ? null
+              : () => Navigator.pushNamed(context, onTapRoute!),
+      borderRadius: BorderRadius.circular(8),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(
+              icon,
+              size: 20,
+              color:
+                  selected ? const Color(0xFF0EA5E9) : const Color(0xFF6B7280),
+            ),
+            const SizedBox(height: 3),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11,
+                color:
+                    selected
+                        ? const Color(0xFF0EA5E9)
+                        : const Color(0xFF6B7280),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _CenterStar extends StatelessWidget {
+  const _CenterStar();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: 44,
+      width: 44,
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        gradient: LinearGradient(
+          colors: <Color>[
+            Color(0xFFEC4899),
+            Color(0xFF6366F1),
+            Color(0xFF06B6D4),
+          ],
+        ),
+      ),
+      child: const Icon(Icons.auto_awesome, color: Colors.white, size: 22),
     );
   }
 }
