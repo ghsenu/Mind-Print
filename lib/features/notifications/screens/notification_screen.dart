@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mind_print/features/notifications/screens/notification_details_screen.dart';
 
 class NotificationScreen extends StatefulWidget {
   const NotificationScreen({super.key});
@@ -287,12 +288,27 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         itemBuilder: (BuildContext context, int index) {
                           final _NotificationItem item =
                               _visibleNotifications[index];
-                          return _NotificationTile(
-                            title: item.title,
-                            message: item.message,
-                            time: item.time,
-                            icon: item.icon,
-                            isUnread: !item.isRead,
+                          return InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder:
+                                      (context) => NotificationDetailsScreen(
+                                        title: item.title,
+                                        message: item.message,
+                                        time: item.time,
+                                      ),
+                                ),
+                              );
+                            },
+                            child: _NotificationTile(
+                              title: item.title,
+                              message: item.message,
+                              time: item.time,
+                              icon: item.icon,
+                              isUnread: !item.isRead,
+                            ),
                           );
                         },
                       ),
