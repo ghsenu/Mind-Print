@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mind_print/app/app.dart';
 import 'package:mind_print/core/bootstrap/app_bootstrap.dart';
 
@@ -7,7 +8,11 @@ Future<void> main() async {
 
   try {
     await AppBootstrap.initialize();
-    runApp(const MindPrintApp());
+    runApp(
+      const ProviderScope(
+        child: MindPrintApp(),
+      ),
+    );
   } catch (error) {
     runApp(_BootstrapErrorApp(error: error.toString()));
   }

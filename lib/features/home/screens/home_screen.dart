@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:mind_print/features/chatbot/screens/chatbot_screen.dart';
+import 'package:mind_print/features/journal/screens/voice_journal_screen.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -43,303 +45,363 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final String moodLabel = _moods[_selectedMood].label;
+    const Color softBlueIcon = Color(0xFFB9D9EB);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFEAF6FF),
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: Column(
-            children: <Widget>[
-              const SizedBox(height: 12),
-              Row(
-                children: <Widget>[
-                  const CircleAvatar(
-                    radius: 18,
-                    backgroundColor: Color(0xFFFFDAB9),
-                    child: Text('🧑🏽', style: TextStyle(fontSize: 18)),
-                  ),
-                  const SizedBox(width: 8),
-                  const Text(
-                    'Hi, Michael',
-                    style: TextStyle(fontSize: 20, color: Color(0xFF374151)),
-                  ),
-                  const Spacer(),
-                  Container(
-                    height: 42,
-                    width: 42,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(22),
-                      border: Border.all(color: const Color(0xFFD1D5DB)),
+        child: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: <Color>[
+                Color(0xFFF8FBFF),
+                Color(0xFFD9ECF8),
+                Color(0xFFB9D9EB),
+              ],
+            ),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: <Widget>[
+                const SizedBox(height: 12),
+                Row(
+                  children: <Widget>[
+                    const CircleAvatar(
+                      radius: 18,
+                      backgroundColor: Color(0xFFFFDAB9),
+                      child: Text('🧑🏽', style: TextStyle(fontSize: 18)),
                     ),
-                    child: IconButton(
-                      onPressed:
-                          () => Navigator.pushNamed(
-                            context,
-                            AppRoutes.notifications,
-                          ),
-                      icon: const Icon(
-                        Icons.notifications_none,
-                        color: Color(0xFF4B5563),
+                    const SizedBox(width: 8),
+                    const Text(
+                      'Hi, Michael',
+                      style: TextStyle(fontSize: 17, color: Color(0xFF374151)),
+                    ),
+                    const Spacer(),
+                    Container(
+                      height: 42,
+                      width: 42,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(22),
+                        border: Border.all(color: const Color(0xFFD1D5DB)),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 22),
-              const Text(
-                'Good Morning!\nHow are you today?',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                  fontSize: 34,
-                  fontWeight: FontWeight.w500,
-                  color: Color(0xFF111827),
-                  height: 1.25,
-                ),
-              ),
-              const SizedBox(height: 18),
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onHorizontalDragEnd: _handleMoodSwipe,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: List<Widget>.generate(_moods.length, (int index) {
-                    final bool isSelected = index == _selectedMood;
-                    return GestureDetector(
-                      onTap: () {
-                        setState(() {
-                          _selectedMood = index;
-                        });
-                      },
-                      child: AnimatedScale(
-                        scale: isSelected ? 1.18 : 1.0,
-                        duration: const Duration(milliseconds: 180),
-                        child: SizedBox(
-                          width: 64,
-                          child: Column(
-                            children: <Widget>[
-                              Text(
-                                _moods[index].emoji,
-                                style: const TextStyle(fontSize: 34),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                _moods[index].label,
-                                overflow: TextOverflow.ellipsis,
-                                style: const TextStyle(
-                                  fontSize: 13,
-                                  color: Color(0xFF374151),
-                                ),
-                              ),
-                            ],
-                          ),
+                      child: IconButton(
+                        onPressed:
+                            () => Navigator.pushNamed(
+                              context,
+                              AppRoutes.notifications,
+                            ),
+                        icon: const Icon(
+                          Icons.notifications_none,
+                          color: Color(0xFFB9D9EB),
                         ),
                       ),
-                    );
-                  }),
-                ),
-              ),
-              const SizedBox(height: 18),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFFFF1E5),
-                  borderRadius: BorderRadius.circular(14),
-                ),
-                child: const Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Icon(
-                      Icons.warning_amber_rounded,
-                      color: Color(0xFFFB923C),
-                      size: 22,
                     ),
-                    SizedBox(width: 10),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: <Widget>[
-                          Text(
-                            'Predictive Mood Alert',
-                            style: TextStyle(
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                              color: Color(0xFFEA580C),
+                  ],
+                ),
+                const SizedBox(height: 22),
+                const Text(
+                  'Good Morning!\nHow are you today?',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 26,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF111827),
+                    height: 1.2,
+                  ),
+                ),
+                const SizedBox(height: 18),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onHorizontalDragEnd: _handleMoodSwipe,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: List<Widget>.generate(_moods.length, (int index) {
+                      final bool isSelected = index == _selectedMood;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedMood = index;
+                          });
+                        },
+                        child: AnimatedScale(
+                          scale: isSelected ? 1.18 : 1.0,
+                          duration: const Duration(milliseconds: 180),
+                          child: SizedBox(
+                            width: 64,
+                            child: Column(
+                              children: <Widget>[
+                                Text(
+                                  _moods[index].emoji,
+                                  style: const TextStyle(fontSize: 30),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  _moods[index].label,
+                                  overflow: TextOverflow.ellipsis,
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    color: Color(0xFF374151),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            'A mood dip is predicted for this afternoon. Consider a 5-minute meditation.',
+                        ),
+                      );
+                    }),
+                  ),
+                ),
+                const SizedBox(height: 18),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFFF1E5),
+                    borderRadius: BorderRadius.circular(14),
+                  ),
+                  child: const Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Color(0xFFFB923C),
+                        size: 22,
+                      ),
+                      SizedBox(width: 10),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text(
+                              'Predictive Mood Alert',
+                              style: TextStyle(
+                                fontSize: 13,
+                                fontWeight: FontWeight.w700,
+                                color: Color(0xFFEA580C),
+                              ),
+                            ),
+                            SizedBox(height: 4),
+                            Text(
+                              'A mood dip is predicted for this afternoon. Consider a 5-minute meditation.',
+                              style: TextStyle(
+                                fontSize: 11,
+                                color: Color(0xFFEA580C),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Text(
+                        'x',
+                        style: TextStyle(
+                          color: Color(0xFFEA580C),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(14),
+                    boxShadow: const <BoxShadow>[
+                      BoxShadow(
+                        color: Color(0x1F000000),
+                        blurRadius: 8,
+                        offset: Offset(0, 3),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      Row(
+                        children: <Widget>[
+                          const Text(
+                            "Today's Insight",
                             style: TextStyle(
-                              fontSize: 12,
-                              color: Color(0xFFEA580C),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const Spacer(),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 10,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFE9FCEB),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: const Text(
+                              '94% Confidence',
+                              style: TextStyle(
+                                fontSize: 10,
+                                color: Color(0xFF22C55E),
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    Text(
-                      'x',
-                      style: TextStyle(
-                        color: Color(0xFFEA580C),
-                        fontWeight: FontWeight.bold,
+                      const SizedBox(height: 8),
+                      Text(
+                        'Based on your morning check-in, your dominant emotion is',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: Color(0xFF4B5563),
+                        ),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 6),
+                      Text(
+                        moodLabel,
+                        style: const TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF374151),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 14),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(14),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(14),
-                  boxShadow: const <BoxShadow>[
-                    BoxShadow(
-                      color: Color(0x1F000000),
-                      blurRadius: 8,
-                      offset: Offset(0, 3),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                const SizedBox(height: 14),
+                Row(
                   children: <Widget>[
-                    Row(
-                      children: <Widget>[
-                        const Text(
-                          "Today's Insight",
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                        const Spacer(),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 10,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFE9FCEB),
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: const Text(
-                            '94% Confidence',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: Color(0xFF22C55E),
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Based on your morning check-in, your dominant emotion is',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: Color(0xFF4B5563),
+                    Expanded(
+                      child: _actionCard(
+                        Icons.menu_book_outlined,
+                        'Write\nJournal',
+                        iconColor: softBlueIcon,
+                        selected: true,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const VoiceJournalScreen()),
+                          );
+                        },
                       ),
                     ),
-                    const SizedBox(height: 6),
-                    Text(
-                      moodLabel,
-                      style: const TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF374151),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _actionCard(
+                        Icons.mic_none,
+                        'Voice Journal',
+                        iconColor: softBlueIcon,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (context) => const VoiceJournalScreen()),
+                          );
+                        },
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 14),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: _actionCard(
-                      Icons.menu_book_outlined,
-                      'Write\nJournal',
-                      selected: true,
+                const SizedBox(height: 12),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: _actionCard(
+                        Icons.analytics_outlined,
+                        'Analytics',
+                        iconColor: softBlueIcon,
+                      ),
                     ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(child: _actionCard(Icons.mic_none, 'Voice Journal')),
-                ],
-              ),
-              const SizedBox(height: 12),
-              Row(
-                children: <Widget>[
-                  Expanded(
-                    child: _actionCard(Icons.analytics_outlined, 'Analytics'),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: _actionCard(Icons.auto_graph_outlined, 'Activities'),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 10),
-                decoration: const BoxDecoration(
-                  border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: const <Widget>[
-                    _BottomItem(Icons.home_outlined, 'Home', selected: true),
-                    _BottomItem(
-                      Icons.notifications_none,
-                      'Notifications',
-                      onTapRoute: AppRoutes.notifications,
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _actionCard(
+                        Icons.auto_graph_outlined,
+                        'Activities',
+                        iconColor: softBlueIcon,
+                      ),
                     ),
-                    _CenterStar(),
-                    _BottomItem(Icons.person_outline, 'Profile'),
-                    _BottomItem(Icons.settings_outlined, 'Settings'),
                   ],
                 ),
-              ),
-            ],
+                const Spacer(),
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 10),
+                  decoration: const BoxDecoration(
+                    border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: <Widget>[
+                      _BottomItem(Icons.home_outlined, 'Home', selected: true),
+                      const _BottomItem(
+                        Icons.notifications_none,
+                        'Notifications',
+                        onTapRoute: AppRoutes.notifications,
+                        unselectedColor: softBlueIcon,
+                      ),
+                      const _CenterStar(),
+                      const _BottomItem(
+                        Icons.person_outline,
+                        'Profile',
+                        unselectedColor: softBlueIcon,
+                      ),
+                      const _BottomItem(
+                        Icons.settings_outlined,
+                        'Settings',
+                        unselectedColor: softBlueIcon,
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  Widget _actionCard(IconData icon, String title, {bool selected = false}) {
-    return Container(
-      height: 72,
-      padding: const EdgeInsets.symmetric(horizontal: 12),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: selected ? const Color(0xFF0EA5E9) : const Color(0xFFD1D5DB),
-          width: selected ? 2 : 1,
+  Widget _actionCard(
+    IconData icon,
+    String title, {
+    bool selected = false,
+    Color iconColor = const Color(0xFF111827),
+    VoidCallback? onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(14),
+      child: Container(
+        height: 72,
+        padding: const EdgeInsets.symmetric(horizontal: 12),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected ? const Color(0xFF0EA5E9) : const Color(0xFFD1D5DB),
+            width: selected ? 2 : 1,
+          ),
+          boxShadow: const <BoxShadow>[
+            BoxShadow(
+              color: Color(0x1A000000),
+              blurRadius: 5,
+              offset: Offset(0, 2),
+            ),
+          ],
         ),
-        boxShadow: const <BoxShadow>[
-          BoxShadow(
-            color: Color(0x1A000000),
-            blurRadius: 5,
-            offset: Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: <Widget>[
-          Icon(icon, color: const Color(0xFF111827), size: 22),
-          const SizedBox(width: 8),
-          Text(
-            title,
-            style: const TextStyle(fontSize: 15, color: Color(0xFF111827)),
-          ),
-        ],
+        child: Row(
+          children: <Widget>[
+            Icon(icon, color: iconColor, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              title,
+              style: const TextStyle(fontSize: 14, color: Color(0xFF111827)),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -358,12 +420,14 @@ class _BottomItem extends StatelessWidget {
     this.label, {
     this.selected = false,
     this.onTapRoute,
+    this.unselectedColor = const Color(0xFF6B7280),
   });
 
   final IconData icon;
   final String label;
   final bool selected;
   final String? onTapRoute;
+  final Color unselectedColor;
 
   @override
   Widget build(BuildContext context) {
@@ -381,18 +445,14 @@ class _BottomItem extends StatelessWidget {
             Icon(
               icon,
               size: 20,
-              color:
-                  selected ? const Color(0xFF0EA5E9) : const Color(0xFF6B7280),
+              color: selected ? const Color(0xFF0EA5E9) : unselectedColor,
             ),
             const SizedBox(height: 3),
             Text(
               label,
               style: TextStyle(
                 fontSize: 11,
-                color:
-                    selected
-                        ? const Color(0xFF0EA5E9)
-                        : const Color(0xFF6B7280),
+                color: selected ? const Color(0xFF0EA5E9) : unselectedColor,
               ),
             ),
           ],
@@ -407,20 +467,29 @@ class _CenterStar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 44,
-      width: 44,
-      decoration: const BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: <Color>[
-            Color(0xFFEC4899),
-            Color(0xFF6366F1),
-            Color(0xFF06B6D4),
-          ],
+    return InkWell(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const ChatBotScreen()),
+        );
+      },
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        height: 44,
+        width: 44,
+        decoration: const BoxDecoration(
+          shape: BoxShape.circle,
+          gradient: LinearGradient(
+            colors: <Color>[
+              Color(0xFFEC4899),
+              Color(0xFF6366F1),
+              Color(0xFF06B6D4),
+            ],
+          ),
         ),
+        child: const Icon(Icons.auto_awesome, color: Colors.white, size: 22),
       ),
-      child: const Icon(Icons.auto_awesome, color: Colors.white, size: 22),
     );
   }
 }
