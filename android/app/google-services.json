@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "987595589557",
+    "project_id": "mindprint-db",
+    "storage_bucket": "mindprint-db.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:987595589557:android:21f7da80a56bfb7ca37bfc",
+        "android_client_info": {
+          "package_name": "com.example.mind_print"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDlt2qjlks7Yz9QPgx3WaZjTMmlKjx_tlo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

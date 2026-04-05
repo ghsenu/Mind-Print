@@ -1,21 +1,26 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mind_print/features/auth/providers/auth_provider.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
 
-class OtpScreen extends StatefulWidget {
-  const OtpScreen({super.key});
+class OtpScreen extends ConsumerStatefulWidget {
+  final String verificationId;
+
+  const OtpScreen({super.key, required this.verificationId});
 
   @override
-  State<OtpScreen> createState() => _OtpScreenState();
+  ConsumerState<OtpScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<OtpScreen> {
-  static const int _otpLength = 4;
+class _OtpScreenState extends ConsumerState<OtpScreen> {
+  static const int _otpLength = 6; // Firebase uses 6 digits
   late final List<TextEditingController> _controllers;
   late final List<FocusNode> _focusNodes;
   Timer? _resendTimer;
   int _secondsLeft = 23;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -64,6 +69,43 @@ class _OtpScreenState extends State<OtpScreen> {
     }
     if (value.isEmpty && index > 0) {
       _focusNodes[index - 1].requestFocus();
+    }
+  }
+
+  Future<void> _verifyCode() async {
+    final smsCode = _controllers.map((c) => c.text).join('');
+    if (smsCode.length < 6) return;
+
+    if (widget.verificationId.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Invalid verification session. Please go back and resend code.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      final authService = ref.read(authServiceProvider);
+      await authService.verifyOTP(
+        verificationId: widget.verificationId,
+        smsCode: smsCode,
+      );
+
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.congratulations);
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.toString())));
+      }
     }
   }
 
@@ -122,11 +164,7 @@ class _OtpScreenState extends State<OtpScreen> {
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed:
-                      () => Navigator.pushReplacementNamed(
-                        context,
-                        AppRoutes.congratulations,
-                      ),
+                  onPressed: _isLoading ? null : _verifyCode,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF3350F6),
                     elevation: 0,
@@ -134,10 +172,23 @@ class _OtpScreenState extends State<OtpScreen> {
                       borderRadius: BorderRadius.circular(28),
                     ),
                   ),
-                  child: const Text(
-                    'Verify',
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  ),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                          : const Text(
+                            'Verify',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                 ),
               ),
               const SizedBox(height: 48),
@@ -191,8 +242,12 @@ class _OtpScreenState extends State<OtpScreen> {
 
   Widget _otpBox(int index) {
     final bool hasValue = _controllers[index].text.isNotEmpty;
+    // We adjust width to avoid overflowing on small screens since Firebase uses 6 digits.
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxBoxWidth = (screenWidth - 48 - (12 * 5)) / 6;
+
     return SizedBox(
-      width: 66,
+      width: maxBoxWidth.clamp(30.0, 50.0).toDouble(),
       child: TextField(
         controller: _controllers[index],
         focusNode: _focusNodes[index],

@@ -7,6 +7,7 @@ import 'package:mind_print/features/auth/screens/login_screen.dart';
 import 'package:mind_print/features/auth/screens/onboarding_questionnaire_screen.dart';
 import 'package:mind_print/features/auth/screens/onboarding_screen.dart';
 import 'package:mind_print/features/auth/screens/otp.dart';
+import 'package:mind_print/features/auth/screens/phone_auth_screen.dart';
 import 'package:mind_print/features/auth/screens/reset_password_screen.dart';
 import 'package:mind_print/features/auth/screens/signup_screen.dart';
 import 'package:mind_print/features/auth/screens/splash_screen.dart';
@@ -27,7 +28,13 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   AppRoutes.biometricsPrivacy: (_) => const BiometricsPrivacyScreen(),
   AppRoutes.forgotPassword: (_) => const ForgotPasswordScreen(),
   AppRoutes.resetPassword: (_) => const ResetPasswordScreen(),
-  AppRoutes.otp: (_) => const OtpScreen(),
+  AppRoutes.phoneAuth: (_) => const PhoneAuthScreen(),
+  AppRoutes.otp: (context) {
+    // Extract verificationId passed as argument
+    final verificationId =
+        ModalRoute.of(context)?.settings.arguments as String?;
+    return OtpScreen(verificationId: verificationId ?? '');
+  },
   AppRoutes.onboardingQuestionnaire:
       (_) => const OnboardingQuestionnaireScreen(),
   AppRoutes.home: (_) => const HomeScreen(),

@@ -7,6 +7,7 @@ class AppRoutes {
   static const String biometricsPrivacy = '/biometrics-privacy';
   static const String forgotPassword = '/forgot-password';
   static const String resetPassword = '/reset-password';
+  static const String phoneAuth = '/phone-auth';
   static const String otp = '/otp';
   static const String onboardingQuestionnaire = '/onboarding-questionnaire';
   static const String home = '/home';

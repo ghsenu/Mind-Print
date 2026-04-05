@@ -44,17 +44,38 @@ class _VoiceJournalScreenState extends State<VoiceJournalScreen> {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    final months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
-    final weekdays = ['MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY', 'SUNDAY'];
-    
+    final months = [
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
+    ];
+    final weekdays = [
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+      'SUNDAY',
+    ];
+
     final weekday = weekdays[now.weekday - 1];
     final month = months[now.month - 1];
-    
+
     int hour = now.hour;
     final ampm = hour >= 12 ? 'PM' : 'AM';
     hour = hour % 12;
     if (hour == 0) hour = 12;
-    
+
     final minuteStr = now.minute.toString().padLeft(2, '0');
     final dateString = '$weekday $month ${now.day} $hour:$minuteStr $ampm';
 
@@ -65,7 +86,10 @@ class _VoiceJournalScreenState extends State<VoiceJournalScreen> {
           children: [
             // Top Bar
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -82,12 +106,16 @@ class _VoiceJournalScreenState extends State<VoiceJournalScreen> {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const Icon(Icons.lock_outline, color: Colors.black54, size: 20),
+                  const Icon(
+                    Icons.lock_outline,
+                    color: Colors.black54,
+                    size: 20,
+                  ),
                 ],
               ),
             ),
             const Divider(height: 1, color: Color(0xFFE5E7EB)),
-            
+
             // Text Input Area
             Expanded(
               child: Padding(
@@ -113,13 +141,11 @@ class _VoiceJournalScreenState extends State<VoiceJournalScreen> {
                 ),
               ),
             ),
-            
+
             // Bottom Section
             Container(
               padding: const EdgeInsets.fromLTRB(20, 20, 0, 30),
-              decoration: const BoxDecoration(
-                color: Colors.white,
-              ),
+              decoration: const BoxDecoration(color: Colors.white),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -133,49 +159,59 @@ class _VoiceJournalScreenState extends State<VoiceJournalScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Feeling Chips
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: _feelings.map((feeling) {
-                        final isSelected = _selectedFeeling == feeling['label'];
-                        final hasBorder = feeling.containsKey('borderColor');
-                        
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _selectedFeeling = feeling['label'];
-                            });
-                          },
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 12),
-                            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                            decoration: BoxDecoration(
-                              color: feeling['color'],
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: isSelected 
-                                    ? feeling['textColor'] 
-                                    : (hasBorder ? feeling['borderColor'] : Colors.transparent),
-                                width: isSelected ? 2 : (hasBorder ? 1 : 0),
+                      children:
+                          _feelings.map((feeling) {
+                            final isSelected =
+                                _selectedFeeling == feeling['label'];
+                            final hasBorder = feeling.containsKey(
+                              'borderColor',
+                            );
+
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  _selectedFeeling = feeling['label'];
+                                });
+                              },
+                              child: Container(
+                                margin: const EdgeInsets.only(right: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 20,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: feeling['color'],
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color:
+                                        isSelected
+                                            ? feeling['textColor']
+                                            : (hasBorder
+                                                ? feeling['borderColor']
+                                                : Colors.transparent),
+                                    width: isSelected ? 2 : (hasBorder ? 1 : 0),
+                                  ),
+                                ),
+                                child: Text(
+                                  feeling['label'],
+                                  style: TextStyle(
+                                    color: feeling['textColor'],
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              feeling['label'],
-                              style: TextStyle(
-                                color: feeling['textColor'],
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          }).toList(),
                     ),
                   ),
                   const SizedBox(height: 24),
-                  
+
                   // Save Button
                   Padding(
                     padding: const EdgeInsets.only(right: 20.0),
@@ -206,12 +242,16 @@ class _VoiceJournalScreenState extends State<VoiceJournalScreen> {
                     ),
                   ),
                   const SizedBox(height: 16),
-                  
+
                   // Privacy footer
                   const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.shield_outlined, size: 14, color: Color(0xFF9CA3AF)),
+                      Icon(
+                        Icons.shield_outlined,
+                        size: 14,
+                        color: Color(0xFF9CA3AF),
+                      ),
                       SizedBox(width: 6),
                       Text(
                         'ENCRYPTED PRIVACY VAULT',

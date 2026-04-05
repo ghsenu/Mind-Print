@@ -285,7 +285,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const VoiceJournalScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => const VoiceJournalScreen(),
+                            ),
                           );
                         },
                       ),
@@ -299,7 +301,9 @@ class _HomeScreenState extends State<HomeScreen> {
                         onTap: () {
                           Navigator.push(
                             context,
-                            MaterialPageRoute(builder: (context) => const VoiceJournalScreen()),
+                            MaterialPageRoute(
+                              builder: (context) => const VoiceJournalScreen(),
+                            ),
                           );
                         },
                       ),

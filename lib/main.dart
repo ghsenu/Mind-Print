@@ -8,11 +8,7 @@ Future<void> main() async {
 
   try {
     await AppBootstrap.initialize();
-    runApp(
-      const ProviderScope(
-        child: MindPrintApp(),
-      ),
-    );
+    runApp(const ProviderScope(child: MindPrintApp()));
   } catch (error) {
     runApp(_BootstrapErrorApp(error: error.toString()));
   }

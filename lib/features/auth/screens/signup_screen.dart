@@ -14,7 +14,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool _isLoading = false;
@@ -34,16 +35,16 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     final confirmPassword = _confirmPasswordController.text.trim();
 
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all fields')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Please fill all fields')));
       return;
     }
 
     if (password != confirmPassword) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Passwords do not match')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passwords do not match')));
       return;
     }
 
@@ -51,15 +52,22 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     try {
       final authService = ref.read(authServiceProvider);
-      await authService.signUpWithEmail(email: email, password: password);
-      
+      await authService.signUpWithEmail(
+        email: email,
+        password: password,
+        username: _usernameController.text.trim(),
+      );
+
       if (!mounted) return;
-      Navigator.pushNamed(context, AppRoutes.otp); // OTP or Biometric screen next per design
+      Navigator.pushNamed(
+        context,
+        AppRoutes.phoneAuth,
+      ); // Go to phone auth next
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -70,17 +78,18 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
     try {
       final authService = ref.read(authServiceProvider);
-      final user = await authService.signInWithGoogle(); // Maps to user sign in/up logic
-      
+      final user =
+          await authService.signInWithGoogle(); // Maps to user sign in/up logic
+
       if (!mounted) return;
       if (user != null) {
         Navigator.pushReplacementNamed(context, AppRoutes.home);
       }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.toString())),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(e.toString())));
     } finally {
       if (mounted) setState(() => _isLoading = false);
     }
@@ -178,16 +187,23 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                       borderRadius: BorderRadius.circular(28),
                     ),
                   ),
-                  child: _isLoading
-                      ? const SizedBox(
-                          height: 24,
-                          width: 24,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
-                        )
-                      : const Text(
-                          'Register',
-                          style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
-                        ),
+                  child:
+                      _isLoading
+                          ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                          : const Text(
+                            'Register',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
                 ),
               ),
               const SizedBox(height: 32),
@@ -213,10 +229,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   _buildSocialButton(Icons.facebook, Colors.blue),
-                  _buildSocialTextIcon(
-                    'G',
-                    Colors.red,
-                  ), // Placeholder for Google
+                  GestureDetector(
+                    onTap: _handleGoogleSignUp,
+                    child: _buildSocialTextIcon('G', Colors.red),
+                  ), // Google Login
                   _buildSocialButton(Icons.apple, Colors.black),
                 ],
               ),
@@ -256,9 +272,11 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   Widget _buildInputField({
     required String hintText,
+    TextEditingController? controller,
     TextInputType? keyboardType,
   }) {
     return TextFormField(
+      controller: controller,
       keyboardType: keyboardType,
       decoration: InputDecoration(
         hintText: hintText,
@@ -287,10 +305,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
 
   Widget _buildPasswordField({
     required String hintText,
+    TextEditingController? controller,
     required bool isObscure,
     required VoidCallback onToggle,
   }) {
     return TextFormField(
+      controller: controller,
       obscureText: isObscure,
       decoration: InputDecoration(
         hintText: hintText,
