@@ -5,11 +5,7 @@ AI-Powered Mental Health Awareness Application
 Sprint Timeline
 Phase-Based Agile Development Plan
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
+
 
 # 1. Development Methodology
 MindPrint follows an Agile development methodology with two-week sprint cycles. Each sprint has defined deliverables, acceptance criteria, and a review checkpoint. The project is divided into six development phases aligned with the academic project timeline.

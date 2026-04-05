@@ -5,11 +5,6 @@ AI-Powered Mental Health Awareness Application
 Realtime Channels
 Firestore Live Listeners, Data Sync & Push Notification Channels
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
 
 # 1. Overview
 MindPrint uses Firestore real-time listeners (onSnapshot) and Firebase Cloud Messaging (FCM) to deliver live data updates to the Flutter UI without manual polling. This ensures the app always reflects the latest state immediately after server-side processing completes.

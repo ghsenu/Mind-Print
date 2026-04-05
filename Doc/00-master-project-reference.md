@@ -5,11 +5,6 @@ AI-Powered Mental Health Awareness Application
 Master Project Reference
 Complete Technical Overview & Document Index
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
 
 # 1. Project Overview
 MindPrint is an AI-powered mental health awareness mobile application designed for Sri Lankan undergraduate students. The application integrates multimodal emotional analysis, predictive mood forecasting, and privacy-secured self-care interventions through a Flutter-based Android mobile application backed by Firebase cloud services and pre-trained AI APIs.

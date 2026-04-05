@@ -5,11 +5,7 @@ AI-Powered Mental Health Awareness Application
 Auth Flow
 Authentication, Registration, Biometric & Session Management
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
+
 
 # 1. Authentication Overview
 MindPrint uses Firebase Authentication as the identity provider. The app supports three authentication methods: email/password registration, Google Sign-In, and biometric authentication (Face ID / Fingerprint) as a local security layer on top of Firebase sessions.

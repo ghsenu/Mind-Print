@@ -5,11 +5,6 @@ AI-Powered Mental Health Awareness Application
 Backend Structure
 Firebase Cloud Functions Architecture & Server-Side Logic
 
-Student: Gihansa S Buwanayake
-Index Number: 10952999
-Supervisor: Dr. Rasika Ranaweera
-Programme: BSc (Hons) Software Engineering — NSBM Green University
-Module: PUSL3190 Computing Project
 
 # 1. Backend Overview
 MindPrint uses a serverless backend architecture built entirely on Firebase Cloud Functions (Node.js runtime). There is no traditional server — all business logic, AI API orchestration, scheduled tasks, and data processing are handled by individual Cloud Functions that scale automatically.

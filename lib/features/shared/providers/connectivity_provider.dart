@@ -1,0 +1,3 @@
+class ConnectivityProvider {
+  const ConnectivityProvider();
+}
