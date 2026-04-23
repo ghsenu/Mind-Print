@@ -12,7 +12,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    Future<void>.delayed(const Duration(seconds: 8), () {
+    Future<void>.delayed(const Duration(seconds: 3), () {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
     });
@@ -26,6 +26,9 @@ class _SplashScreenState extends State<SplashScreen> {
         children: [
           // Background Image
           Image.asset('Assets/skybg.png', fit: BoxFit.cover),
+
+          // Dark overlay to improve foreground contrast.
+          Container(color: Colors.black.withValues(alpha: 0.45)),
 
           Positioned(
             top: 16,

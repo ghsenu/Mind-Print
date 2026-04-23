@@ -9,6 +9,7 @@ class MindPrintApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Mind Print',
       theme: buildMindPrintTheme(),
       initialRoute: AppRoutes.splash,
