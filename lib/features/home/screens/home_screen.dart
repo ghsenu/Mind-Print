@@ -62,10 +62,13 @@ class _HomeScreenState extends State<HomeScreen> {
               ],
             ),
           ),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Column(
-              children: <Widget>[
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Column(
+                    children: <Widget>[
                 const SizedBox(height: 12),
                 Row(
                   children: <Widget>[
@@ -273,15 +276,23 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 20),
+                const Text(
+                  'Explore Features',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                    color: Color(0xFF111827),
+                  ),
+                ),
                 const SizedBox(height: 14),
                 Row(
                   children: <Widget>[
                     Expanded(
-                      child: _actionCard(
-                        Icons.menu_book_outlined,
-                        'Write\nJournal',
-                        iconColor: softBlueIcon,
-                        selected: true,
+                      child: _CategoryCard(
+                        icon: Icons.menu_book_outlined,
+                        title: 'Journal',
+                        isSelected: true,
                         onTap: () {
                           Navigator.push(
                             context,
@@ -292,117 +303,150 @@ class _HomeScreenState extends State<HomeScreen> {
                         },
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
-                      child: _actionCard(
-                        Icons.mic_none,
-                        'Voice Journal',
-                        iconColor: softBlueIcon,
+                      child: _CategoryCard(
+                        icon: Icons.auto_graph_outlined,
+                        title: 'Activities',
                         onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const VoiceJournalScreen(),
-                            ),
-                          );
+                          Navigator.pushNamed(context, AppRoutes.coping);
                         },
                       ),
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 14),
                 Row(
                   children: <Widget>[
                     Expanded(
-                      child: _actionCard(
-                        Icons.analytics_outlined,
-                        'Analytics',
-                        iconColor: softBlueIcon,
+                      child: _CategoryCard(
+                        icon: Icons.bar_chart_rounded,
+                        title: 'Analytics',
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.analytics);
+                        },
                       ),
                     ),
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 14),
                     Expanded(
-                      child: _actionCard(
-                        Icons.auto_graph_outlined,
-                        'Activities',
-                        iconColor: softBlueIcon,
+                      child: _CategoryCard(
+                        icon: Icons.picture_as_pdf_outlined,
+                        title: 'Fingerprint\nReport',
+                        onTap: () {
+                          Navigator.pushNamed(context, AppRoutes.reports);
+                        },
                       ),
                     ),
                   ],
                 ),
-                const Spacer(),
-                Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10),
-                  decoration: const BoxDecoration(
-                    border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: <Widget>[
-                      _BottomItem(Icons.home_outlined, 'Home', selected: true),
-                      const _BottomItem(
-                        Icons.notifications_none,
-                        'Notifications',
-                        onTapRoute: AppRoutes.notifications,
-                        unselectedColor: softBlueIcon,
-                      ),
-                      const _CenterStar(),
-                      const _BottomItem(
-                        Icons.person_outline,
-                        'Profile',
-                        unselectedColor: softBlueIcon,
-                      ),
-                      const _BottomItem(
-                        Icons.settings_outlined,
-                        'Settings',
-                        unselectedColor: softBlueIcon,
-                      ),
+                const SizedBox(height: 32),
                     ],
                   ),
                 ),
-              ],
-            ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 10),
+                decoration: const BoxDecoration(
+                  border: Border(top: BorderSide(color: Color(0xFFE5E7EB))),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: <Widget>[
+                    _BottomItem(Icons.home_outlined, 'Home', selected: true),
+                    const _BottomItem(
+                      Icons.notifications_none,
+                      'Notifications',
+                      onTapRoute: AppRoutes.notifications,
+                      unselectedColor: softBlueIcon,
+                    ),
+                    const _CenterStar(),
+                    const _BottomItem(
+                      Icons.person_outline,
+                      'Profile',
+                      unselectedColor: softBlueIcon,
+                    ),
+                    const _BottomItem(
+                      Icons.settings_outlined,
+                      'Settings',
+                      unselectedColor: softBlueIcon,
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
         ),
       ),
     );
   }
+}
 
-  Widget _actionCard(
-    IconData icon,
-    String title, {
-    bool selected = false,
-    Color iconColor = const Color(0xFF111827),
-    VoidCallback? onTap,
-  }) {
+class _CategoryCard extends StatelessWidget {
+  const _CategoryCard({
+    required this.icon,
+    required this.title,
+    required this.onTap,
+    this.isSelected = false,
+  });
+
+  final IconData icon;
+  final String title;
+  final VoidCallback onTap;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(18),
       child: Container(
-        height: 72,
-        padding: const EdgeInsets.symmetric(horizontal: 12),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        height: 82,
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(14),
+          color: const Color(0xFFF4F5F7),
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: selected ? const Color(0xFF0EA5E9) : const Color(0xFFD1D5DB),
-            width: selected ? 2 : 1,
+            color: isSelected ? const Color(0xFF2490E8) : const Color(0xFFBFD0DC),
+            width: isSelected ? 2 : 1,
           ),
-          boxShadow: const <BoxShadow>[
+          boxShadow: <BoxShadow>[
             BoxShadow(
-              color: Color(0x1A000000),
-              blurRadius: 5,
-              offset: Offset(0, 2),
+              color: const Color(0x22000000),
+              blurRadius: 7,
+              offset: const Offset(0, 3),
             ),
           ],
         ),
         child: Row(
           children: <Widget>[
-            Icon(icon, color: iconColor, size: 20),
-            const SizedBox(width: 8),
-            Text(
-              title,
-              style: const TextStyle(fontSize: 14, color: Color(0xFF111827)),
+            Container(
+              width: 38,
+              height: 38,
+              alignment: Alignment.center,
+              decoration: BoxDecoration(
+                color: const Color(0xFFF7F8FA),
+                borderRadius: BorderRadius.circular(10),
+                border: Border.all(color: const Color(0xFFD5DEE6)),
+              ),
+              child: Icon(
+                icon,
+                size: 20,
+                color: const Color(0xFF1E2940),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                title,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+                style: const TextStyle(
+                  height: 1.1,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                  color: Color(0xFF1A2238),
+                ),
+              ),
             ),
           ],
         ),

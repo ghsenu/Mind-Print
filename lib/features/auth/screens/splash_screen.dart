@@ -27,6 +27,26 @@ class _SplashScreenState extends State<SplashScreen> {
           // Background Image
           Image.asset('Assets/skybg.png', fit: BoxFit.cover),
 
+          Positioned(
+            top: 16,
+            right: 16,
+            child: SafeArea(
+              child: TextButton(
+                onPressed: () {
+                  Navigator.pushReplacementNamed(context, AppRoutes.login);
+                },
+                child: const Text(
+                  'Skip',
+                  style: TextStyle(
+                    color: Colors.black87,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ),
+          ),
+
           SafeArea(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,

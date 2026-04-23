@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mind_print/features/shared/constants/route_names.dart';
 
 class VoiceJournalScreen extends StatefulWidget {
   const VoiceJournalScreen({super.key});
@@ -220,8 +221,7 @@ class _VoiceJournalScreenState extends State<VoiceJournalScreen> {
                       height: 56,
                       child: ElevatedButton(
                         onPressed: () {
-                          // Handle save action
-                          Navigator.pop(context);
+                          Navigator.pushNamed(context, AppRoutes.emotionResult);
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFD3E3F1),
