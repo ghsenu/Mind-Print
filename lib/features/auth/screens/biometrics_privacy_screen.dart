@@ -167,8 +167,10 @@ class _BiometricsPrivacyScreenState extends State<BiometricsPrivacyScreen> {
               const SizedBox(height: 12),
               TextButton(
                 onPressed:
-                    () =>
-                        Navigator.pushReplacementNamed(context, AppRoutes.home),
+                    () => Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.login,
+                    ),
                 child: const Text(
                   'Skip for now',
                   style: TextStyle(
