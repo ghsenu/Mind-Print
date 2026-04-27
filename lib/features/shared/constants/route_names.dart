@@ -13,6 +13,7 @@ class AppRoutes {
   static const String home = '/home';
   static const String notifications = '/notifications';
   static const String journal = '/journal';
+  static const String emotionResult = '/journal/emotion-result';
   static const String analytics = '/analytics';
   static const String coping = '/coping';
   static const String reports = '/reports';

@@ -1,10 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth;
-  final GoogleSignIn _googleSignIn;
+  final GoogleSignIn? _googleSignIn;
   final FirebaseFirestore _firestore;
 
   AuthService({
@@ -12,7 +13,11 @@ class AuthService {
     GoogleSignIn? googleSignIn,
     FirebaseFirestore? firestore,
   }) : _firebaseAuth = firebaseAuth ?? FirebaseAuth.instance,
-       _googleSignIn = googleSignIn ?? GoogleSignIn(),
+       _googleSignIn =
+           googleSignIn ??
+           (kIsWeb
+               ? null
+               : GoogleSignIn(scopes: const <String>['email', 'profile'])),
        _firestore = firestore ?? FirebaseFirestore.instance;
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
@@ -105,6 +110,15 @@ class AuthService {
 
   Future<UserCredential?> signInWithGoogle() async {
     try {
+      if (kIsWeb) {
+        final GoogleAuthProvider provider = GoogleAuthProvider();
+        return await _firebaseAuth.signInWithPopup(provider);
+      }
+
+      if (_googleSignIn == null) {
+        throw StateError('Google Sign-In is not available on this platform.');
+      }
+
       final GoogleSignInAccount? googleUser = await _googleSignIn.signIn();
       if (googleUser == null) return null;
 
@@ -133,7 +147,7 @@ class AuthService {
   Future<void> signOut() async {
     try {
       await _firebaseAuth.signOut();
-      if (await _googleSignIn.isSignedIn()) {
+      if (_googleSignIn != null && await _googleSignIn.isSignedIn()) {
         await _googleSignIn.signOut();
       }
     } catch (e) {

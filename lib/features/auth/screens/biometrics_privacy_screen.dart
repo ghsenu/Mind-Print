@@ -52,7 +52,7 @@ class _BiometricsPrivacyScreenState extends State<BiometricsPrivacyScreen> {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Biometrics enabled successfully.')),
         );
-        Navigator.pushReplacementNamed(context, AppRoutes.login);
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Authentication was cancelled.')),

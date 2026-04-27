@@ -57,7 +57,7 @@ class CongratulationsScreen extends StatelessWidget {
                     ),
                     const SizedBox(height: 18),
                     const Text(
-                      "We've sent you a verification email, please\ncheck your inbox and follow the instructions\nto verify your account.",
+                      "We've successfully verified your phone number\nand your account is now ready to use.",
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 15,
@@ -87,7 +87,7 @@ class CongratulationsScreen extends StatelessWidget {
                         AppRoutes.biometricsPrivacy,
                       ),
                   child: const Text(
-                    'Sign in here',
+                    'Continue',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w700,
