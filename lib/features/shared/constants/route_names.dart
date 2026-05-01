@@ -18,4 +18,10 @@ class AppRoutes {
   static const String coping = '/coping';
   static const String reports = '/reports';
   static const String settings = '/settings';
+  static const String editProfile = '/edit-profile';
+  static const String games = '/games';
+  static const String breathing = '/activities/breathing';
+  static const String musicTherapy = '/activities/music';
+  static const String meditation = '/activities/meditation';
+  static const String cbtExercises = '/activities/cbt';
 }

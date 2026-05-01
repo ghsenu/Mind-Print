@@ -14,7 +14,8 @@ class OnboardingQuestionnaireScreen extends StatelessWidget {
             const Text('Onboarding questionnaire placeholder'),
             const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: () => Navigator.pushReplacementNamed(context, AppRoutes.home),
+              onPressed:
+                  () => Navigator.pushReplacementNamed(context, AppRoutes.home),
               child: const Text('Finish & Go Home'),
             ),
           ],

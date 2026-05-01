@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mind_print/features/chatbot/screens/chatbot_screen.dart';
-import 'package:mind_print/features/journal/screens/voice_journal_screen.dart';
+import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +12,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentMoodIndex = 2;
+  bool _showStressBanner = true;
 
   final List<_MoodData> _moods = [
     const _MoodData('😔', 'Stressed'),
@@ -36,10 +36,15 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 22,
-                      backgroundImage: NetworkImage(
-                        'https://api.dicebear.com/7.x/avataaars/png?seed=Michael',
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushNamed(context, AppRoutes.editProfile);
+                      },
+                      child: const CircleAvatar(
+                        radius: 22,
+                        backgroundImage: NetworkImage(
+                          'https://api.dicebear.com/7.x/avataaars/png?seed=Michael',
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -67,7 +72,88 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
+              // ── Stress Banner ─────────────────────────────────────────
+              if (_showStressBanner && _currentMoodIndex == 0)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF1F1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: const Color(0xFFFFCDD2),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('😮‍💨',
+                            style: TextStyle(fontSize: 22)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'You seem stressed',
+                                style: GoogleFonts.lora(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFB91C1C),
+                                ),
+                              ),
+                              Text(
+                                'Try a breathing exercise to reset',
+                                style: GoogleFonts.lora(
+                                  fontSize: 12,
+                                  color: const Color(0xFFEF4444),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pushNamed(
+                              context, AppRoutes.breathing),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 7),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFEF4444),
+                              borderRadius:
+                                  BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'Try',
+                              style: GoogleFonts.lora(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () => setState(
+                              () => _showStressBanner = false),
+                          child: Icon(
+                            Icons.close,
+                            size: 16,
+                            color: const Color(0xFFEF4444)
+                                .withOpacity(0.6),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 16),
 
               // ── Greeting ──────────────────────────────────────────────
               Center(
@@ -186,12 +272,12 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () => Navigator.pushNamed(context, AppRoutes.coping),
                     ),
                     _ActionCard(
-                      icon: Icons.bar_chart_outlined,
+                      icon: Icons.sports_esports_outlined,
                       title: 'Games',
-                      subtitle: 'View your patterns',
+                      subtitle: 'Play your way to calm',
                       iconBg: const Color(0xFFF3E8FF),
                       iconColor: const Color(0xFFA855F7),
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.analytics),
+                      onTap: () => Navigator.pushNamed(context, AppRoutes.games),
                     ),
                     _ActionCard(
                       icon: Icons.favorite_border_outlined,
@@ -210,7 +296,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: _CustomBottomNav(),
+      bottomNavigationBar: const CustomBottomNav(selectedIndex: 0),
     );
   }
 }
@@ -471,124 +557,6 @@ class _ActionCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _CustomBottomNav extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _NavIcon(
-            icon: Icons.home_filled,
-            label: 'Home',
-            isSelected: true,
-            onTap: () {}, // Already home
-          ),
-          _NavIcon(
-            icon: Icons.psychology_outlined,
-            label: 'Mood Predic',
-            onTap: () => Navigator.pushNamed(context, AppRoutes.coping),
-          ),
-          // Middle Button
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ChatBotScreen()),
-            ),
-            child: Transform.translate(
-              offset: const Offset(0, -10),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFA855F7), Color(0xFF0EA5E9)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x660EA5E9),
-                      blurRadius: 15,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
-                ),
-                child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
-              ),
-            ),
-          ),
-          _NavIcon(
-            icon: Icons.bar_chart_outlined,
-            label: 'Analytics',
-            onTap: () => Navigator.pushNamed(context, AppRoutes.analytics),
-          ),
-          _NavIcon(
-            icon: Icons.settings_outlined,
-            label: 'Settings',
-            onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _NavIcon extends StatelessWidget {
-  const _NavIcon({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.isSelected = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  @override
-  Widget build(BuildContext context) {
-    final color = isSelected ? const Color(0xFF0EA5E9) : const Color(0xFF6B6B8A);
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.lora(
-              fontSize: 10,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: color,
-            ),
-          ),
-        ],
       ),
     );
   }
