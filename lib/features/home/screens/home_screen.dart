@@ -1,7 +1,7 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mind_print/features/chatbot/screens/chatbot_screen.dart';
-import 'package:mind_print/features/journal/screens/voice_journal_screen.dart';
+import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -13,6 +13,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentMoodIndex = 2;
+  bool _showStressBanner = true;
 
   final List<_MoodData> _moods = [
     const _MoodData('😔', 'Stressed'),
@@ -36,38 +37,105 @@ class _HomeScreenState extends State<HomeScreen> {
                 padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
                 child: Row(
                   children: [
-                    const CircleAvatar(
-                      radius: 22,
-                      backgroundImage: NetworkImage(
-                        'https://api.dicebear.com/7.x/avataaars/png?seed=Michael',
+                    GestureDetector(
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.editProfile),
+                      child: const CircleAvatar(
+                        radius: 22,
+                        backgroundImage: NetworkImage(
+                          'https://api.dicebear.com/7.x/avataaars/png?seed=Michael',
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
                     RichText(
                       text: TextSpan(
                         style: GoogleFonts.lora(
-                          fontSize: 16,
-                          color: const Color(0xFF6B6B8A),
-                        ),
+                            fontSize: 16,
+                            color: const Color(0xFF6B6B8A)),
                         children: [
                           const TextSpan(text: 'Hi, '),
                           TextSpan(
                             text: 'Michael',
                             style: GoogleFonts.lora(
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF1A1A2E),
-                            ),
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF1A1A2E)),
                           ),
                         ],
                       ),
                     ),
                     const Spacer(),
-                    _NotificationBell(),
+                    const _NotificationBell(),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
+
+              // ── Stress Banner ─────────────────────────────────────────
+              if (_showStressBanner && _currentMoodIndex == 0)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFFF1F1),
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(color: const Color(0xFFFFCDD2)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Text('😮‍💨',
+                            style: TextStyle(fontSize: 22)),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('You seem stressed',
+                                  style: GoogleFonts.lora(
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                      color: const Color(0xFFB91C1C))),
+                              Text('Try a breathing exercise to reset',
+                                  style: GoogleFonts.lora(
+                                      fontSize: 12,
+                                      color: const Color(0xFFEF4444))),
+                            ],
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () => Navigator.pushNamed(
+                              context, AppRoutes.breathing),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 12, vertical: 7),
+                            decoration: BoxDecoration(
+                                color: const Color(0xFFEF4444),
+                                borderRadius: BorderRadius.circular(12)),
+                            child: Text('Try',
+                                style: GoogleFonts.lora(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white)),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        GestureDetector(
+                          onTap: () =>
+                              setState(() => _showStressBanner = false),
+                          child: Icon(Icons.close,
+                              size: 16,
+                              color: const Color(0xFFEF4444)
+                                  .withOpacity(0.6)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              const SizedBox(height: 16),
 
               // ── Greeting ──────────────────────────────────────────────
               Center(
@@ -76,69 +144,47 @@ class _HomeScreenState extends State<HomeScreen> {
                     Text(
                       'Good Morning!',
                       style: GoogleFonts.lora(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1A1A2E),
-                      ),
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1A1A2E)),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'How are you feeling today?',
                       style: GoogleFonts.lora(
-                        fontSize: 15,
-                        color: const Color(0xFF6B6B8A),
-                      ),
+                          fontSize: 15,
+                          color: const Color(0xFF6B6B8A)),
                     ),
                   ],
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
-              // ── Mood Row ──────────────────────────────────────────────
+              // ── Animated Mood Bar ─────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: List.generate(_moods.length, (index) {
-                    final mood = _moods[index];
-                    final isSelected = _currentMoodIndex == index;
-                    return GestureDetector(
-                      onTap: () => setState(() => _currentMoodIndex = index),
-                      child: Column(
-                        children: [
-                          AnimatedScale(
-                            scale: isSelected ? 1.2 : 1.0,
-                            duration: const Duration(milliseconds: 200),
-                            child: Text(
-                              mood.emoji,
-                              style: const TextStyle(fontSize: 44),
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            mood.label,
-                            style: GoogleFonts.lora(
-                              fontSize: 12,
-                              fontWeight: isSelected
-                                  ? FontWeight.bold
-                                  : FontWeight.normal,
-                              color: isSelected
-                                  ? const Color(0xFF1A1A2E)
-                                  : const Color(0xFF6B6B8A),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  }),
+                  children: List.generate(
+                    _moods.length,
+                    (i) => _AnimatedMoodEmoji(
+                      emoji: _moods[i].emoji,
+                      label: _moods[i].label,
+                      isSelected: _currentMoodIndex == i,
+                      floatPhase: i * 0.2,
+                      onTap: () =>
+                          setState(() => _currentMoodIndex = i),
+                    ),
+                  ),
                 ),
               ),
 
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
 
               // ── Insight Card ──────────────────────────────────────────
-              _InsightCard(dominantEmotion: _moods[_currentMoodIndex].label),
+              _InsightCard(
+                  dominantEmotion: _moods[_currentMoodIndex].label),
 
               const SizedBox(height: 24),
 
@@ -148,17 +194,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Text(
                   'QUICK ACTIONS',
                   style: GoogleFonts.lora(
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 1.2,
-                    color: const Color(0xFF6B6B8A).withOpacity(0.7),
-                  ),
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.2,
+                      color: const Color(0xFF6B6B8A).withOpacity(0.7)),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // ── Action Grid ───────────────────────────────────────────
+              // ── Action Cards ──────────────────────────────────────────
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: GridView.count(
@@ -167,39 +212,55 @@ class _HomeScreenState extends State<HomeScreen> {
                   crossAxisCount: 2,
                   mainAxisSpacing: 16,
                   crossAxisSpacing: 16,
-                  childAspectRatio: 1.15,
+                  childAspectRatio: 1.1,
                   children: [
                     _ActionCard(
                       icon: Icons.edit_outlined,
                       title: 'Journal',
                       subtitle: 'Write your thoughts',
-                      iconBg: const Color(0xFFE0F2FE),
-                      iconColor: const Color(0xFF0EA5E9),
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.journal),
+                      gradientColors: const [
+                        Color(0xFF667EEA),
+                        Color(0xFF764BA2)
+                      ],
+                      animOffset: 0.0,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.journal),
                     ),
                     _ActionCard(
                       icon: Icons.mic_none_outlined,
                       title: 'Activities',
                       subtitle: 'Speak your mind',
-                      iconBg: const Color(0xFFFEE2E2),
-                      iconColor: const Color(0xFFEF4444),
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.coping),
+                      gradientColors: const [
+                        Color(0xFFFF6B6B),
+                        Color(0xFFFF8E53)
+                      ],
+                      animOffset: 0.25,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.coping),
                     ),
                     _ActionCard(
-                      icon: Icons.bar_chart_outlined,
+                      icon: Icons.sports_esports_outlined,
                       title: 'Games',
-                      subtitle: 'View your patterns',
-                      iconBg: const Color(0xFFF3E8FF),
-                      iconColor: const Color(0xFFA855F7),
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.analytics),
+                      subtitle: 'Play your way to calm',
+                      gradientColors: const [
+                        Color(0xFF4776E6),
+                        Color(0xFF8E54E9)
+                      ],
+                      animOffset: 0.5,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.games),
                     ),
                     _ActionCard(
                       icon: Icons.favorite_border_outlined,
-                      title: 'Emotional Fingerprint',
+                      title: 'Reports',
                       subtitle: 'Exercises & music',
-                      iconBg: const Color(0xFFDCFCE7),
-                      iconColor: const Color(0xFF22C55E),
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.reports),
+                      gradientColors: const [
+                        Color(0xFF11998E),
+                        Color(0xFF38EF7D)
+                      ],
+                      animOffset: 0.75,
+                      onTap: () => Navigator.pushNamed(
+                          context, AppRoutes.reports),
                     ),
                   ],
                 ),
@@ -210,13 +271,13 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      bottomNavigationBar: _CustomBottomNav(),
+      bottomNavigationBar: const CustomBottomNav(selectedIndex: 0),
     );
   }
 }
 
 // ─────────────────────────────────────────────────────────────
-// Sub-widgets
+// Models
 // ─────────────────────────────────────────────────────────────
 
 class _MoodData {
@@ -225,11 +286,142 @@ class _MoodData {
   final String label;
 }
 
-class _NotificationBell extends StatelessWidget {
+// ─────────────────────────────────────────────────────────────
+// Animated Mood Emoji
+// ─────────────────────────────────────────────────────────────
+
+class _AnimatedMoodEmoji extends StatefulWidget {
+  const _AnimatedMoodEmoji({
+    required this.emoji,
+    required this.label,
+    required this.isSelected,
+    required this.floatPhase,
+    required this.onTap,
+  });
+
+  final String emoji;
+  final String label;
+  final bool isSelected;
+  final double floatPhase;
+  final VoidCallback onTap;
+
+  @override
+  State<_AnimatedMoodEmoji> createState() => _AnimatedMoodEmojiState();
+}
+
+class _AnimatedMoodEmojiState extends State<_AnimatedMoodEmoji>
+    with TickerProviderStateMixin {
+  late final AnimationController _floatCtrl;
+  late final AnimationController _bounceCtrl;
+  late final Animation<double> _floatAnim;
+  late final Animation<double> _scaleAnim;
+
+  @override
+  void initState() {
+    super.initState();
+    _floatCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 1800),
+      value: widget.floatPhase,
+    )..repeat(reverse: true);
+
+    _floatAnim = Tween<double>(begin: 0, end: -7).animate(
+      CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut),
+    );
+
+    _bounceCtrl = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 500),
+    );
+
+    _scaleAnim = TweenSequence<double>([
+      TweenSequenceItem(tween: Tween(begin: 1.0, end: 1.4), weight: 30),
+      TweenSequenceItem(tween: Tween(begin: 1.4, end: 0.88), weight: 35),
+      TweenSequenceItem(tween: Tween(begin: 0.88, end: 1.2), weight: 35),
+    ]).animate(_bounceCtrl);
+  }
+
+  @override
+  void didUpdateWidget(_AnimatedMoodEmoji old) {
+    super.didUpdateWidget(old);
+    if (widget.isSelected && !old.isSelected) {
+      _bounceCtrl.forward(from: 0.0);
+    }
+  }
+
+  @override
+  void dispose() {
+    _floatCtrl.dispose();
+    _bounceCtrl.dispose();
+    super.dispose();
+  }
+
+  double get _displayScale {
+    if (_bounceCtrl.isAnimating) return _scaleAnim.value;
+    return widget.isSelected ? 1.2 : 1.0;
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.pushNamed(context, AppRoutes.notifications),
+      onTap: widget.onTap,
+      child: AnimatedBuilder(
+        animation: Listenable.merge([_floatCtrl, _bounceCtrl]),
+        builder: (context, _) {
+          return Column(
+            children: [
+              Transform.translate(
+                offset: Offset(0, _floatAnim.value),
+                child: Transform.scale(
+                  scale: _displayScale,
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 200),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: widget.isSelected
+                          ? const Color(0xFF4C557E).withOpacity(0.12)
+                          : Colors.transparent,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Text(widget.emoji,
+                        style: const TextStyle(fontSize: 36)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 6),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: GoogleFonts.lora(
+                  fontSize: 11,
+                  fontWeight: widget.isSelected
+                      ? FontWeight.bold
+                      : FontWeight.normal,
+                  color: widget.isSelected
+                      ? const Color(0xFF1A1A2E)
+                      : const Color(0xFF6B6B8A),
+                ),
+                child: Text(widget.label),
+              ),
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────
+// Notification Bell
+// ─────────────────────────────────────────────────────────────
+
+class _NotificationBell extends StatelessWidget {
+  const _NotificationBell();
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () =>
+          Navigator.pushNamed(context, AppRoutes.notifications),
       child: Container(
         width: 44,
         height: 44,
@@ -247,7 +439,8 @@ class _NotificationBell extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            const Icon(Icons.notifications_none, color: Color(0xFF1A1A2E)),
+            const Icon(Icons.notifications_none,
+                color: Color(0xFF1A1A2E)),
             Positioned(
               top: 12,
               right: 12,
@@ -266,6 +459,10 @@ class _NotificationBell extends StatelessWidget {
     );
   }
 }
+
+// ─────────────────────────────────────────────────────────────
+// Insight Card
+// ─────────────────────────────────────────────────────────────
 
 class _InsightCard extends StatelessWidget {
   const _InsightCard({required this.dominantEmotion});
@@ -296,107 +493,85 @@ class _InsightCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text(
-                        "Today's Insight",
-                        style: GoogleFonts.lora(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1A2E),
-                        ),
-                      ),
+                      Text("Today's Insight",
+                          style: GoogleFonts.lora(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF1A1A2E))),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
+                            horizontal: 8, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFFDCFCE7),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '98% match',
-                          style: GoogleFonts.lora(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF15803D),
-                          ),
-                        ),
+                            color: const Color(0xFFDCFCE7),
+                            borderRadius: BorderRadius.circular(12)),
+                        child: Text('98% match',
+                            style: GoogleFonts.lora(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF15803D))),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text(
-                    'DOMINANT EMOTION',
-                    style: GoogleFonts.lora(
-                      fontSize: 10,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.0,
-                      color: const Color(0xFF6B6B8A),
-                    ),
-                  ),
+                  Text('DOMINANT EMOTION',
+                      style: GoogleFonts.lora(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                          letterSpacing: 1.0,
+                          color: const Color(0xFF6B6B8A))),
                   const SizedBox(height: 8),
-                  Text(
-                    dominantEmotion,
-                    style: GoogleFonts.lora(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: const Color(0xFF1A1A2E),
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: Text(
+                      dominantEmotion,
+                      key: ValueKey(dominantEmotion),
+                      style: GoogleFonts.lora(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1A1A2E)),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 10,
-                      vertical: 6,
-                    ),
+                        horizontal: 10, vertical: 6),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF0F9FF),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
+                        color: const Color(0xFFF0F9FF),
+                        borderRadius: BorderRadius.circular(12)),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.eco_outlined,
-                          size: 14,
-                          color: Color(0xFF0EA5E9),
-                        ),
+                        const Icon(Icons.eco_outlined,
+                            size: 14, color: Color(0xFF0EA5E9)),
                         const SizedBox(width: 4),
-                        Text(
-                          'Calm · 78%',
-                          style: GoogleFonts.lora(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF0EA5E9),
-                          ),
-                        ),
+                        Text('Calm · 78%',
+                            style: GoogleFonts.lora(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                                color: const Color(0xFF0EA5E9))),
                       ],
                     ),
                   ),
                 ],
               ),
             ),
-            // Progress Circle Placeholder
             Container(
               width: 80,
               height: 80,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                  color: const Color(0xFFF0F9FF),
-                  width: 8,
-                ),
+                    color:
+                        const Color(0xFF0EA5E9).withOpacity(0.2),
+                    width: 6),
               ),
               child: Center(
-                child: Text(
-                  '78%',
-                  style: GoogleFonts.lora(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                    color: const Color(0xFF0EA5E9),
-                  ),
-                ),
+                child: Text('78%',
+                    style: GoogleFonts.lora(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF0EA5E9))),
               ),
             ),
           ],
@@ -406,190 +581,158 @@ class _InsightCard extends StatelessWidget {
   }
 }
 
-class _ActionCard extends StatelessWidget {
+// ─────────────────────────────────────────────────────────────
+// Action Card — gradient + animated bubbles
+// ─────────────────────────────────────────────────────────────
+
+class _ActionCard extends StatefulWidget {
   const _ActionCard({
     required this.icon,
     required this.title,
     required this.subtitle,
-    required this.iconBg,
-    required this.iconColor,
+    required this.gradientColors,
+    required this.animOffset,
     this.onTap,
   });
 
   final IconData icon;
   final String title;
   final String subtitle;
-  final Color iconBg;
-  final Color iconColor;
+  final List<Color> gradientColors;
+  final double animOffset;
   final VoidCallback? onTap;
 
   @override
+  State<_ActionCard> createState() => _ActionCardState();
+}
+
+class _ActionCardState extends State<_ActionCard>
+    with SingleTickerProviderStateMixin {
+  late final AnimationController _ctrl;
+
+  @override
+  void initState() {
+    super.initState();
+    _ctrl = AnimationController(
+      vsync: this,
+      duration: const Duration(seconds: 10),
+      value: widget.animOffset,
+    )..repeat();
+  }
+
+  @override
+  void dispose() {
+    _ctrl.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.03),
-              blurRadius: 15,
-              offset: const Offset(0, 8),
-            ),
-          ],
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Container(
-              padding: const EdgeInsets.all(10),
+      onTap: widget.onTap,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(20),
+        child: AnimatedBuilder(
+          animation: _ctrl,
+          builder: (context, _) {
+            return Container(
               decoration: BoxDecoration(
-                color: iconBg,
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Icon(icon, color: iconColor, size: 24),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              title,
-              style: GoogleFonts.lora(
-                fontSize: 15,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1A1A2E),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              subtitle,
-              style: GoogleFonts.lora(
-                fontSize: 11,
-                color: const Color(0xFF6B6B8A),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _CustomBottomNav extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 80,
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: const BorderRadius.only(
-          topLeft: Radius.circular(30),
-          topRight: Radius.circular(30),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 20,
-            offset: const Offset(0, -5),
-          ),
-        ],
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          _NavIcon(
-            icon: Icons.home_filled,
-            label: 'Home',
-            isSelected: true,
-            onTap: () {}, // Already home
-          ),
-          _NavIcon(
-            icon: Icons.psychology_outlined,
-            label: 'Mood Predic',
-            onTap: () => Navigator.pushNamed(context, AppRoutes.coping),
-          ),
-          // Middle Button
-          GestureDetector(
-            onTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => const ChatBotScreen()),
-            ),
-            child: Transform.translate(
-              offset: const Offset(0, -10),
-              child: Container(
-                width: 56,
-                height: 56,
-                decoration: const BoxDecoration(
-                  shape: BoxShape.circle,
-                  gradient: LinearGradient(
-                    colors: [Color(0xFFA855F7), Color(0xFF0EA5E9)],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Color(0x660EA5E9),
-                      blurRadius: 15,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
+                gradient: LinearGradient(
+                  colors: widget.gradientColors,
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
                 ),
-                child: const Icon(Icons.auto_awesome, color: Colors.white, size: 28),
               ),
-            ),
-          ),
-          _NavIcon(
-            icon: Icons.bar_chart_outlined,
-            label: 'Analytics',
-            onTap: () => Navigator.pushNamed(context, AppRoutes.analytics),
-          ),
-          _NavIcon(
-            icon: Icons.settings_outlined,
-            label: 'Settings',
-            onTap: () => Navigator.pushNamed(context, AppRoutes.settings),
-          ),
-        ],
+              child: Stack(
+                children: [
+                  CustomPaint(
+                    painter: _BubblePainter(progress: _ctrl.value),
+                    size: Size.infinite,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(14),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(widget.icon,
+                            color: Colors.white, size: 26),
+                        const SizedBox(height: 8),
+                        Text(
+                          widget.title,
+                          style: GoogleFonts.lora(
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          widget.subtitle,
+                          style: GoogleFonts.lora(
+                              fontSize: 10,
+                              color: Colors.white70),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
 }
 
-class _NavIcon extends StatelessWidget {
-  const _NavIcon({
-    required this.icon,
-    required this.label,
-    required this.onTap,
-    this.isSelected = false,
-  });
+// ─────────────────────────────────────────────────────────────
+// Bubble Painter
+// ─────────────────────────────────────────────────────────────
 
-  final IconData icon;
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
+class _BubblePainter extends CustomPainter {
+  const _BubblePainter({required this.progress});
+  final double progress;
 
   @override
-  Widget build(BuildContext context) {
-    final color = isSelected ? const Color(0xFF0EA5E9) : const Color(0xFF6B6B8A);
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 24),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: GoogleFonts.lora(
-              fontSize: 10,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              color: color,
-            ),
-          ),
-        ],
-      ),
+  void paint(Canvas canvas, Size size) {
+    final t = progress * 2 * pi;
+
+    // large blob — top-right, drifts slowly
+    _draw(canvas, size,
+        cx: size.width * 0.75 + sin(t * 0.7) * size.width * 0.12,
+        cy: size.height * 0.25 + cos(t * 0.5) * size.height * 0.18,
+        r: size.width * 0.38,
+        opacity: 0.18);
+
+    // medium blob — bottom-left
+    _draw(canvas, size,
+        cx: size.width * 0.15 + sin(t * 0.4 + 1.2) * size.width * 0.1,
+        cy: size.height * 0.75 + cos(t * 0.6 + 0.8) * size.height * 0.15,
+        r: size.width * 0.28,
+        opacity: 0.14);
+
+    // small blob — center, quicker drift
+    _draw(canvas, size,
+        cx: size.width * 0.5 + sin(t * 0.9 + 2.5) * size.width * 0.2,
+        cy: size.height * 0.5 + cos(t * 0.8 + 1.0) * size.height * 0.2,
+        r: size.width * 0.16,
+        opacity: 0.10);
+  }
+
+  void _draw(Canvas canvas, Size size,
+      {required double cx,
+      required double cy,
+      required double r,
+      required double opacity}) {
+    canvas.drawCircle(
+      Offset(cx, cy),
+      r,
+      Paint()..color = Colors.white.withOpacity(opacity),
     );
   }
+
+  @override
+  bool shouldRepaint(_BubblePainter old) => old.progress != progress;
 }

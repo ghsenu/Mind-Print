@@ -86,8 +86,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     super.dispose();
   }
 
-  void _goToLogin() =>
-      Navigator.pushReplacementNamed(context, AppRoutes.login);
+  void _goToLogin() => Navigator.pushReplacementNamed(context, AppRoutes.login);
 
   @override
   Widget build(BuildContext context) {
@@ -169,12 +168,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 end: Offset.zero,
                               ).animate(animation);
                               // incoming child slides from right, outgoing slides to left
-                              return child.key ==
-                                      ValueKey(_current)
+                              return child.key == ValueKey(_current)
                                   ? SlideTransition(
-                                      position: slideIn, child: child)
+                                    position: slideIn,
+                                    child: child,
+                                  )
                                   : SlideTransition(
-                                      position: slideOut, child: child);
+                                    position: slideOut,
+                                    child: child,
+                                  );
                             },
                             child: _TextSlide(
                               key: ValueKey(_current),

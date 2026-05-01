@@ -82,7 +82,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
         child: Stack(
           children: [
             SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 40.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 24.0,
+                vertical: 40.0,
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -154,7 +157,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               AppRoutes.forgotPassword,
                             ),
                         child: const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 6,
+                          ),
                           child: Text(
                             'Forgot Password?',
                             style: TextStyle(
@@ -221,7 +227,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                               _keepMeSignedIn = value ?? true;
                             });
                           },
-                          activeColor: const Color(0xFF3333CC), // Match design blue
+                          activeColor: const Color(
+                            0xFF3333CC,
+                          ), // Match design blue
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(4),
                           ),
@@ -230,7 +238,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       const SizedBox(width: 12),
                       const Text(
                         'Keep me signed in',
-                        style: TextStyle(fontSize: 15, color: Color(0xFF4B5563)),
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: Color(0xFF4B5563),
+                        ),
                       ),
                     ],
                   ),
@@ -279,7 +290,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                         padding: EdgeInsets.symmetric(horizontal: 16),
                         child: Text(
                           'or sign in with',
-                          style: TextStyle(color: Color(0xFF9CA3AF), fontSize: 14),
+                          style: TextStyle(
+                            color: Color(0xFF9CA3AF),
+                            fontSize: 14,
+                          ),
                         ),
                       ),
                       Expanded(child: Divider(color: Colors.grey.shade300)),
@@ -362,10 +376,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
               top: 0,
               right: 0,
               child: TextButton(
-                onPressed: () => Navigator.pushReplacementNamed(
-                  context,
-                  AppRoutes.onboardingQuestionnaire,
-                ),
+                onPressed:
+                    () => Navigator.pushReplacementNamed(
+                      context,
+                      AppRoutes.onboardingQuestionnaire,
+                    ),
                 child: const Text(
                   'Skip (Dev)',
                   style: TextStyle(

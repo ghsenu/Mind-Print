@@ -37,9 +37,10 @@ class _Dot extends StatelessWidget {
       width: active ? 36 : 8,
       height: 8,
       decoration: BoxDecoration(
-        color: active
-            ? PageIndicator.kBrandBlue
-            : PageIndicator.kBrandBlue.withOpacity(0.30),
+        color:
+            active
+                ? PageIndicator.kBrandBlue
+                : PageIndicator.kBrandBlue.withOpacity(0.30),
         borderRadius: BorderRadius.circular(4),
       ),
     );
