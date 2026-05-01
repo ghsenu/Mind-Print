@@ -23,7 +23,6 @@ import 'package:mind_print/features/games/screens/memory_match_screen.dart';
 import 'package:mind_print/features/games/screens/breathing_ball_screen.dart';
 import 'package:mind_print/features/home/screens/home_screen.dart';
 import 'package:mind_print/features/profile/screens/edit_profile_screen.dart';
-import 'package:mind_print/features/journal/screens/emotion_result_screen.dart';
 import 'package:mind_print/features/journal/screens/journal_tab.dart';
 import 'package:mind_print/features/notifications/screens/notification_screen.dart';
 import 'package:mind_print/features/reports/screens/export_screen.dart';
@@ -50,7 +49,6 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   AppRoutes.home: (_) => const HomeScreen(),
   AppRoutes.notifications: (_) => const NotificationScreen(),
   AppRoutes.journal: (_) => const JournalTab(),
-  AppRoutes.emotionResult: (_) => const EmotionResultScreen(),
   AppRoutes.analytics: (_) => const AnalyticsTab(),
   AppRoutes.coping: (_) => const ActivitiesScreen(),
   AppRoutes.reports: (_) => const ExportScreen(),

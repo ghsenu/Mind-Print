@@ -1,10 +1,28 @@
 import 'package:flutter/material.dart';
+import 'package:mind_print/features/shared/models/emotion_result.dart';
 
 class EmotionResultScreen extends StatelessWidget {
-  const EmotionResultScreen({super.key});
+  const EmotionResultScreen({super.key, required this.result});
+
+  final EmotionResult result;
+
+  static const Map<String, String> _emotionEmoji = {
+    'joy': '😊',
+    'sadness': '😢',
+    'anger': '😠',
+    'fear': '😰',
+    'surprise': '😲',
+    'disgust': '🤢',
+    'neutral': '😐',
+  };
 
   @override
   Widget build(BuildContext context) {
+    final emoji = _emotionEmoji[result.primaryEmotion] ?? '😐';
+    final emotionLabel = result.primaryEmotion[0].toUpperCase() +
+        result.primaryEmotion.substring(1);
+    final confidencePct = (result.intensity * 100).round();
+
     return Scaffold(
       backgroundColor: const Color(0xFFF3F6FA),
       appBar: AppBar(
@@ -21,25 +39,36 @@ class EmotionResultScreen extends StatelessWidget {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 12),
                 child: Column(
                   children: <Widget>[
-                    _buildEmotionHero(),
-                    const SizedBox(height: 18),
-                    _buildSecondaryEmotions(),
-                    const SizedBox(height: 18),
-                    _buildAiInsightCard(),
-                    const SizedBox(height: 14),
-                    _buildCbtCard(),
+                    _buildEmotionHero(emoji, emotionLabel, confidencePct),
+                    if (result.secondaryEmotions.isNotEmpty) ...[
+                      const SizedBox(height: 18),
+                      _buildSecondaryEmotions(result.secondaryEmotions),
+                    ],
+                    if (result.aiInsight != null) ...[
+                      const SizedBox(height: 18),
+                      _buildAiInsightCard(result.aiInsight!),
+                    ],
+                    if (result.cbtReframe != null) ...[
+                      const SizedBox(height: 14),
+                      _buildCbtCard(
+                        result.cbtReframe!,
+                        result.distortionType,
+                      ),
+                    ],
+                    const SizedBox(height: 8),
                   ],
                 ),
               ),
             ),
-            _buildBottomArea(),
+            _buildBottomArea(context),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildEmotionHero() {
+  Widget _buildEmotionHero(
+      String emoji, String emotionLabel, int confidencePct) {
     return Column(
       children: <Widget>[
         Container(
@@ -50,8 +79,8 @@ class EmotionResultScreen extends StatelessWidget {
             border: Border.all(color: const Color(0xFF88A6C5), width: 7),
             color: Colors.white,
           ),
-          child: const Center(
-            child: Text('😌', style: TextStyle(fontSize: 38)),
+          child: Center(
+            child: Text(emoji, style: const TextStyle(fontSize: 38)),
           ),
         ),
         const SizedBox(height: 14),
@@ -62,7 +91,7 @@ class EmotionResultScreen extends StatelessWidget {
             borderRadius: BorderRadius.circular(16),
           ),
           child: const Text(
-            'MULTIMODAL ANALYSIS',
+            'AI ANALYSIS',
             style: TextStyle(
               fontSize: 10,
               letterSpacing: 0.5,
@@ -72,18 +101,18 @@ class EmotionResultScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 8),
-        const Text(
-          'Joyful',
-          style: TextStyle(
+        Text(
+          emotionLabel,
+          style: const TextStyle(
             fontSize: 34,
             fontWeight: FontWeight.w700,
             color: Color(0xFF162033),
           ),
         ),
         const SizedBox(height: 6),
-        const Text(
-          '85% Confidence Score',
-          style: TextStyle(
+        Text(
+          '$confidencePct% Confidence Score',
+          style: const TextStyle(
             fontSize: 15,
             fontWeight: FontWeight.w500,
             color: Color(0xFF50627C),
@@ -93,7 +122,7 @@ class EmotionResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSecondaryEmotions() {
+  Widget _buildSecondaryEmotions(List<String> emotions) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(14, 12, 14, 14),
@@ -118,17 +147,20 @@ class EmotionResultScreen extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: const <Widget>[
-              _EmotionChip(label: 'Calm', score: '12%'),
-              _EmotionChip(label: 'Surprise', score: '3%'),
-            ],
+            children: emotions
+                .map(
+                  (e) => _EmotionChip(
+                    label: e[0].toUpperCase() + e.substring(1),
+                  ),
+                )
+                .toList(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildAiInsightCard() {
+  Widget _buildAiInsightCard(String insight) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -137,10 +169,10 @@ class EmotionResultScreen extends StatelessWidget {
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: const Color(0xFFE3EAF2)),
       ),
-      child: const Column(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Row(
+          const Row(
             children: <Widget>[
               Icon(
                 Icons.auto_awesome_outlined,
@@ -158,10 +190,10 @@ class EmotionResultScreen extends StatelessWidget {
               ),
             ],
           ),
-          SizedBox(height: 10),
+          const SizedBox(height: 10),
           Text(
-            'Based on your vocal tone and heart rate variance, your joy appears to be rooted in a sense of relief. The subtle calming markers suggest that a recent stressor has been successfully navigated.',
-            style: TextStyle(
+            insight,
+            style: const TextStyle(
               height: 1.45,
               fontSize: 13,
               color: Color(0xFF50627C),
@@ -172,7 +204,9 @@ class EmotionResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildCbtCard() {
+  Widget _buildCbtCard(String reframe, String? distortionType) {
+    final distortionLabel = distortionType?.toUpperCase().replaceAll('-', ' ');
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(14),
@@ -194,39 +228,30 @@ class EmotionResultScreen extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 8),
-          Row(
-            children: <Widget>[
-              const Expanded(
-                child: Text(
-                  '"I\'m just lucky"',
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w700,
-                    color: Color(0xFF1F2B3B),
-                  ),
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+          if (distortionLabel != null)
+            Align(
+              alignment: Alignment.centerRight,
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEFF4FA),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Text(
-                  'DISCOUNTING POSITIVES',
-                  style: TextStyle(
+                child: Text(
+                  distortionLabel,
+                  style: const TextStyle(
                     fontSize: 9,
                     fontWeight: FontWeight.w700,
                     color: Color(0xFF6A7E96),
                   ),
                 ),
               ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          const Text(
-            '"You acknowledge your effort in this outcome. You didn\'t just stumble into this success; your persistence played a key role."',
-            style: TextStyle(
+            ),
+          if (distortionLabel != null) const SizedBox(height: 8),
+          Text(
+            '"$reframe"',
+            style: const TextStyle(
               height: 1.45,
               fontSize: 13,
               color: Color(0xFF50627C),
@@ -258,7 +283,7 @@ class EmotionResultScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildBottomArea() {
+  Widget _buildBottomArea(BuildContext context) {
     return Container(
       color: const Color(0xFFF3F6FA),
       child: SafeArea(
@@ -272,9 +297,10 @@ class EmotionResultScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton.icon(
-                  onPressed: () {},
-                  icon: const Icon(Icons.bookmark_border_rounded, size: 18),
-                  label: const Text('Save to Journal'),
+                  onPressed: () =>
+                      Navigator.of(context).popUntil((r) => r.isFirst),
+                  icon: const Icon(Icons.check_rounded, size: 18),
+                  label: const Text('Done'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF89A8C8),
                     foregroundColor: Colors.white,
@@ -288,8 +314,6 @@ class EmotionResultScreen extends StatelessWidget {
                   ),
                 ),
               ),
-              const SizedBox(height: 10),
-              const _MiniBottomNav(),
             ],
           ),
         ),
@@ -299,10 +323,9 @@ class EmotionResultScreen extends StatelessWidget {
 }
 
 class _EmotionChip extends StatelessWidget {
-  const _EmotionChip({required this.label, required this.score});
+  const _EmotionChip({required this.label});
 
   final String label;
-  final String score;
 
   @override
   Widget build(BuildContext context) {
@@ -312,90 +335,14 @@ class _EmotionChip extends StatelessWidget {
         color: const Color(0xFFF0F5FA),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: RichText(
-        text: TextSpan(
-          children: <InlineSpan>[
-            TextSpan(
-              text: '$label ',
-              style: const TextStyle(
-                fontWeight: FontWeight.w700,
-                fontSize: 12,
-                color: Color(0xFF33465F),
-              ),
-            ),
-            TextSpan(
-              text: score,
-              style: const TextStyle(
-                fontSize: 12,
-                fontWeight: FontWeight.w600,
-                color: Color(0xFF8CA0B8),
-              ),
-            ),
-          ],
+      child: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w700,
+          fontSize: 12,
+          color: Color(0xFF33465F),
         ),
       ),
-    );
-  }
-}
-
-class _MiniBottomNav extends StatelessWidget {
-  const _MiniBottomNav();
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      height: 58,
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: const Color(0xFFE4EAF3)),
-      ),
-      child: const Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: <Widget>[
-          _NavItem(icon: Icons.home_outlined, label: 'Home'),
-          _NavItem(
-            icon: Icons.auto_graph_outlined,
-            label: 'Analysis',
-            active: true,
-          ),
-          _NavItem(icon: Icons.menu_book_outlined, label: 'Journal'),
-          _NavItem(icon: Icons.person_outline_rounded, label: 'Profile'),
-        ],
-      ),
-    );
-  }
-}
-
-class _NavItem extends StatelessWidget {
-  const _NavItem({
-    required this.icon,
-    required this.label,
-    this.active = false,
-  });
-
-  final IconData icon;
-  final String label;
-  final bool active;
-
-  @override
-  Widget build(BuildContext context) {
-    final Color color =
-        active ? const Color(0xFF7697B8) : const Color(0xFF8FA0B4);
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: <Widget>[
-        Icon(icon, size: 20, color: color),
-        const SizedBox(height: 3),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 11,
-            fontWeight: active ? FontWeight.w700 : FontWeight.w500,
-            color: color,
-          ),
-        ),
-      ],
     );
   }
 }
