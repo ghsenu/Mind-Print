@@ -11,8 +11,14 @@ import 'package:mind_print/features/auth/screens/phone_auth_screen.dart';
 import 'package:mind_print/features/auth/screens/reset_password_screen.dart';
 import 'package:mind_print/features/auth/screens/signup_screen.dart';
 import 'package:mind_print/features/auth/screens/splash_screen.dart';
-import 'package:mind_print/features/coping/screens/toolkit_screen.dart';
+import 'package:mind_print/features/coping/screens/activities_screen.dart';
+import 'package:mind_print/features/coping/screens/breathing_screen.dart';
+import 'package:mind_print/features/coping/screens/music_therapy_screen.dart';
+import 'package:mind_print/features/coping/screens/meditation_screen.dart';
+import 'package:mind_print/features/coping/screens/cbt_screen.dart';
+import 'package:mind_print/features/games/screens/games_screen.dart';
 import 'package:mind_print/features/home/screens/home_screen.dart';
+import 'package:mind_print/features/profile/screens/edit_profile_screen.dart';
 import 'package:mind_print/features/journal/screens/emotion_result_screen.dart';
 import 'package:mind_print/features/journal/screens/journal_tab.dart';
 import 'package:mind_print/features/notifications/screens/notification_screen.dart';
@@ -31,7 +37,6 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   AppRoutes.resetPassword: (_) => const ResetPasswordScreen(),
   AppRoutes.phoneAuth: (_) => const PhoneAuthScreen(),
   AppRoutes.otp: (context) {
-    // Extract verificationId passed as argument
     final verificationId =
         ModalRoute.of(context)?.settings.arguments as String?;
     return OtpScreen(verificationId: verificationId ?? '');
@@ -43,7 +48,13 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   AppRoutes.journal: (_) => const JournalTab(),
   AppRoutes.emotionResult: (_) => const EmotionResultScreen(),
   AppRoutes.analytics: (_) => const AnalyticsTab(),
-  AppRoutes.coping: (_) => const ToolkitScreen(),
+  AppRoutes.coping: (_) => const ActivitiesScreen(),
   AppRoutes.reports: (_) => const ExportScreen(),
   AppRoutes.settings: (_) => const SettingsScreen(),
+  AppRoutes.editProfile: (_) => const EditProfileScreen(),
+  AppRoutes.games: (_) => const GamesScreen(),
+  AppRoutes.breathing: (_) => const BreathingScreen(),
+  AppRoutes.musicTherapy: (_) => const MusicTherapyScreen(),
+  AppRoutes.meditation: (_) => const MeditationScreen(),
+  AppRoutes.cbtExercises: (_) => const CbtScreen(),
 };

@@ -199,10 +199,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-          Icon(
-            Icons.chevron_right,
-            color: const Color(0xFFACAEBD),
-          ),
+          Icon(Icons.chevron_right, color: const Color(0xFFACAEBD)),
         ],
       ),
     );
@@ -277,10 +274,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ),
                 ),
                 const SizedBox(width: 8),
-                const Icon(
-                  Icons.chevron_right,
-                  color: Color(0xFFACAEBD),
-                ),
+                const Icon(Icons.chevron_right, color: Color(0xFFACAEBD)),
               ],
             ),
           ),
@@ -315,11 +309,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     color: const Color(0xFFE8EFFF),
                     borderRadius: BorderRadius.circular(8),
                   ),
-                  child: Icon(
-                    icon,
-                    color: const Color(0xFF6A8DFF),
-                    size: 20,
-                  ),
+                  child: Icon(icon, color: const Color(0xFF6A8DFF), size: 20),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -384,8 +374,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: (titleColor ?? const Color(0xFF6A8DFF))
-                        .withOpacity(0.1),
+                    color: (titleColor ?? const Color(0xFF6A8DFF)).withOpacity(
+                      0.1,
+                    ),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Icon(
@@ -420,10 +411,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ],
                   ),
                 ),
-                const Icon(
-                  Icons.chevron_right,
-                  color: Color(0xFFACAEBD),
-                ),
+                const Icon(Icons.chevron_right, color: Color(0xFFACAEBD)),
               ],
             ),
           ),
@@ -437,127 +425,127 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _showLanguageDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Select Language'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            ListTile(
-              title: const Text('English'),
-              onTap: () => Navigator.pop(context),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Select Language'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                ListTile(
+                  title: const Text('English'),
+                  onTap: () => Navigator.pop(context),
+                ),
+                ListTile(
+                  title: const Text('Spanish'),
+                  onTap: () => Navigator.pop(context),
+                ),
+                ListTile(
+                  title: const Text('French'),
+                  onTap: () => Navigator.pop(context),
+                ),
+              ],
             ),
-            ListTile(
-              title: const Text('Spanish'),
-              onTap: () => Navigator.pop(context),
-            ),
-            ListTile(
-              title: const Text('French'),
-              onTap: () => Navigator.pop(context),
-            ),
-          ],
-        ),
-      ),
+          ),
     );
   }
 
   void _showChangePasswordDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Change Password'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Current Password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Change Password'),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Current Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  obscureText: true,
                 ),
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'New Password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                const SizedBox(height: 16),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'New Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  obscureText: true,
                 ),
-              ),
-              obscureText: true,
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: 'Confirm Password',
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8),
+                const SizedBox(height: 16),
+                TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Confirm Password',
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  obscureText: true,
                 ),
-              ),
-              obscureText: true,
+              ],
             ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Update'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Update'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showLogOutDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Log Out'),
-        content: const Text('You will need to sign in again'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Log Out'),
+            content: const Text('You will need to sign in again'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text('Log Out'),
+              ),
+            ],
           ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
-            ),
-            child: const Text('Log Out'),
-          ),
-        ],
-      ),
     );
   }
 
   void _showDeleteAccountDialog(BuildContext context) {
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Delete Account'),
-        content: const Text(
-          'Are you sure? This action cannot be undone. Permanently remove all your data.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.red,
+      builder:
+          (context) => AlertDialog(
+            title: const Text('Delete Account'),
+            content: const Text(
+              'Are you sure? This action cannot be undone. Permanently remove all your data.',
             ),
-            child: const Text('Delete'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
+                child: const Text('Delete'),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 }
