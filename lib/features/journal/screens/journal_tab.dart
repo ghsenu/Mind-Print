@@ -11,7 +11,8 @@ class JournalTab extends StatefulWidget {
   State<JournalTab> createState() => _JournalTabState();
 }
 
-class _JournalTabState extends State<JournalTab> with SingleTickerProviderStateMixin {
+class _JournalTabState extends State<JournalTab>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   final List<Map<String, dynamic>> _entries = [
@@ -104,7 +105,8 @@ class _JournalTabState extends State<JournalTab> with SingleTickerProviderStateM
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFC),
       appBar: AppBar(
-        automaticallyImplyLeading: false, // In case it's top-level or you want it flat
+        automaticallyImplyLeading:
+            false, // In case it's top-level or you want it flat
         backgroundColor: const Color(0xFFF9FAFC),
         elevation: 0,
         title: Row(
@@ -149,10 +151,7 @@ class _JournalTabState extends State<JournalTab> with SingleTickerProviderStateM
             height: 50,
             decoration: const BoxDecoration(
               border: Border(
-                bottom: BorderSide(
-                  color: Color(0xFFEAEAEA),
-                  width: 1.5,
-                ),
+                bottom: BorderSide(color: Color(0xFFEAEAEA), width: 1.5),
               ),
             ),
             child: TabBar(
@@ -164,10 +163,7 @@ class _JournalTabState extends State<JournalTab> with SingleTickerProviderStateM
                 fontSize: 15,
               ),
               indicator: const UnderlineTabIndicator(
-                borderSide: BorderSide(
-                  color: Color(0xFFF25A12),
-                  width: 2.5,
-                ),
+                borderSide: BorderSide(color: Color(0xFFF25A12), width: 2.5),
               ),
               tabs: const [
                 Tab(text: 'Text Journal'),
@@ -175,7 +171,7 @@ class _JournalTabState extends State<JournalTab> with SingleTickerProviderStateM
               ],
             ),
           ),
-          
+
           Expanded(
             child: TabBarView(
               controller: _tabController,
@@ -198,7 +194,9 @@ class _JournalTabState extends State<JournalTab> with SingleTickerProviderStateM
         },
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
-      bottomNavigationBar: const CustomBottomNav(selectedIndex: -1), // No selection, just shown
+      bottomNavigationBar: const CustomBottomNav(
+        selectedIndex: -1,
+      ), // No selection, just shown
     );
   }
 
@@ -266,11 +264,7 @@ class _JournalTabState extends State<JournalTab> with SingleTickerProviderStateM
               color: entry['iconBg'],
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(
-              entry['icon'],
-              color: entry['iconColor'],
-              size: 28,
-            ),
+            child: Icon(entry['icon'], color: entry['iconColor'], size: 28),
           ),
           const SizedBox(width: 16),
           // Content
@@ -299,9 +293,17 @@ class _JournalTabState extends State<JournalTab> with SingleTickerProviderStateM
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _buildChip(entry['mood'], entry['moodColor'], entry['moodTextColor']),
+                    _buildChip(
+                      entry['mood'],
+                      entry['moodColor'],
+                      entry['moodTextColor'],
+                    ),
                     const SizedBox(width: 8),
-                    _buildChip(entry['type'], entry['typeColor'], entry['typeTextColor']),
+                    _buildChip(
+                      entry['type'],
+                      entry['typeColor'],
+                      entry['typeTextColor'],
+                    ),
                   ],
                 ),
                 const SizedBox(height: 12),

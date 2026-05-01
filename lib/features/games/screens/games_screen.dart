@@ -28,10 +28,7 @@ class GamesScreen extends StatelessWidget {
       body: Center(
         child: Text(
           'Coming soon',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            color: Colors.grey,
-          ),
+          style: GoogleFonts.inter(fontSize: 16, color: Colors.grey),
         ),
       ),
     );

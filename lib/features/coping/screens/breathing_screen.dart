@@ -83,8 +83,10 @@ class _BreathingScreenState extends State<BreathingScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back,
-                          color: Color(0xFF1A1A2E)),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Color(0xFF1A1A2E),
+                      ),
                       onPressed: () => Navigator.pop(context),
                       padding: EdgeInsets.zero,
                     ),
@@ -116,12 +118,15 @@ class _BreathingScreenState extends State<BreathingScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
-                  children: _exercises
-                      .map((ex) => _ExerciseCard(
-                            exercise: ex,
-                            onTap: () => _startExercise(ex),
-                          ))
-                      .toList(),
+                  children:
+                      _exercises
+                          .map(
+                            (ex) => _ExerciseCard(
+                              exercise: ex,
+                              onTap: () => _startExercise(ex),
+                            ),
+                          )
+                          .toList(),
                 ),
               ),
 
@@ -195,19 +200,13 @@ class _ExerciseCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    _PhaseChip(
-                        label:
-                            'Inhale ${exercise.inhaleSecs}s'),
+                    _PhaseChip(label: 'Inhale ${exercise.inhaleSecs}s'),
                     if (exercise.holdSecs > 0) ...[
                       const SizedBox(width: 6),
-                      _PhaseChip(
-                          label:
-                              'Hold ${exercise.holdSecs}s'),
+                      _PhaseChip(label: 'Hold ${exercise.holdSecs}s'),
                     ],
                     const SizedBox(width: 6),
-                    _PhaseChip(
-                        label:
-                            'Exhale ${exercise.exhaleSecs}s'),
+                    _PhaseChip(label: 'Exhale ${exercise.exhaleSecs}s'),
                   ],
                 ),
               ],
@@ -217,8 +216,7 @@ class _ExerciseCard extends StatelessWidget {
           GestureDetector(
             onTap: onTap,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: exercise.color.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(20),
@@ -266,17 +264,13 @@ class _PhaseChip extends StatelessWidget {
 // ── Active breathing session ─────────────────────────────────────────────────
 
 class _BreathingActiveScreen extends StatefulWidget {
-  const _BreathingActiveScreen({
-    required this.exercise,
-    required this.onQuit,
-  });
+  const _BreathingActiveScreen({required this.exercise, required this.onQuit});
 
   final BreathingExercise exercise;
   final VoidCallback onQuit;
 
   @override
-  State<_BreathingActiveScreen> createState() =>
-      _BreathingActiveScreenState();
+  State<_BreathingActiveScreen> createState() => _BreathingActiveScreenState();
 }
 
 class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
@@ -293,7 +287,11 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
   int _sessionSecsLeft = 0;
   bool _paused = false;
 
-  static const List<String> _phaseLabels = ['Inhale...', 'Hold...', 'Exhale...'];
+  static const List<String> _phaseLabels = [
+    'Inhale...',
+    'Hold...',
+    'Exhale...',
+  ];
   static const List<String> _phaseHints = [
     "Breathe in slowly",
     "Hold still",
@@ -319,14 +317,12 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
     final secs = _phaseSecs(phase);
 
     if (phase == 0) {
-      _pulseController.duration =
-          Duration(seconds: widget.exercise.inhaleSecs);
+      _pulseController.duration = Duration(seconds: widget.exercise.inhaleSecs);
       _pulseController.forward(from: 0);
     } else if (phase == 1) {
       // hold — no scale change
     } else {
-      _pulseController.duration =
-          Duration(seconds: widget.exercise.exhaleSecs);
+      _pulseController.duration = Duration(seconds: widget.exercise.exhaleSecs);
       _pulseController.reverse(from: 1);
     }
 
@@ -385,29 +381,35 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20)),
-        title: Text('Session Complete 🎉',
-            style: GoogleFonts.lora(fontWeight: FontWeight.bold)),
-        content: Text(
-          'Great work! You completed ${widget.exercise.name}.',
-          style: GoogleFonts.lora(color: const Color(0xFF6B6B8A)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              widget.onQuit();
-            },
-            child: Text('Done',
-                style: GoogleFonts.lora(
-                  color: const Color(0xFF6ACFEF),
-                  fontWeight: FontWeight.bold,
-                )),
+      builder:
+          (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
+            ),
+            title: Text(
+              'Session Complete 🎉',
+              style: GoogleFonts.lora(fontWeight: FontWeight.bold),
+            ),
+            content: Text(
+              'Great work! You completed ${widget.exercise.name}.',
+              style: GoogleFonts.lora(color: const Color(0xFF6B6B8A)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  widget.onQuit();
+                },
+                child: Text(
+                  'Done',
+                  style: GoogleFonts.lora(
+                    color: const Color(0xFF6ACFEF),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -447,8 +449,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                       color: Colors.white.withOpacity(0.6),
                     ),
                   ),
-                  Icon(Icons.water_drop_outlined,
-                      color: ex.color, size: 20),
+                  Icon(Icons.water_drop_outlined, color: ex.color, size: 20),
                 ],
               ),
             ),

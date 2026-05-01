@@ -109,8 +109,10 @@ class CbtScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back,
-                          color: Color(0xFF1A1A2E)),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Color(0xFF1A1A2E),
+                      ),
                       onPressed: () => Navigator.pop(context),
                       padding: EdgeInsets.zero,
                     ),
@@ -157,9 +159,8 @@ class CbtScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
-                  children: _exercises
-                      .map((ex) => _CbtCard(exercise: ex))
-                      .toList(),
+                  children:
+                      _exercises.map((ex) => _CbtCard(exercise: ex)).toList(),
                 ),
               ),
 
@@ -180,12 +181,13 @@ class _CbtCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () => Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => _CbtDetailScreen(exercise: exercise),
-        ),
-      ),
+      onTap:
+          () => Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => _CbtDetailScreen(exercise: exercise),
+            ),
+          ),
       child: Container(
         margin: const EdgeInsets.only(bottom: 14),
         padding: const EdgeInsets.all(18),
@@ -292,8 +294,10 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back,
-                        color: Color(0xFF1A1A2E)),
+                    icon: const Icon(
+                      Icons.arrow_back,
+                      color: Color(0xFF1A1A2E),
+                    ),
                     onPressed: () => Navigator.pop(context),
                     padding: EdgeInsets.zero,
                   ),
@@ -308,10 +312,7 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
                       ),
                     ),
                   ),
-                  Text(
-                    ex.emoji,
-                    style: const TextStyle(fontSize: 28),
-                  ),
+                  Text(ex.emoji, style: const TextStyle(fontSize: 28)),
                 ],
               ),
             ),
@@ -332,12 +333,12 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(4),
                 child: LinearProgressIndicator(
-                  value: ex.steps.isEmpty
-                      ? 0
-                      : _completed.length / ex.steps.length,
+                  value:
+                      ex.steps.isEmpty
+                          ? 0
+                          : _completed.length / ex.steps.length,
                   minHeight: 6,
-                  backgroundColor:
-                      ex.color.withOpacity(0.12),
+                  backgroundColor: ex.color.withOpacity(0.12),
                   color: ex.color,
                 ),
               ),
@@ -362,31 +363,30 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
                 itemBuilder: (context, i) {
                   final done = _completed.contains(i);
                   return GestureDetector(
-                    onTap: () => setState(() {
-                      if (done) {
-                        _completed.remove(i);
-                      } else {
-                        _completed.add(i);
-                      }
-                    }),
+                    onTap:
+                        () => setState(() {
+                          if (done) {
+                            _completed.remove(i);
+                          } else {
+                            _completed.add(i);
+                          }
+                        }),
                     child: AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: done
-                            ? ex.color.withOpacity(0.08)
-                            : Colors.white,
+                        color: done ? ex.color.withOpacity(0.08) : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
-                          color: done
-                              ? ex.color.withOpacity(0.3)
-                              : Colors.transparent,
+                          color:
+                              done
+                                  ? ex.color.withOpacity(0.3)
+                                  : Colors.transparent,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black
-                                .withOpacity(done ? 0.01 : 0.04),
+                            color: Colors.black.withOpacity(done ? 0.01 : 0.04),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -395,29 +395,30 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
                       child: Row(
                         children: [
                           AnimatedContainer(
-                            duration:
-                                const Duration(milliseconds: 200),
+                            duration: const Duration(milliseconds: 200),
                             width: 28,
                             height: 28,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: done
-                                  ? ex.color
-                                  : ex.color.withOpacity(0.1),
+                              color:
+                                  done ? ex.color : ex.color.withOpacity(0.1),
                             ),
                             child: Center(
-                              child: done
-                                  ? const Icon(Icons.check,
-                                      color: Colors.white, size: 16)
-                                  : Text(
-                                      '${i + 1}',
-                                      style: GoogleFonts.lora(
-                                        fontSize: 12,
-                                        fontWeight:
-                                            FontWeight.bold,
-                                        color: ex.color,
+                              child:
+                                  done
+                                      ? const Icon(
+                                        Icons.check,
+                                        color: Colors.white,
+                                        size: 16,
+                                      )
+                                      : Text(
+                                        '${i + 1}',
+                                        style: GoogleFonts.lora(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: ex.color,
+                                        ),
                                       ),
-                                    ),
                             ),
                           ),
                           const SizedBox(width: 14),
@@ -426,12 +427,12 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
                               ex.steps[i],
                               style: GoogleFonts.lora(
                                 fontSize: 14,
-                                color: done
-                                    ? const Color(0xFF6B6B8A)
-                                    : const Color(0xFF1A1A2E),
-                                decoration: done
-                                    ? TextDecoration.lineThrough
-                                    : null,
+                                color:
+                                    done
+                                        ? const Color(0xFF6B6B8A)
+                                        : const Color(0xFF1A1A2E),
+                                decoration:
+                                    done ? TextDecoration.lineThrough : null,
                               ),
                             ),
                           ),

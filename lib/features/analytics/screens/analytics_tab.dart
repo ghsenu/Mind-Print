@@ -90,8 +90,9 @@ class AnalyticsTab extends StatelessWidget {
                                     width: 74,
                                     height: 74,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF9CC9FF)
-                                          .withOpacity(0.18),
+                                      color: const Color(
+                                        0xFF9CC9FF,
+                                      ).withOpacity(0.18),
                                       shape: BoxShape.circle,
                                     ),
                                   ),
@@ -99,8 +100,9 @@ class AnalyticsTab extends StatelessWidget {
                                     width: 28,
                                     height: 28,
                                     decoration: BoxDecoration(
-                                      color: const Color(0xFF9CC9FF)
-                                          .withOpacity(0.35),
+                                      color: const Color(
+                                        0xFF9CC9FF,
+                                      ).withOpacity(0.35),
                                       shape: BoxShape.circle,
                                     ),
                                   ),
@@ -194,8 +196,9 @@ class AnalyticsTab extends StatelessWidget {
                           minHeight: 4,
                           value: 0.78,
                           backgroundColor: Color(0xFFE4EFFC),
-                          valueColor:
-                              AlwaysStoppedAnimation<Color>(Color(0xFF27C16B)),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            Color(0xFF27C16B),
+                          ),
                         ),
                       ),
                     ],
@@ -456,10 +459,7 @@ class _InsightPanel extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const Icon(
-                      Icons.chevron_right,
-                      color: Color(0xFF8FA1BF),
-                    ),
+                    const Icon(Icons.chevron_right, color: Color(0xFF8FA1BF)),
                   ],
                 ),
                 child,
@@ -546,19 +546,22 @@ class _RadarChartPainter extends CustomPainter {
     final center = Offset(size.width / 2, size.height / 2);
     final radius = size.width * 0.34;
 
-    final gridPaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 1
-      ..color = const Color(0xFFD7E7FA);
+    final gridPaint =
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 1
+          ..color = const Color(0xFFD7E7FA);
 
-    final fillPaint = Paint()
-      ..style = PaintingStyle.fill
-      ..color = const Color(0xFF5A8DFF).withOpacity(0.18);
+    final fillPaint =
+        Paint()
+          ..style = PaintingStyle.fill
+          ..color = const Color(0xFF5A8DFF).withOpacity(0.18);
 
-    final outlinePaint = Paint()
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 2
-      ..color = const Color(0xFF2F80ED);
+    final outlinePaint =
+        Paint()
+          ..style = PaintingStyle.stroke
+          ..strokeWidth = 2
+          ..color = const Color(0xFF2F80ED);
 
     for (var i = 1; i <= 3; i++) {
       canvas.drawCircle(center, radius * (i / 3), gridPaint);
@@ -590,11 +593,7 @@ class _RadarChartPainter extends CustomPainter {
     canvas.drawPath(path, outlinePaint);
 
     for (final point in points) {
-      canvas.drawCircle(
-        point,
-        4,
-        Paint()..color = const Color(0xFF2F80ED),
-      );
+      canvas.drawCircle(point, 4, Paint()..color = const Color(0xFF2F80ED));
     }
   }
 

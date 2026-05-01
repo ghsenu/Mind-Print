@@ -136,11 +136,16 @@ class ActivitiesScreen extends StatelessWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () => Navigator.pushNamed(
-                            context, AppRoutes.breathing),
+                        onTap:
+                            () => Navigator.pushNamed(
+                              context,
+                              AppRoutes.breathing,
+                            ),
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
                           decoration: BoxDecoration(
                             color: Colors.white.withOpacity(0.25),
                             borderRadius: BorderRadius.circular(20),
@@ -182,9 +187,10 @@ class ActivitiesScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
-                  children: _categories
-                      .map((cat) => _CategoryRow(category: cat))
-                      .toList(),
+                  children:
+                      _categories
+                          .map((cat) => _CategoryRow(category: cat))
+                          .toList(),
                 ),
               ),
 

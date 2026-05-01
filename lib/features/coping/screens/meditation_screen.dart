@@ -83,8 +83,10 @@ class _MeditationScreenState extends State<MeditationScreen> {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back,
-                          color: Color(0xFF1A1A2E)),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Color(0xFF1A1A2E),
+                      ),
                       onPressed: () => Navigator.pop(context),
                       padding: EdgeInsets.zero,
                     ),
@@ -142,44 +144,49 @@ class _MeditationScreenState extends State<MeditationScreen> {
                       ),
                       const SizedBox(height: 12),
                       Row(
-                        children: _durations.map((d) {
-                          final isSelected = d == _selectedDuration;
-                          return Expanded(
-                            child: GestureDetector(
-                              onTap: () =>
-                                  setState(() => _selectedDuration = d),
-                              child: AnimatedContainer(
-                                duration:
-                                    const Duration(milliseconds: 200),
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 4),
-                                padding: const EdgeInsets.symmetric(
-                                    vertical: 10),
-                                decoration: BoxDecoration(
-                                  color: isSelected
-                                      ? const Color(0xFF6ACFEF)
-                                      : const Color(0xFFF0FBFF),
-                                  borderRadius:
-                                      BorderRadius.circular(12),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    '${d}m',
-                                    style: GoogleFonts.lora(
-                                      fontSize: 14,
-                                      fontWeight: isSelected
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                      color: isSelected
-                                          ? Colors.white
-                                          : const Color(0xFF6B6B8A),
+                        children:
+                            _durations.map((d) {
+                              final isSelected = d == _selectedDuration;
+                              return Expanded(
+                                child: GestureDetector(
+                                  onTap:
+                                      () =>
+                                          setState(() => _selectedDuration = d),
+                                  child: AnimatedContainer(
+                                    duration: const Duration(milliseconds: 200),
+                                    margin: const EdgeInsets.symmetric(
+                                      horizontal: 4,
+                                    ),
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 10,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color:
+                                          isSelected
+                                              ? const Color(0xFF6ACFEF)
+                                              : const Color(0xFFF0FBFF),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        '${d}m',
+                                        style: GoogleFonts.lora(
+                                          fontSize: 14,
+                                          fontWeight:
+                                              isSelected
+                                                  ? FontWeight.bold
+                                                  : FontWeight.normal,
+                                          color:
+                                              isSelected
+                                                  ? Colors.white
+                                                  : const Color(0xFF6B6B8A),
+                                        ),
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
+                              );
+                            }).toList(),
                       ),
                     ],
                   ),
@@ -217,17 +224,14 @@ class _MeditationScreenState extends State<MeditationScreen> {
                       ),
                       const SizedBox(height: 12),
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceAround,
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
                         children: List.generate(
                           _moodEmojis.length,
                           (i) => GestureDetector(
-                            onTap: () =>
-                                setState(() => _moodBefore = i),
+                            onTap: () => setState(() => _moodBefore = i),
                             child: AnimatedScale(
                               scale: _moodBefore == i ? 1.3 : 1.0,
-                              duration:
-                                  const Duration(milliseconds: 200),
+                              duration: const Duration(milliseconds: 200),
                               child: Text(
                                 _moodEmojis[i],
                                 style: const TextStyle(fontSize: 28),
@@ -238,8 +242,7 @@ class _MeditationScreenState extends State<MeditationScreen> {
                       ),
                       const SizedBox(height: 10),
                       Row(
-                        mainAxisAlignment:
-                            MainAxisAlignment.spaceBetween,
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text(
                             'Before: ${_moodEmojis[_moodBefore]}',
@@ -285,13 +288,15 @@ class _MeditationScreenState extends State<MeditationScreen> {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
-                  children: _sessions
-                      .map((s) => _SessionCard(
-                            session: s,
-                            onStart: () => setState(
-                                () => _activeSession = s),
-                          ))
-                      .toList(),
+                  children:
+                      _sessions
+                          .map(
+                            (s) => _SessionCard(
+                              session: s,
+                              onStart: () => setState(() => _activeSession = s),
+                            ),
+                          )
+                          .toList(),
                 ),
               ),
 
@@ -305,10 +310,7 @@ class _MeditationScreenState extends State<MeditationScreen> {
 }
 
 class _SessionCard extends StatelessWidget {
-  const _SessionCard({
-    required this.session,
-    required this.onStart,
-  });
+  const _SessionCard({required this.session, required this.onStart});
 
   final MeditationSession session;
   final VoidCallback onStart;
@@ -366,7 +368,9 @@ class _SessionCard extends StatelessWidget {
                 const SizedBox(height: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 8, vertical: 3),
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: session.color.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(8),
@@ -386,8 +390,7 @@ class _SessionCard extends StatelessWidget {
           GestureDetector(
             onTap: onStart,
             child: Container(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
                 color: session.color.withOpacity(0.15),
                 borderRadius: BorderRadius.circular(20),
@@ -466,51 +469,61 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (_) => StatefulBuilder(
-        builder: (ctx, setS) => AlertDialog(
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20)),
-          title: Text('Session Complete 🎉',
-              style: GoogleFonts.lora(fontWeight: FontWeight.bold)),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text('How do you feel now?',
-                  style: GoogleFonts.lora(
-                      color: const Color(0xFF6B6B8A))),
-              const SizedBox(height: 16),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                children: List.generate(
-                  emojis.length,
-                  (i) => GestureDetector(
-                    onTap: () => setS(() => selected = i),
-                    child: AnimatedScale(
-                      scale: selected == i ? 1.3 : 1.0,
-                      duration: const Duration(milliseconds: 150),
-                      child: Text(emojis[i],
-                          style: const TextStyle(fontSize: 28)),
-                    ),
+      builder:
+          (_) => StatefulBuilder(
+            builder:
+                (ctx, setS) => AlertDialog(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  title: Text(
+                    'Session Complete 🎉',
+                    style: GoogleFonts.lora(fontWeight: FontWeight.bold),
+                  ),
+                  content: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        'How do you feel now?',
+                        style: GoogleFonts.lora(color: const Color(0xFF6B6B8A)),
+                      ),
+                      const SizedBox(height: 16),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: List.generate(
+                          emojis.length,
+                          (i) => GestureDetector(
+                            onTap: () => setS(() => selected = i),
+                            child: AnimatedScale(
+                              scale: selected == i ? 1.3 : 1.0,
+                              duration: const Duration(milliseconds: 150),
+                              child: Text(
+                                emojis[i],
+                                style: const TextStyle(fontSize: 28),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        widget.onComplete(selected);
+                      },
+                      child: Text(
+                        'Done',
+                        style: GoogleFonts.lora(
+                          color: widget.session.color,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
           ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(ctx);
-                widget.onComplete(selected);
-              },
-              child: Text('Done',
-                  style: GoogleFonts.lora(
-                    color: widget.session.color,
-                    fontWeight: FontWeight.bold,
-                  )),
-            ),
-          ],
-        ),
-      ),
     );
   }
 
@@ -549,8 +562,11 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                       color: Colors.white.withOpacity(0.6),
                     ),
                   ),
-                  Icon(Icons.self_improvement_rounded,
-                      color: widget.session.color, size: 20),
+                  Icon(
+                    Icons.self_improvement_rounded,
+                    color: widget.session.color,
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -573,8 +589,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: widget.session.color
-                                .withOpacity(0.2),
+                            color: widget.session.color.withOpacity(0.2),
                             width: 1,
                           ),
                         ),
@@ -587,8 +602,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                       child: CircularProgressIndicator(
                         value: progress,
                         strokeWidth: 6,
-                        backgroundColor:
-                            Colors.white.withOpacity(0.08),
+                        backgroundColor: Colors.white.withOpacity(0.08),
                         color: widget.session.color,
                       ),
                     ),
@@ -596,8 +610,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                     Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Text('🧘',
-                            style: const TextStyle(fontSize: 52)),
+                        Text('🧘', style: const TextStyle(fontSize: 52)),
                         const SizedBox(height: 12),
                         Text(
                           _format(_secsLeft),
@@ -642,8 +655,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                 children: [
                   Expanded(
                     child: GestureDetector(
-                      onTap: () =>
-                          setState(() => _paused = !_paused),
+                      onTap: () => setState(() => _paused = !_paused),
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
@@ -682,8 +694,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                             style: GoogleFonts.lora(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color:
-                                  Colors.white.withOpacity(0.7),
+                              color: Colors.white.withOpacity(0.7),
                             ),
                           ),
                         ),

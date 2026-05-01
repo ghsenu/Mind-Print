@@ -64,8 +64,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
     // UI only — derive a fake current position from seek value
     final parts = total.split(':');
     if (parts.length != 2) return '0:00';
-    final totalSecs =
-        int.parse(parts[0]) * 60 + int.parse(parts[1]);
+    final totalSecs = int.parse(parts[0]) * 60 + int.parse(parts[1]);
     final currentSecs = (totalSecs * val).round();
     final m = currentSecs ~/ 60;
     final s = currentSecs % 60;
@@ -85,8 +84,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.keyboard_arrow_down_rounded,
-                        color: Colors.white, size: 32),
+                    icon: const Icon(
+                      Icons.keyboard_arrow_down_rounded,
+                      color: Colors.white,
+                      size: 32,
+                    ),
                     onPressed: () => Navigator.pop(context),
                     padding: EdgeInsets.zero,
                   ),
@@ -122,7 +124,8 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                     boxShadow: [
                       BoxShadow(
                         color: _current.moodColor.withOpacity(
-                            0.15 + _albumPulse.value * 0.2),
+                          0.15 + _albumPulse.value * 0.2,
+                        ),
                         blurRadius: 40 + _albumPulse.value * 20,
                         spreadRadius: 4,
                       ),
@@ -131,8 +134,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                   child: Center(
                     child: Text(
                       '🎵',
-                      style: TextStyle(
-                          fontSize: 64 + _albumPulse.value * 8),
+                      style: TextStyle(fontSize: 64 + _albumPulse.value * 8),
                     ),
                   ),
                 );
@@ -172,7 +174,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                   ),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 5),
+                      horizontal: 12,
+                      vertical: 5,
+                    ),
                     decoration: BoxDecoration(
                       color: _current.moodColor.withOpacity(0.2),
                       borderRadius: BorderRadius.circular(12),
@@ -200,11 +204,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       activeTrackColor: _current.moodColor,
-                      inactiveTrackColor:
-                          Colors.white.withOpacity(0.15),
+                      inactiveTrackColor: Colors.white.withOpacity(0.15),
                       thumbColor: Colors.white,
                       thumbShape: const RoundSliderThumbShape(
-                          enabledThumbRadius: 6),
+                        enabledThumbRadius: 6,
+                      ),
                       trackHeight: 3,
                       overlayShape: SliderComponentShape.noOverlay,
                     ),
@@ -214,15 +218,12 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                     ),
                   ),
                   Padding(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 4),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Row(
-                      mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          _durationLabel(
-                              _seekValue, _current.duration),
+                          _durationLabel(_seekValue, _current.duration),
                           style: GoogleFonts.lora(
                             fontSize: 12,
                             color: Colors.white.withOpacity(0.5),
@@ -297,14 +298,15 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
               child: Container(
                 decoration: const BoxDecoration(
                   color: Color(0xFF1E293B),
-                  borderRadius:
-                      BorderRadius.vertical(top: Radius.circular(28)),
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
                 ),
                 child: Column(
                   children: [
                     GestureDetector(
-                      onTap: () => setState(
-                          () => _playlistExpanded = !_playlistExpanded),
+                      onTap:
+                          () => setState(
+                            () => _playlistExpanded = !_playlistExpanded,
+                          ),
                       child: Padding(
                         padding: const EdgeInsets.fromLTRB(20, 16, 20, 8),
                         child: Row(
@@ -322,8 +324,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                               _playlistExpanded
                                   ? Icons.keyboard_arrow_down_rounded
                                   : Icons.keyboard_arrow_up_rounded,
-                              color:
-                                  Colors.white.withOpacity(0.5),
+                              color: Colors.white.withOpacity(0.5),
                             ),
                           ],
                         ),
@@ -332,26 +333,26 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                     if (_playlistExpanded)
                       Expanded(
                         child: ListView.builder(
-                          padding:
-                              const EdgeInsets.symmetric(horizontal: 16),
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
                           itemCount: widget.playlist.length,
                           itemBuilder: (context, index) {
                             final t = widget.playlist[index];
                             final isActive = index == _currentIndex;
                             return GestureDetector(
-                              onTap: () =>
-                                  setState(() => _currentIndex = index),
+                              onTap:
+                                  () => setState(() => _currentIndex = index),
                               child: Container(
-                                margin:
-                                    const EdgeInsets.only(bottom: 8),
+                                margin: const EdgeInsets.only(bottom: 8),
                                 padding: const EdgeInsets.symmetric(
-                                    horizontal: 14, vertical: 12),
+                                  horizontal: 14,
+                                  vertical: 12,
+                                ),
                                 decoration: BoxDecoration(
-                                  color: isActive
-                                      ? t.moodColor.withOpacity(0.15)
-                                      : Colors.transparent,
-                                  borderRadius:
-                                      BorderRadius.circular(14),
+                                  color:
+                                      isActive
+                                          ? t.moodColor.withOpacity(0.15)
+                                          : Colors.transparent,
+                                  borderRadius: BorderRadius.circular(14),
                                 ),
                                 child: Row(
                                   children: [
@@ -359,21 +360,17 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                                       width: 36,
                                       height: 36,
                                       decoration: BoxDecoration(
-                                        color: t.moodColor
-                                            .withOpacity(0.15),
-                                        borderRadius:
-                                            BorderRadius.circular(10),
+                                        color: t.moodColor.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Icon(
                                         isActive && _isPlaying
-                                            ? Icons
-                                                .pause_rounded
-                                            : Icons
-                                                .play_arrow_rounded,
-                                        color: isActive
-                                            ? t.moodColor
-                                            : Colors.white
-                                                .withOpacity(0.4),
+                                            ? Icons.pause_rounded
+                                            : Icons.play_arrow_rounded,
+                                        color:
+                                            isActive
+                                                ? t.moodColor
+                                                : Colors.white.withOpacity(0.4),
                                         size: 18,
                                       ),
                                     ),
@@ -387,37 +384,37 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                                             t.title,
                                             style: GoogleFonts.lora(
                                               fontSize: 13,
-                                              fontWeight: isActive
-                                                  ? FontWeight.bold
-                                                  : FontWeight.normal,
-                                              color: isActive
-                                                  ? Colors.white
-                                                  : Colors.white
-                                                      .withOpacity(
-                                                          0.7),
+                                              fontWeight:
+                                                  isActive
+                                                      ? FontWeight.bold
+                                                      : FontWeight.normal,
+                                              color:
+                                                  isActive
+                                                      ? Colors.white
+                                                      : Colors.white
+                                                          .withOpacity(0.7),
                                             ),
                                           ),
                                           Text(
                                             t.duration,
                                             style: GoogleFonts.lora(
                                               fontSize: 11,
-                                              color: Colors.white
-                                                  .withOpacity(0.4),
+                                              color: Colors.white.withOpacity(
+                                                0.4,
+                                              ),
                                             ),
                                           ),
                                         ],
                                       ),
                                     ),
                                     Container(
-                                      padding:
-                                          const EdgeInsets.symmetric(
-                                              horizontal: 8,
-                                              vertical: 3),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 3,
+                                      ),
                                       decoration: BoxDecoration(
-                                        color: t.moodColor
-                                            .withOpacity(0.15),
-                                        borderRadius:
-                                            BorderRadius.circular(8),
+                                        color: t.moodColor.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
                                         t.moodTag,
@@ -465,9 +462,7 @@ class _ControlButton extends StatelessWidget {
       onTap: enabled ? onTap : null,
       child: Icon(
         icon,
-        color: enabled
-            ? Colors.white
-            : Colors.white.withOpacity(0.3),
+        color: enabled ? Colors.white : Colors.white.withOpacity(0.3),
         size: size,
       ),
     );

@@ -73,8 +73,10 @@ class MusicTherapyScreen extends StatelessWidget {
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back,
-                          color: Color(0xFF1A1A2E)),
+                      icon: const Icon(
+                        Icons.arrow_back,
+                        color: Color(0xFF1A1A2E),
+                      ),
                       onPressed: () => Navigator.pop(context),
                       padding: EdgeInsets.zero,
                     ),
@@ -109,40 +111,50 @@ class MusicTherapyScreen extends StatelessWidget {
                 child: SingleChildScrollView(
                   scrollDirection: Axis.horizontal,
                   child: Row(
-                    children: [
-                      'All', 'Anxious', 'Stressed', 'Sad', 'Restless',
-                    ].asMap().entries.map((e) {
-                      return Container(
-                        margin: const EdgeInsets.only(right: 10),
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        decoration: BoxDecoration(
-                          color: e.key == 0
-                              ? const Color(0xFF6ACFEF)
-                              : Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.04),
-                              blurRadius: 8,
-                              offset: const Offset(0, 3),
+                    children:
+                        [
+                          'All',
+                          'Anxious',
+                          'Stressed',
+                          'Sad',
+                          'Restless',
+                        ].asMap().entries.map((e) {
+                          return Container(
+                            margin: const EdgeInsets.only(right: 10),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
                             ),
-                          ],
-                        ),
-                        child: Text(
-                          e.value,
-                          style: GoogleFonts.lora(
-                            fontSize: 13,
-                            fontWeight: e.key == 0
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                            color: e.key == 0
-                                ? Colors.white
-                                : const Color(0xFF6B6B8A),
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                            decoration: BoxDecoration(
+                              color:
+                                  e.key == 0
+                                      ? const Color(0xFF6ACFEF)
+                                      : Colors.white,
+                              borderRadius: BorderRadius.circular(20),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.04),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 3),
+                                ),
+                              ],
+                            ),
+                            child: Text(
+                              e.value,
+                              style: GoogleFonts.lora(
+                                fontSize: 13,
+                                fontWeight:
+                                    e.key == 0
+                                        ? FontWeight.bold
+                                        : FontWeight.normal,
+                                color:
+                                    e.key == 0
+                                        ? Colors.white
+                                        : const Color(0xFF6B6B8A),
+                              ),
+                            ),
+                          );
+                        }).toList(),
                   ),
                 ),
               ),
@@ -168,13 +180,14 @@ class MusicTherapyScreen extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
                 child: Column(
-                  children: _playlist.asMap().entries.map((e) {
-                    return _TrackRow(
-                      track: e.value,
-                      index: e.key,
-                      playlist: _playlist,
-                    );
-                  }).toList(),
+                  children:
+                      _playlist.asMap().entries.map((e) {
+                        return _TrackRow(
+                          track: e.value,
+                          index: e.key,
+                          playlist: _playlist,
+                        );
+                      }).toList(),
                 ),
               ),
 
@@ -257,7 +270,9 @@ class _TrackRow extends StatelessWidget {
                 const SizedBox(height: 8),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 3),
+                    horizontal: 10,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: track.moodColor.withOpacity(0.12),
                     borderRadius: BorderRadius.circular(8),
@@ -277,23 +292,26 @@ class _TrackRow extends StatelessWidget {
           // More + Play
           Column(
             children: [
-              const Icon(Icons.more_horiz,
-                  color: Color(0xFF6B6B8A), size: 20),
+              const Icon(Icons.more_horiz, color: Color(0xFF6B6B8A), size: 20),
               const SizedBox(height: 8),
               GestureDetector(
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => MusicPlayerScreen(
-                      track: track,
-                      playlist: playlist,
-                      initialIndex: index,
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (_) => MusicPlayerScreen(
+                              track: track,
+                              playlist: playlist,
+                              initialIndex: index,
+                            ),
+                      ),
                     ),
-                  ),
-                ),
                 child: Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 7),
+                    horizontal: 16,
+                    vertical: 7,
+                  ),
                   decoration: BoxDecoration(
                     color: track.moodColor,
                     borderRadius: BorderRadius.circular(16),

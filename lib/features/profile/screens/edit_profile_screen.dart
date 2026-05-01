@@ -70,7 +70,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           children: [
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 20,
+                ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -89,9 +92,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             child: CircleAvatar(
                               radius: 60,
                               backgroundColor: Colors.white,
-                              backgroundImage: _imageFile != null
-                                  ? FileImage(_imageFile!) as ImageProvider
-                                  : const NetworkImage('https://api.dicebear.com/7.x/avataaars/png?seed=Michael'),
+                              backgroundImage:
+                                  _imageFile != null
+                                      ? FileImage(_imageFile!) as ImageProvider
+                                      : const NetworkImage(
+                                        'https://api.dicebear.com/7.x/avataaars/png?seed=Michael',
+                                      ),
                             ),
                           ),
                           Positioned(
@@ -124,10 +130,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     const SizedBox(height: 40),
 
                     // Forms
-                    _buildTextField(
-                      label: 'Name',
-                      controller: _nameController,
-                    ),
+                    _buildTextField(label: 'Name', controller: _nameController),
                     const SizedBox(height: 20),
                     _buildTextField(
                       label: 'Email',
@@ -163,7 +166,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     // TODO: Implement save logic
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFF28C8C), // Light coral/red color
+                    backgroundColor: const Color(
+                      0xFFF28C8C,
+                    ), // Light coral/red color
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
@@ -212,8 +217,13 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
           decoration: InputDecoration(
             filled: true,
-            fillColor: Colors.transparent, // Background transparent like design? Actually looks slightly lighter or transparent. We'll use transparent or #F8FBFD
-            contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+            fillColor:
+                Colors
+                    .transparent, // Background transparent like design? Actually looks slightly lighter or transparent. We'll use transparent or #F8FBFD
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 14,
+            ),
             enabledBorder: OutlineBorder(color: const Color(0xFFE0E5ED)),
             focusedBorder: OutlineBorder(color: const Color(0xFF0EA5E9)),
           ),
@@ -225,8 +235,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
 class OutlineBorder extends OutlineInputBorder {
   OutlineBorder({required Color color})
-      : super(
-          borderSide: BorderSide(color: color, width: 1),
-          borderRadius: BorderRadius.circular(8),
-        );
+    : super(
+        borderSide: BorderSide(color: color, width: 1),
+        borderRadius: BorderRadius.circular(8),
+      );
 }
