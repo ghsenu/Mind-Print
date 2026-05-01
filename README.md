@@ -1,5 +1,5 @@
 # mind_print
-
+ 
 MindPrint Flutter application.
 
 ## Environment and Database Setup
