@@ -17,6 +17,10 @@ import 'package:mind_print/features/coping/screens/music_therapy_screen.dart';
 import 'package:mind_print/features/coping/screens/meditation_screen.dart';
 import 'package:mind_print/features/coping/screens/cbt_screen.dart';
 import 'package:mind_print/features/games/screens/games_screen.dart';
+import 'package:mind_print/features/games/screens/star_rain_screen.dart';
+import 'package:mind_print/features/games/screens/bubble_pop_screen.dart';
+import 'package:mind_print/features/games/screens/memory_match_screen.dart';
+import 'package:mind_print/features/games/screens/breathing_ball_screen.dart';
 import 'package:mind_print/features/home/screens/home_screen.dart';
 import 'package:mind_print/features/profile/screens/edit_profile_screen.dart';
 import 'package:mind_print/features/journal/screens/emotion_result_screen.dart';
@@ -53,6 +57,10 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   AppRoutes.settings: (_) => const SettingsScreen(),
   AppRoutes.editProfile: (_) => const EditProfileScreen(),
   AppRoutes.games: (_) => const GamesScreen(),
+  AppRoutes.starRain: (_) => const StarRainScreen(),
+  AppRoutes.bubblePop: (_) => const BubblePopScreen(),
+  AppRoutes.memoryMatch: (_) => const MemoryMatchScreen(),
+  AppRoutes.breathingBall: (_) => const BreathingBallScreen(),
   AppRoutes.breathing: (_) => const BreathingScreen(),
   AppRoutes.musicTherapy: (_) => const MusicTherapyScreen(),
   AppRoutes.meditation: (_) => const MeditationScreen(),

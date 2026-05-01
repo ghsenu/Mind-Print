@@ -24,4 +24,8 @@ class AppRoutes {
   static const String musicTherapy = '/activities/music';
   static const String meditation = '/activities/meditation';
   static const String cbtExercises = '/activities/cbt';
+  static const String starRain = '/games/star-rain';
+  static const String bubblePop = '/games/bubble-pop';
+  static const String memoryMatch = '/games/memory-match';
+  static const String breathingBall = '/games/breathing-ball';
 }
