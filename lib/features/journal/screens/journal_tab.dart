@@ -1,92 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mind_print/features/journal/providers/journal_provider.dart';
+import 'package:mind_print/features/journal/screens/voice_journal_screen.dart';
+import 'package:mind_print/features/shared/models/journal_entry.dart';
+import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 
-import '../../shared/widgets/custom_bottom_nav.dart';
-import 'voice_journal_screen.dart';
-
-class JournalTab extends StatefulWidget {
+class JournalTab extends ConsumerStatefulWidget {
   const JournalTab({super.key});
 
   @override
-  State<JournalTab> createState() => _JournalTabState();
+  ConsumerState<JournalTab> createState() => _JournalTabState();
 }
 
-class _JournalTabState extends State<JournalTab>
+class _JournalTabState extends ConsumerState<JournalTab>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-
-  final List<Map<String, dynamic>> _entries = [
-    {
-      'date': 'October 24, 2023',
-      'mood': 'CALM',
-      'moodColor': const Color(0xFFE4F8EA),
-      'moodTextColor': const Color(0xFF28A745),
-      'type': 'TEXT',
-      'typeColor': const Color(0xFFFDECE4),
-      'typeTextColor': const Color(0xFFF25A12),
-      'text': 'Feeling much more centered after the...',
-      'icon': Icons.sentiment_satisfied_alt,
-      'iconBg': const Color(0xFFFDECE4),
-      'iconColor': const Color(0xFFF25A12),
-      'isVoice': false,
-    },
-    {
-      'date': 'October 23, 2023',
-      'mood': 'REFLECTIVE',
-      'moodColor': const Color(0xFFE6F0FF),
-      'moodTextColor': const Color(0xFF0056D2),
-      'type': 'VOICE',
-      'typeColor': const Color(0xFFFEEFEB),
-      'typeTextColor': const Color(0xFFF25A12),
-      'text': 'Recorded some thoughts about the...',
-      'icon': Icons.sentiment_neutral,
-      'iconBg': const Color(0xFFE6F0FF),
-      'iconColor': const Color(0xFF0056D2),
-      'isVoice': true,
-    },
-    {
-      'date': 'October 22, 2023',
-      'mood': 'ANXIOUS',
-      'moodColor': const Color(0xFFFDF0CF),
-      'moodTextColor': const Color(0xFFE88E0E),
-      'type': 'TEXT',
-      'typeColor': const Color(0xFFFDECE4),
-      'typeTextColor': const Color(0xFFF25A12),
-      'text': 'Struggling to stay focused today with...',
-      'icon': Icons.sentiment_very_dissatisfied,
-      'iconBg': const Color(0xFFFDF0CF),
-      'iconColor': const Color(0xFFF25A12),
-      'isVoice': false,
-    },
-    {
-      'date': 'October 21, 2023',
-      'mood': 'JOYFUL',
-      'moodColor': const Color(0xFFFDF0CF),
-      'moodTextColor': const Color(0xFFF25A12),
-      'type': 'TEXT',
-      'typeColor': const Color(0xFFFDECE4),
-      'typeTextColor': const Color(0xFFF25A12),
-      'text': 'Had a breakthrough in therapy today....',
-      'icon': Icons.sentiment_very_satisfied,
-      'iconBg': const Color(0xFFFDECE4),
-      'iconColor': const Color(0xFFF25A12),
-      'isVoice': false,
-    },
-    {
-      'date': 'October 20, 2023',
-      'mood': 'INSPIRED',
-      'moodColor': const Color(0xFFF3E8FF),
-      'moodTextColor': const Color(0xFF7E22CE),
-      'type': 'VOICE',
-      'typeColor': const Color(0xFFFEEFEB),
-      'typeTextColor': const Color(0xFFF25A12),
-      'text': 'New project starting! Lots of idea...',
-      'icon': Icons.sentiment_very_satisfied,
-      'iconBg': const Color(0xFFF3E8FF),
-      'iconColor': const Color(0xFF7E22CE),
-      'isVoice': true,
-    },
-  ];
 
   @override
   void initState() {
@@ -100,13 +29,69 @@ class _JournalTabState extends State<JournalTab>
     super.dispose();
   }
 
+  // Mood score → display data
+  static const Map<int, Map<String, dynamic>> _moodMeta = {
+    1: {
+      'label': 'STRESSED',
+      'moodColor': Color(0xFFFAE5D4),
+      'moodTextColor': Color(0xFFD5743D),
+      'iconBg': Color(0xFFFAE5D4),
+      'iconColor': Color(0xFFD5743D),
+    },
+    2: {
+      'label': 'SAD',
+      'moodColor': Color(0xFFE6F0FF),
+      'moodTextColor': Color(0xFF0056D2),
+      'iconBg': Color(0xFFE6F0FF),
+      'iconColor': Color(0xFF0056D2),
+    },
+    3: {
+      'label': 'NEUTRAL',
+      'moodColor': Color(0xFFF3E8FF),
+      'moodTextColor': Color(0xFF7E22CE),
+      'iconBg': Color(0xFFF3E8FF),
+      'iconColor': Color(0xFF7E22CE),
+    },
+    4: {
+      'label': 'CALM',
+      'moodColor': Color(0xFFE4F8EA),
+      'moodTextColor': Color(0xFF28A745),
+      'iconBg': Color(0xFFE4F8EA),
+      'iconColor': Color(0xFF28A745),
+    },
+    5: {
+      'label': 'JOYFUL',
+      'moodColor': Color(0xFFFDF0CF),
+      'moodTextColor': Color(0xFFF25A12),
+      'iconBg': Color(0xFFFDECE4),
+      'iconColor': Color(0xFFF25A12),
+    },
+  };
+
+  static const Map<int, IconData> _moodIcons = {
+    1: Icons.sentiment_very_dissatisfied,
+    2: Icons.sentiment_dissatisfied,
+    3: Icons.sentiment_neutral,
+    4: Icons.sentiment_satisfied_alt,
+    5: Icons.sentiment_very_satisfied,
+  };
+
+  String _formatDate(DateTime dt) {
+    const months = [
+      'January', 'February', 'March', 'April', 'May', 'June',
+      'July', 'August', 'September', 'October', 'November', 'December',
+    ];
+    return '${months[dt.month - 1]} ${dt.day}, ${dt.year}';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final journalsAsync = ref.watch(journalsProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF9FAFC),
       appBar: AppBar(
-        automaticallyImplyLeading:
-            false, // In case it's top-level or you want it flat
+        automaticallyImplyLeading: false,
         backgroundColor: const Color(0xFFF9FAFC),
         elevation: 0,
         title: Row(
@@ -146,7 +131,6 @@ class _JournalTabState extends State<JournalTab>
       body: Column(
         children: [
           const SizedBox(height: 10),
-          // Custom TabBar to match exactly the design
           Container(
             height: 50,
             decoration: const BoxDecoration(
@@ -171,14 +155,35 @@ class _JournalTabState extends State<JournalTab>
               ],
             ),
           ),
-
           Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _buildJournalList(),
-                _buildJournalList(), // Showing same content for voice as placeholder
-              ],
+            child: journalsAsync.when(
+              loading: () => const Center(
+                child: CircularProgressIndicator(color: Color(0xFFF25A12)),
+              ),
+              error: (e, _) => Center(
+                child: Text(
+                  'Could not load entries.\n$e',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    color: const Color(0xFF8A93A6),
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+              data: (entries) {
+                final textEntries =
+                    entries.where((e) => e.entryType == 'text').toList();
+                final voiceEntries =
+                    entries.where((e) => e.entryType == 'voice').toList();
+
+                return TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildJournalList(textEntries),
+                    _buildJournalList(voiceEntries),
+                  ],
+                );
+              },
             ),
           ),
         ],
@@ -186,21 +191,44 @@ class _JournalTabState extends State<JournalTab>
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFFF25A12),
         onPressed: () {
-          // Navigate to Write Journal Screen. Currently routing to VoiceJournalScreen.
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const VoiceJournalScreen()),
+            MaterialPageRoute(
+              builder: (context) => const VoiceJournalScreen(),
+            ),
           );
         },
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
-      bottomNavigationBar: const CustomBottomNav(
-        selectedIndex: -1,
-      ), // No selection, just shown
+      bottomNavigationBar: const CustomBottomNav(selectedIndex: -1),
     );
   }
 
-  Widget _buildJournalList() {
+  Widget _buildJournalList(List<JournalEntry> entries) {
+    if (entries.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(
+              Icons.book_outlined,
+              size: 48,
+              color: Color(0xFFCDD5E0),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'No entries yet.\nTap + to write your first.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.inter(
+                color: const Color(0xFF8A93A6),
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
     return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
       child: Column(
@@ -217,28 +245,28 @@ class _JournalTabState extends State<JournalTab>
                   color: const Color(0xFF1E212C),
                 ),
               ),
-              GestureDetector(
-                onTap: () {},
-                child: Text(
-                  'View All',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFFF25A12),
-                  ),
+              Text(
+                '${entries.length} total',
+                style: GoogleFonts.inter(
+                  fontSize: 13,
+                  color: const Color(0xFF8A93A6),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          ..._entries.map((entry) => _buildJournalCard(entry)),
-          const SizedBox(height: 30), // Padding above bottom nav/FAB
+          ...entries.map((entry) => _buildJournalCard(entry)),
+          const SizedBox(height: 80),
         ],
       ),
     );
   }
 
-  Widget _buildJournalCard(Map<String, dynamic> entry) {
+  Widget _buildJournalCard(JournalEntry entry) {
+    final meta = _moodMeta[entry.moodScore] ?? _moodMeta[3]!;
+    final icon = _moodIcons[entry.moodScore] ?? Icons.sentiment_neutral;
+    final isVoice = entry.entryType == 'voice';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(16),
@@ -256,18 +284,16 @@ class _JournalTabState extends State<JournalTab>
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Emoji Icon
           Container(
             width: 56,
             height: 56,
             decoration: BoxDecoration(
-              color: entry['iconBg'],
+              color: meta['iconBg'] as Color,
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(entry['icon'], color: entry['iconColor'], size: 28),
+            child: Icon(icon, color: meta['iconColor'] as Color, size: 28),
           ),
           const SizedBox(width: 16),
-          // Content
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -276,7 +302,7 @@ class _JournalTabState extends State<JournalTab>
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      entry['date'],
+                      _formatDate(entry.createdAt),
                       style: GoogleFonts.inter(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -284,7 +310,7 @@ class _JournalTabState extends State<JournalTab>
                       ),
                     ),
                     Icon(
-                      entry['isVoice'] ? Icons.mic_none : Icons.edit_note,
+                      isVoice ? Icons.mic_none : Icons.edit_note,
                       size: 18,
                       color: const Color(0xFF8A93A6),
                     ),
@@ -294,21 +320,31 @@ class _JournalTabState extends State<JournalTab>
                 Row(
                   children: [
                     _buildChip(
-                      entry['mood'],
-                      entry['moodColor'],
-                      entry['moodTextColor'],
+                      meta['label'] as String,
+                      meta['moodColor'] as Color,
+                      meta['moodTextColor'] as Color,
                     ),
                     const SizedBox(width: 8),
                     _buildChip(
-                      entry['type'],
-                      entry['typeColor'],
-                      entry['typeTextColor'],
+                      isVoice ? 'VOICE' : 'TEXT',
+                      const Color(0xFFFDECE4),
+                      const Color(0xFFF25A12),
                     ),
+                    if (entry.isAnalyzed) ...[
+                      const SizedBox(width: 8),
+                      _buildChip(
+                        'ANALYZED',
+                        const Color(0xFFE4F8EA),
+                        const Color(0xFF28A745),
+                      ),
+                    ],
                   ],
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  entry['text'],
+                  entry.content.isNotEmpty
+                      ? entry.content
+                      : 'Voice entry',
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     color: const Color(0xFF8A93A6),

@@ -1,17 +1,19 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
 
-class HomeScreen extends StatefulWidget {
+class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() => _HomeScreenState();
+  ConsumerState<HomeScreen> createState() => _HomeScreenState();
 }
 
-class _HomeScreenState extends State<HomeScreen> {
+class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentMoodIndex = 2;
   bool _showStressBanner = true;
 
@@ -25,6 +27,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final profile = ref.watch(userProfileProvider).value;
+    final displayName = profile?.displayName ?? 'there';
+    final avatarUrl = profile?.profilePhoto ??
+        'https://api.dicebear.com/7.x/avataaars/png?seed=${profile?.userId ?? 'user'}';
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0FBFF),
       body: SafeArea(
@@ -40,11 +47,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     GestureDetector(
                       onTap: () => Navigator.pushNamed(
                           context, AppRoutes.editProfile),
-                      child: const CircleAvatar(
+                      child: CircleAvatar(
                         radius: 22,
-                        backgroundImage: NetworkImage(
-                          'https://api.dicebear.com/7.x/avataaars/png?seed=Michael',
-                        ),
+                        backgroundImage: NetworkImage(avatarUrl),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -56,7 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         children: [
                           const TextSpan(text: 'Hi, '),
                           TextSpan(
-                            text: 'Michael',
+                            text: displayName,
                             style: GoogleFonts.lora(
                                 fontWeight: FontWeight.bold,
                                 color: const Color(0xFF1A1A2E)),
