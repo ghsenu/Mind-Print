@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mind_print/features/journal/providers/journal_provider.dart';
 import 'package:mind_print/features/journal/screens/voice_journal_screen.dart';
+import 'package:mind_print/features/journal/screens/voice_record_screen.dart';
 import 'package:mind_print/features/shared/models/journal_entry.dart';
 import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 
@@ -190,14 +191,7 @@ class _JournalTabState extends ConsumerState<JournalTab>
       ),
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color(0xFFF25A12),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const VoiceJournalScreen(),
-            ),
-          );
-        },
+        onPressed: () => _showEntryTypeSheet(context),
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: -1),
@@ -375,6 +369,65 @@ class _JournalTabState extends ConsumerState<JournalTab>
           fontWeight: FontWeight.w700,
           color: textColor,
           letterSpacing: 0.5,
+        ),
+      ),
+    );
+  }
+
+  void _showEntryTypeSheet(BuildContext context) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (sheetCtx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 24, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'New Journal Entry',
+                style: GoogleFonts.inter(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1A1A2E),
+                ),
+              ),
+              const SizedBox(height: 20),
+              _SheetOption(
+                icon: Icons.edit_note,
+                title: 'Text Entry',
+                subtitle: 'Write about how you feel',
+                onTap: () {
+                  Navigator.pop(sheetCtx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const VoiceJournalScreen(),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 12),
+              _SheetOption(
+                icon: Icons.mic,
+                title: 'Voice Entry',
+                subtitle: 'Speak and let AI transcribe',
+                onTap: () {
+                  Navigator.pop(sheetCtx);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const VoiceRecordScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -47,5 +47,7 @@
 	<true/>
 	<key>NSFaceIDUsageDescription</key>
 	<string>Use Face ID to secure your journal and protect your private thoughts.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>MindPrint needs microphone access to record your voice journal entries.</string>
 </dict>
 </plist>

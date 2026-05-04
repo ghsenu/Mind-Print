@@ -111,6 +111,58 @@ class JournalService {
     return result;
   }
 
+  Future<EmotionResult> analyzeVoiceEntry(
+    String userId,
+    String transcript,
+    String voiceUrl,
+    int moodScore,
+  ) async {
+    final journalRef = _db.journals(userId).doc();
+    final journalId = journalRef.id;
+
+    final entry = JournalEntry(
+      id: journalId,
+      userId: userId,
+      content: transcript,
+      moodScore: moodScore,
+      entryType: 'voice',
+      voiceUrl: voiceUrl,
+      createdAt: DateTime.now(),
+    );
+    await journalRef.set(entry.toFirestore());
+
+    final analysis = await _hf.analyze(transcript);
+    final insight =
+        _emotionInsights[analysis.primaryEmotion] ?? _emotionInsights['neutral']!;
+    final reframe = analysis.distortionType != null
+        ? _distortionReframes[analysis.distortionType]
+        : null;
+
+    final resultRef = _db
+        .journals(userId)
+        .doc(journalId)
+        .collection('emotionResults')
+        .doc();
+
+    final result = EmotionResult(
+      id: resultRef.id,
+      journalId: journalId,
+      userId: userId,
+      primaryEmotion: analysis.primaryEmotion,
+      intensity: analysis.intensity,
+      secondaryEmotions: analysis.secondaryEmotions,
+      sentiment: analysis.sentiment,
+      distortionType: analysis.distortionType,
+      aiInsight: insight,
+      cbtReframe: reframe,
+      analyzedAt: DateTime.now(),
+    );
+
+    await resultRef.set(result.toFirestore());
+    await journalRef.update({'isAnalyzed': true});
+    return result;
+  }
+
   Future<void> deleteEntry(String userId, String journalId) {
     return _db.journals(userId).doc(journalId).delete();
   }
