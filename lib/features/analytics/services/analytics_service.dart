@@ -169,6 +169,20 @@ class AnalyticsService {
     String userId,
     List<JournalEntry> journals,
   ) async {
+    if (journals.isEmpty) {
+      final ref = _db.predictions(userId).doc();
+      final prediction = Prediction(
+        id: ref.id,
+        userId: userId,
+        averageMood: 0,
+        trend: 'stable',
+        alertNeeded: false,
+        generatedAt: DateTime.now(),
+      );
+      await ref.set(prediction.toFirestore());
+      return prediction;
+    }
+
     final recent = journals.take(7).toList();
     final count = recent.length;
 

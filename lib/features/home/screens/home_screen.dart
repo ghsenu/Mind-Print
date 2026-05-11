@@ -209,17 +209,21 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       label: _moods[i].label,
                       isSelected: _currentMoodIndex == i,
                       floatPhase: i * 0.2,
-                      onTap: () {
+                      onTap: () async {
                         setState(() => _currentMoodIndex = i);
                         final user = ref.read(currentUserProvider);
                         if (user != null) {
-                          ref
-                              .read(moodCheckinServiceProvider)
-                              .saveMoodCheckin(
-                                user.uid,
-                                i + 1,
-                                _moods[i].label,
-                              );
+                          try {
+                            await ref
+                                .read(moodCheckinServiceProvider)
+                                .saveMoodCheckin(
+                                  user.uid,
+                                  i + 1,
+                                  _moods[i].label,
+                                );
+                          } catch (e) {
+                            debugPrint('Failed to save mood check-in: $e');
+                          }
                         }
                       },
                     ),

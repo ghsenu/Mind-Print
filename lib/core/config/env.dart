@@ -78,8 +78,7 @@ class Env {
 
   static String get hfApiKey => dotenv.get('HUGGINGFACE_API_KEY', fallback: '');
 
-  static String get assemblyAiApiKey =>
-      dotenv.get('ASSEMBLYAI_API_KEY', fallback: '');
+  static String get assemblyAiApiKey => _require('ASSEMBLYAI_API_KEY');
 
   static String _require(String key) {
     final String? value = dotenv.maybeGet(key);
