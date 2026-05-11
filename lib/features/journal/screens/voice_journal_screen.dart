@@ -101,12 +101,27 @@ class _VoiceJournalScreenState extends ConsumerState<VoiceJournalScreen> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     const months = [
-      'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
     ];
     const weekdays = [
-      'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY',
-      'FRIDAY', 'SATURDAY', 'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+      'SUNDAY',
     ];
 
     final weekday = weekdays[now.weekday - 1];
@@ -207,49 +222,57 @@ class _VoiceJournalScreenState extends ConsumerState<VoiceJournalScreen> {
                       SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
-                          children: _feelings.map((feeling) {
-                            final isSelected =
-                                _selectedFeeling == feeling['label'];
-                            final hasBorder =
-                                feeling.containsKey('borderColor');
+                          children:
+                              _feelings.map((feeling) {
+                                final isSelected =
+                                    _selectedFeeling == feeling['label'];
+                                final hasBorder = feeling.containsKey(
+                                  'borderColor',
+                                );
 
-                            return GestureDetector(
-                              onTap: _isLoading
-                                  ? null
-                                  : () => setState(
-                                        () => _selectedFeeling =
-                                            feeling['label'] as String,
+                                return GestureDetector(
+                                  onTap:
+                                      _isLoading
+                                          ? null
+                                          : () => setState(
+                                            () =>
+                                                _selectedFeeling =
+                                                    feeling['label'] as String,
+                                          ),
+                                  child: Container(
+                                    margin: const EdgeInsets.only(right: 12),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 20,
+                                      vertical: 12,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: feeling['color'] as Color,
+                                      borderRadius: BorderRadius.circular(24),
+                                      border: Border.all(
+                                        color:
+                                            isSelected
+                                                ? feeling['textColor'] as Color
+                                                : (hasBorder
+                                                    ? feeling['borderColor']
+                                                        as Color
+                                                    : Colors.transparent),
+                                        width:
+                                            isSelected
+                                                ? 2
+                                                : (hasBorder ? 1 : 0),
                                       ),
-                              child: Container(
-                                margin: const EdgeInsets.only(right: 12),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 20,
-                                  vertical: 12,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: feeling['color'] as Color,
-                                  borderRadius: BorderRadius.circular(24),
-                                  border: Border.all(
-                                    color: isSelected
-                                        ? feeling['textColor'] as Color
-                                        : (hasBorder
-                                            ? feeling['borderColor'] as Color
-                                            : Colors.transparent),
-                                    width:
-                                        isSelected ? 2 : (hasBorder ? 1 : 0),
+                                    ),
+                                    child: Text(
+                                      feeling['label'] as String,
+                                      style: TextStyle(
+                                        color: feeling['textColor'] as Color,
+                                        fontWeight: FontWeight.w600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
                                   ),
-                                ),
-                                child: Text(
-                                  feeling['label'] as String,
-                                  style: TextStyle(
-                                    color: feeling['textColor'] as Color,
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 14,
-                                  ),
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                                );
+                              }).toList(),
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -264,44 +287,47 @@ class _VoiceJournalScreenState extends ConsumerState<VoiceJournalScreen> {
                             onPressed: _isLoading ? null : _saveAndAnalyze,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: const Color(0xFFD3E3F1),
-                              disabledBackgroundColor:
-                                  const Color(0xFFD3E3F1).withValues(alpha: 0.6),
+                              disabledBackgroundColor: const Color(
+                                0xFFD3E3F1,
+                              ).withValues(alpha: 0.6),
                               elevation: 0,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(28),
                               ),
                             ),
-                            child: _isLoading
-                                ? const Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          color: Colors.black54,
+                            child:
+                                _isLoading
+                                    ? const Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        SizedBox(
+                                          width: 18,
+                                          height: 18,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            color: Colors.black54,
+                                          ),
                                         ),
-                                      ),
-                                      SizedBox(width: 12),
-                                      Text(
-                                        'Analyzing...',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w700,
-                                          color: Colors.black54,
+                                        SizedBox(width: 12),
+                                        Text(
+                                          'Analyzing...',
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w700,
+                                            color: Colors.black54,
+                                          ),
                                         ),
+                                      ],
+                                    )
+                                    : const Text(
+                                      'Save & Analyze',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w700,
+                                        color: Colors.black87,
                                       ),
-                                    ],
-                                  )
-                                : const Text(
-                                    'Save & Analyze',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w700,
-                                      color: Colors.black87,
                                     ),
-                                  ),
                           ),
                         ),
                       ),

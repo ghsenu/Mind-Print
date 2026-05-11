@@ -56,15 +56,17 @@ class _BubblePopScreenState extends State<BubblePopScreen>
     if (_bubbles.length >= 10 || _screenSize == Size.zero) return;
     final rng = math.Random();
     setState(() {
-      _bubbles.add(_Bubble(
-        id: _nextId++,
-        x: rng.nextDouble(),
-        y: startMidScreen ? 0.4 + rng.nextDouble() * 0.5 : 1.05,
-        radius: 20 + rng.nextDouble() * 30,
-        color: _pastelColors[rng.nextInt(_pastelColors.length)],
-        speed: 0.025 + rng.nextDouble() * 0.03,
-        driftPhase: rng.nextDouble() * math.pi * 2,
-      ));
+      _bubbles.add(
+        _Bubble(
+          id: _nextId++,
+          x: rng.nextDouble(),
+          y: startMidScreen ? 0.4 + rng.nextDouble() * 0.5 : 1.05,
+          radius: 20 + rng.nextDouble() * 30,
+          color: _pastelColors[rng.nextInt(_pastelColors.length)],
+          speed: 0.025 + rng.nextDouble() * 0.03,
+          driftPhase: rng.nextDouble() * math.pi * 2,
+        ),
+      );
     });
   }
 
@@ -119,13 +121,14 @@ class _BubblePopScreenState extends State<BubblePopScreen>
               left: 0,
               right: 0,
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios_new,
-                          color: Colors.black),
+                      icon: const Icon(
+                        Icons.arrow_back_ios_new,
+                        color: Colors.black,
+                      ),
                       onPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
@@ -161,45 +164,49 @@ class _BubblePopScreenState extends State<BubblePopScreen>
                 final h = constraints.maxHeight;
                 return Stack(
                   clipBehavior: Clip.none,
-                  children: _bubbles.map((b) {
-                    final left = b.x * w - b.radius;
-                    final top = b.y * h - b.radius;
-                    final opacity = b.isPopped
-                        ? (1.6 - b.popScale).clamp(0.0, 1.0)
-                        : 1.0;
-                    return Positioned(
-                      left: left,
-                      top: top,
-                      child: GestureDetector(
-                        onTap: () => _popBubble(b),
-                        child: Opacity(
-                          opacity: opacity,
-                          child: Transform.scale(
-                            scale: b.isPopped ? b.popScale : 1.0,
-                            child: Container(
-                              width: b.radius * 2,
-                              height: b.radius * 2,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                color: b.color.withOpacity(0.75),
-                                border: Border.all(
-                                  color: Colors.white.withOpacity(0.6),
-                                  width: 2,
-                                ),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: b.color.withOpacity(0.3),
-                                    blurRadius: 8,
-                                    spreadRadius: 2,
+                  children:
+                      _bubbles.map((b) {
+                        final left = b.x * w - b.radius;
+                        final top = b.y * h - b.radius;
+                        final opacity =
+                            b.isPopped
+                                ? (1.6 - b.popScale).clamp(0.0, 1.0)
+                                : 1.0;
+                        return Positioned(
+                          left: left,
+                          top: top,
+                          child: GestureDetector(
+                            onTap: () => _popBubble(b),
+                            child: Opacity(
+                              opacity: opacity,
+                              child: Transform.scale(
+                                scale: b.isPopped ? b.popScale : 1.0,
+                                child: Container(
+                                  width: b.radius * 2,
+                                  height: b.radius * 2,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: b.color.withValues(alpha: 0.75),
+                                    border: Border.all(
+                                      color: Colors.white.withValues(
+                                        alpha: 0.6,
+                                      ),
+                                      width: 2,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: b.color.withValues(alpha: 0.3),
+                                        blurRadius: 8,
+                                        spreadRadius: 2,
+                                      ),
+                                    ],
                                   ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                        );
+                      }).toList(),
                 );
               },
             ),

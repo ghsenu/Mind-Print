@@ -38,7 +38,11 @@ class ProfileService {
   }) async {
     final existing = await getProfile(userId);
     if (existing != null) return;
-    final profile = UserProfile.initial(userId, email, displayName: displayName);
+    final profile = UserProfile.initial(
+      userId,
+      email,
+      displayName: displayName,
+    );
     await saveProfile(profile);
   }
 }

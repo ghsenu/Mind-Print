@@ -2,6 +2,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mind_print/features/analytics/providers/analytics_provider.dart';
+import 'package:mind_print/features/auth/providers/auth_provider.dart';
 import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
@@ -29,8 +31,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Widget build(BuildContext context) {
     final profile = ref.watch(userProfileProvider).value;
     final displayName = profile?.displayName ?? 'there';
-    final avatarUrl = profile?.profilePhoto ??
+    final avatarUrl =
+        profile?.profilePhoto ??
         'https://api.dicebear.com/7.x/avataaars/png?seed=${profile?.userId ?? 'user'}';
+    final prediction = ref.watch(latestPredictionProvider).valueOrNull;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0FBFF),
@@ -45,8 +49,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Row(
                   children: [
                     GestureDetector(
-                      onTap: () => Navigator.pushNamed(
-                          context, AppRoutes.editProfile),
+                      onTap:
+                          () => Navigator.pushNamed(
+                            context,
+                            AppRoutes.editProfile,
+                          ),
                       child: CircleAvatar(
                         radius: 22,
                         backgroundImage: NetworkImage(avatarUrl),
@@ -56,15 +63,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     RichText(
                       text: TextSpan(
                         style: GoogleFonts.lora(
-                            fontSize: 16,
-                            color: const Color(0xFF6B6B8A)),
+                          fontSize: 16,
+                          color: const Color(0xFF6B6B8A),
+                        ),
                         children: [
                           const TextSpan(text: 'Hi, '),
                           TextSpan(
                             text: displayName,
                             style: GoogleFonts.lora(
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF1A1A2E)),
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF1A1A2E),
+                            ),
                           ),
                         ],
                       ),
@@ -78,12 +87,15 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 16),
 
               // ── Stress Banner ─────────────────────────────────────────
-              if (_showStressBanner && _currentMoodIndex == 0)
+              if (_showStressBanner &&
+                  (prediction?.alertNeeded == true || _currentMoodIndex == 0))
                 Padding(
                   padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 16, vertical: 12),
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFFF1F1),
                       borderRadius: BorderRadius.circular(16),
@@ -91,49 +103,66 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ),
                     child: Row(
                       children: [
-                        const Text('😮‍💨',
-                            style: TextStyle(fontSize: 22)),
+                        const Text('😮‍💨', style: TextStyle(fontSize: 22)),
                         const SizedBox(width: 12),
                         Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text('You seem stressed',
-                                  style: GoogleFonts.lora(
-                                      fontSize: 13,
-                                      fontWeight: FontWeight.bold,
-                                      color: const Color(0xFFB91C1C))),
-                              Text('Try a breathing exercise to reset',
-                                  style: GoogleFonts.lora(
-                                      fontSize: 12,
-                                      color: const Color(0xFFEF4444))),
+                              Text(
+                                'You seem stressed',
+                                style: GoogleFonts.lora(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.bold,
+                                  color: const Color(0xFFB91C1C),
+                                ),
+                              ),
+                              Text(
+                                'Try a breathing exercise to reset',
+                                style: GoogleFonts.lora(
+                                  fontSize: 12,
+                                  color: const Color(0xFFEF4444),
+                                ),
+                              ),
                             ],
                           ),
                         ),
                         GestureDetector(
-                          onTap: () => Navigator.pushNamed(
-                              context, AppRoutes.breathing),
+                          onTap:
+                              () => Navigator.pushNamed(
+                                context,
+                                AppRoutes.breathing,
+                              ),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 12, vertical: 7),
+                              horizontal: 12,
+                              vertical: 7,
+                            ),
                             decoration: BoxDecoration(
-                                color: const Color(0xFFEF4444),
-                                borderRadius: BorderRadius.circular(12)),
-                            child: Text('Try',
-                                style: GoogleFonts.lora(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
+                              color: const Color(0xFFEF4444),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              'Try',
+                              style: GoogleFonts.lora(
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                         ),
                         const SizedBox(width: 8),
                         GestureDetector(
-                          onTap: () =>
-                              setState(() => _showStressBanner = false),
-                          child: Icon(Icons.close,
-                              size: 16,
-                              color: const Color(0xFFEF4444)
-                                  .withOpacity(0.6)),
+                          onTap:
+                              () => setState(() => _showStressBanner = false),
+                          child: Icon(
+                            Icons.close,
+                            size: 16,
+                            color: const Color(
+                              0xFFEF4444,
+                            ).withValues(alpha: 0.6),
+                          ),
                         ),
                       ],
                     ),
@@ -149,16 +178,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     Text(
                       'Good Morning!',
                       style: GoogleFonts.lora(
-                          fontSize: 28,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1A2E)),
+                        fontSize: 28,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1A1A2E),
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       'How are you feeling today?',
                       style: GoogleFonts.lora(
-                          fontSize: 15,
-                          color: const Color(0xFF6B6B8A)),
+                        fontSize: 15,
+                        color: const Color(0xFF6B6B8A),
+                      ),
                     ),
                   ],
                 ),
@@ -178,8 +209,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       label: _moods[i].label,
                       isSelected: _currentMoodIndex == i,
                       floatPhase: i * 0.2,
-                      onTap: () =>
-                          setState(() => _currentMoodIndex = i),
+                      onTap: () {
+                        setState(() => _currentMoodIndex = i);
+                        final user = ref.read(currentUserProvider);
+                        if (user != null) {
+                          ref
+                              .read(moodCheckinServiceProvider)
+                              .saveMoodCheckin(
+                                user.uid,
+                                i + 1,
+                                _moods[i].label,
+                              );
+                        }
+                      },
                     ),
                   ),
                 ),
@@ -188,8 +230,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 28),
 
               // ── Insight Card ──────────────────────────────────────────
-              _InsightCard(
-                  dominantEmotion: _moods[_currentMoodIndex].label),
+              _InsightCard(dominantEmotion: _moods[_currentMoodIndex].label),
 
               const SizedBox(height: 24),
 
@@ -199,10 +240,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 child: Text(
                   'QUICK ACTIONS',
                   style: GoogleFonts.lora(
-                      fontSize: 12,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.2,
-                      color: const Color(0xFF6B6B8A).withOpacity(0.7)),
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                    color: const Color(0xFF6B6B8A).withValues(alpha: 0.7),
+                  ),
                 ),
               ),
 
@@ -225,11 +267,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       subtitle: 'Write your thoughts',
                       gradientColors: const [
                         Color(0xFF667EEA),
-                        Color(0xFF764BA2)
+                        Color(0xFF764BA2),
                       ],
                       animOffset: 0.0,
-                      onTap: () => Navigator.pushNamed(
-                          context, AppRoutes.journal),
+                      onTap:
+                          () => Navigator.pushNamed(context, AppRoutes.journal),
                     ),
                     _ActionCard(
                       icon: Icons.mic_none_outlined,
@@ -237,11 +279,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       subtitle: 'Speak your mind',
                       gradientColors: const [
                         Color(0xFFFF6B6B),
-                        Color(0xFFFF8E53)
+                        Color(0xFFFF8E53),
                       ],
                       animOffset: 0.25,
-                      onTap: () => Navigator.pushNamed(
-                          context, AppRoutes.coping),
+                      onTap:
+                          () => Navigator.pushNamed(context, AppRoutes.coping),
                     ),
                     _ActionCard(
                       icon: Icons.sports_esports_outlined,
@@ -249,11 +291,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       subtitle: 'Play your way to calm',
                       gradientColors: const [
                         Color(0xFF4776E6),
-                        Color(0xFF8E54E9)
+                        Color(0xFF8E54E9),
                       ],
                       animOffset: 0.5,
-                      onTap: () => Navigator.pushNamed(
-                          context, AppRoutes.games),
+                      onTap:
+                          () => Navigator.pushNamed(context, AppRoutes.games),
                     ),
                     _ActionCard(
                       icon: Icons.favorite_border_outlined,
@@ -261,11 +303,11 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       subtitle: 'Exercises & music',
                       gradientColors: const [
                         Color(0xFF11998E),
-                        Color(0xFF38EF7D)
+                        Color(0xFF38EF7D),
                       ],
                       animOffset: 0.75,
-                      onTap: () => Navigator.pushNamed(
-                          context, AppRoutes.reports),
+                      onTap:
+                          () => Navigator.pushNamed(context, AppRoutes.reports),
                     ),
                   ],
                 ),
@@ -330,9 +372,10 @@ class _AnimatedMoodEmojiState extends State<_AnimatedMoodEmoji>
       value: widget.floatPhase,
     )..repeat(reverse: true);
 
-    _floatAnim = Tween<double>(begin: 0, end: -7).animate(
-      CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut),
-    );
+    _floatAnim = Tween<double>(
+      begin: 0,
+      end: -7,
+    ).animate(CurvedAnimation(parent: _floatCtrl, curve: Curves.easeInOut));
 
     _bounceCtrl = AnimationController(
       vsync: this,
@@ -383,13 +426,16 @@ class _AnimatedMoodEmojiState extends State<_AnimatedMoodEmoji>
                     duration: const Duration(milliseconds: 200),
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: widget.isSelected
-                          ? const Color(0xFF4C557E).withOpacity(0.12)
-                          : Colors.transparent,
+                      color:
+                          widget.isSelected
+                              ? const Color(0xFF4C557E).withValues(alpha: 0.12)
+                              : Colors.transparent,
                       shape: BoxShape.circle,
                     ),
-                    child: Text(widget.emoji,
-                        style: const TextStyle(fontSize: 36)),
+                    child: Text(
+                      widget.emoji,
+                      style: const TextStyle(fontSize: 36),
+                    ),
                   ),
                 ),
               ),
@@ -398,12 +444,12 @@ class _AnimatedMoodEmojiState extends State<_AnimatedMoodEmoji>
                 duration: const Duration(milliseconds: 200),
                 style: GoogleFonts.lora(
                   fontSize: 11,
-                  fontWeight: widget.isSelected
-                      ? FontWeight.bold
-                      : FontWeight.normal,
-                  color: widget.isSelected
-                      ? const Color(0xFF1A1A2E)
-                      : const Color(0xFF6B6B8A),
+                  fontWeight:
+                      widget.isSelected ? FontWeight.bold : FontWeight.normal,
+                  color:
+                      widget.isSelected
+                          ? const Color(0xFF1A1A2E)
+                          : const Color(0xFF6B6B8A),
                 ),
                 child: Text(widget.label),
               ),
@@ -425,8 +471,7 @@ class _NotificationBell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: () =>
-          Navigator.pushNamed(context, AppRoutes.notifications),
+      onTap: () => Navigator.pushNamed(context, AppRoutes.notifications),
       child: Container(
         width: 44,
         height: 44,
@@ -435,7 +480,7 @@ class _NotificationBell extends StatelessWidget {
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -444,8 +489,7 @@ class _NotificationBell extends StatelessWidget {
         child: Stack(
           alignment: Alignment.center,
           children: [
-            const Icon(Icons.notifications_none,
-                color: Color(0xFF1A1A2E)),
+            const Icon(Icons.notifications_none, color: Color(0xFF1A1A2E)),
             Positioned(
               top: 12,
               right: 12,
@@ -484,7 +528,7 @@ class _InsightCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 20,
               offset: const Offset(0, 10),
             ),
@@ -498,33 +542,45 @@ class _InsightCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Text("Today's Insight",
-                          style: GoogleFonts.lora(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              color: const Color(0xFF1A1A2E))),
+                      Text(
+                        "Today's Insight",
+                        style: GoogleFonts.lora(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: const Color(0xFF1A1A2E),
+                        ),
+                      ),
                       const SizedBox(width: 8),
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
-                            color: const Color(0xFFDCFCE7),
-                            borderRadius: BorderRadius.circular(12)),
-                        child: Text('98% match',
-                            style: GoogleFonts.lora(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                                color: const Color(0xFF15803D))),
+                          color: const Color(0xFFDCFCE7),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '98% match',
+                          style: GoogleFonts.lora(
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF15803D),
+                          ),
+                        ),
                       ),
                     ],
                   ),
                   const SizedBox(height: 16),
-                  Text('DOMINANT EMOTION',
-                      style: GoogleFonts.lora(
-                          fontSize: 10,
-                          fontWeight: FontWeight.bold,
-                          letterSpacing: 1.0,
-                          color: const Color(0xFF6B6B8A))),
+                  Text(
+                    'DOMINANT EMOTION',
+                    style: GoogleFonts.lora(
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.0,
+                      color: const Color(0xFF6B6B8A),
+                    ),
+                  ),
                   const SizedBox(height: 8),
                   AnimatedSwitcher(
                     duration: const Duration(milliseconds: 300),
@@ -532,29 +588,39 @@ class _InsightCard extends StatelessWidget {
                       dominantEmotion,
                       key: ValueKey(dominantEmotion),
                       style: GoogleFonts.lora(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: const Color(0xFF1A1A2E)),
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1A1A2E),
+                      ),
                     ),
                   ),
                   const SizedBox(height: 12),
                   Container(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 10, vertical: 6),
+                      horizontal: 10,
+                      vertical: 6,
+                    ),
                     decoration: BoxDecoration(
-                        color: const Color(0xFFF0F9FF),
-                        borderRadius: BorderRadius.circular(12)),
+                      color: const Color(0xFFF0F9FF),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(Icons.eco_outlined,
-                            size: 14, color: Color(0xFF0EA5E9)),
+                        const Icon(
+                          Icons.eco_outlined,
+                          size: 14,
+                          color: Color(0xFF0EA5E9),
+                        ),
                         const SizedBox(width: 4),
-                        Text('Calm · 78%',
-                            style: GoogleFonts.lora(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
-                                color: const Color(0xFF0EA5E9))),
+                        Text(
+                          'Calm · 78%',
+                          style: GoogleFonts.lora(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: const Color(0xFF0EA5E9),
+                          ),
+                        ),
                       ],
                     ),
                   ),
@@ -567,16 +633,19 @@ class _InsightCard extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 border: Border.all(
-                    color:
-                        const Color(0xFF0EA5E9).withOpacity(0.2),
-                    width: 6),
+                  color: const Color(0xFF0EA5E9).withValues(alpha: 0.2),
+                  width: 6,
+                ),
               ),
               child: Center(
-                child: Text('78%',
-                    style: GoogleFonts.lora(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF0EA5E9))),
+                child: Text(
+                  '78%',
+                  style: GoogleFonts.lora(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: const Color(0xFF0EA5E9),
+                  ),
+                ),
               ),
             ),
           ],
@@ -660,22 +729,23 @@ class _ActionCardState extends State<_ActionCard>
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(widget.icon,
-                            color: Colors.white, size: 26),
+                        Icon(widget.icon, color: Colors.white, size: 26),
                         const SizedBox(height: 8),
                         Text(
                           widget.title,
                           style: GoogleFonts.lora(
-                              fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white),
+                            fontSize: 14,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           widget.subtitle,
                           style: GoogleFonts.lora(
-                              fontSize: 10,
-                              color: Colors.white70),
+                            fontSize: 10,
+                            color: Colors.white70,
+                          ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -705,36 +775,48 @@ class _BubblePainter extends CustomPainter {
     final t = progress * 2 * pi;
 
     // large blob — top-right, drifts slowly
-    _draw(canvas, size,
-        cx: size.width * 0.75 + sin(t * 0.7) * size.width * 0.12,
-        cy: size.height * 0.25 + cos(t * 0.5) * size.height * 0.18,
-        r: size.width * 0.38,
-        opacity: 0.18);
+    _draw(
+      canvas,
+      size,
+      cx: size.width * 0.75 + sin(t * 0.7) * size.width * 0.12,
+      cy: size.height * 0.25 + cos(t * 0.5) * size.height * 0.18,
+      r: size.width * 0.38,
+      opacity: 0.18,
+    );
 
     // medium blob — bottom-left
-    _draw(canvas, size,
-        cx: size.width * 0.15 + sin(t * 0.4 + 1.2) * size.width * 0.1,
-        cy: size.height * 0.75 + cos(t * 0.6 + 0.8) * size.height * 0.15,
-        r: size.width * 0.28,
-        opacity: 0.14);
+    _draw(
+      canvas,
+      size,
+      cx: size.width * 0.15 + sin(t * 0.4 + 1.2) * size.width * 0.1,
+      cy: size.height * 0.75 + cos(t * 0.6 + 0.8) * size.height * 0.15,
+      r: size.width * 0.28,
+      opacity: 0.14,
+    );
 
     // small blob — center, quicker drift
-    _draw(canvas, size,
-        cx: size.width * 0.5 + sin(t * 0.9 + 2.5) * size.width * 0.2,
-        cy: size.height * 0.5 + cos(t * 0.8 + 1.0) * size.height * 0.2,
-        r: size.width * 0.16,
-        opacity: 0.10);
+    _draw(
+      canvas,
+      size,
+      cx: size.width * 0.5 + sin(t * 0.9 + 2.5) * size.width * 0.2,
+      cy: size.height * 0.5 + cos(t * 0.8 + 1.0) * size.height * 0.2,
+      r: size.width * 0.16,
+      opacity: 0.10,
+    );
   }
 
-  void _draw(Canvas canvas, Size size,
-      {required double cx,
-      required double cy,
-      required double r,
-      required double opacity}) {
+  void _draw(
+    Canvas canvas,
+    Size size, {
+    required double cx,
+    required double cy,
+    required double r,
+    required double opacity,
+  }) {
     canvas.drawCircle(
       Offset(cx, cy),
       r,
-      Paint()..color = Colors.white.withOpacity(opacity),
+      Paint()..color = Colors.white.withValues(alpha: opacity),
     );
   }
 

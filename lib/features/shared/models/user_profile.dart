@@ -37,14 +37,17 @@ class UserProfile {
     final now = DateTime.now();
     return UserProfile(
       userId: userId,
-      displayName: displayName.isNotEmpty ? displayName : email.split('@').first,
+      displayName:
+          displayName.isNotEmpty ? displayName : email.split('@').first,
       email: email,
       createdAt: now,
       updatedAt: now,
     );
   }
 
-  factory UserProfile.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory UserProfile.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     return UserProfile(
       userId: doc.id,
@@ -63,18 +66,18 @@ class UserProfile {
   }
 
   Map<String, dynamic> toFirestore() => {
-        'displayName': displayName,
-        'email': email,
-        if (profilePhoto != null) 'profilePhoto': profilePhoto,
-        'language': language,
-        'yearOfStudy': yearOfStudy,
-        'biometricEnabled': biometricEnabled,
-        'notificationsEnabled': notificationsEnabled,
-        'offlineSyncEnabled': offlineSyncEnabled,
-        'onboardingCompleted': onboardingCompleted,
-        'createdAt': Timestamp.fromDate(createdAt),
-        'updatedAt': Timestamp.fromDate(updatedAt),
-      };
+    'displayName': displayName,
+    'email': email,
+    if (profilePhoto != null) 'profilePhoto': profilePhoto,
+    'language': language,
+    'yearOfStudy': yearOfStudy,
+    'biometricEnabled': biometricEnabled,
+    'notificationsEnabled': notificationsEnabled,
+    'offlineSyncEnabled': offlineSyncEnabled,
+    'onboardingCompleted': onboardingCompleted,
+    'createdAt': Timestamp.fromDate(createdAt),
+    'updatedAt': Timestamp.fromDate(updatedAt),
+  };
 
   UserProfile copyWith({
     String? displayName,
@@ -87,19 +90,18 @@ class UserProfile {
     bool? offlineSyncEnabled,
     bool? onboardingCompleted,
     DateTime? updatedAt,
-  }) =>
-      UserProfile(
-        userId: userId,
-        displayName: displayName ?? this.displayName,
-        email: email ?? this.email,
-        profilePhoto: profilePhoto ?? this.profilePhoto,
-        language: language ?? this.language,
-        yearOfStudy: yearOfStudy ?? this.yearOfStudy,
-        biometricEnabled: biometricEnabled ?? this.biometricEnabled,
-        notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
-        offlineSyncEnabled: offlineSyncEnabled ?? this.offlineSyncEnabled,
-        onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
-        createdAt: createdAt,
-        updatedAt: updatedAt ?? DateTime.now(),
-      );
+  }) => UserProfile(
+    userId: userId,
+    displayName: displayName ?? this.displayName,
+    email: email ?? this.email,
+    profilePhoto: profilePhoto ?? this.profilePhoto,
+    language: language ?? this.language,
+    yearOfStudy: yearOfStudy ?? this.yearOfStudy,
+    biometricEnabled: biometricEnabled ?? this.biometricEnabled,
+    notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
+    offlineSyncEnabled: offlineSyncEnabled ?? this.offlineSyncEnabled,
+    onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
+    createdAt: createdAt,
+    updatedAt: updatedAt ?? DateTime.now(),
+  );
 }

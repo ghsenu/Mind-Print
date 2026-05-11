@@ -19,7 +19,8 @@ class EmotionResultScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final emoji = _emotionEmoji[result.primaryEmotion] ?? '😐';
-    final emotionLabel = result.primaryEmotion[0].toUpperCase() +
+    final emotionLabel =
+        result.primaryEmotion[0].toUpperCase() +
         result.primaryEmotion.substring(1);
     final confidencePct = (result.intensity * 100).round();
 
@@ -50,10 +51,7 @@ class EmotionResultScreen extends StatelessWidget {
                     ],
                     if (result.cbtReframe != null) ...[
                       const SizedBox(height: 14),
-                      _buildCbtCard(
-                        result.cbtReframe!,
-                        result.distortionType,
-                      ),
+                      _buildCbtCard(result.cbtReframe!, result.distortionType),
                     ],
                     const SizedBox(height: 8),
                   ],
@@ -68,7 +66,10 @@ class EmotionResultScreen extends StatelessWidget {
   }
 
   Widget _buildEmotionHero(
-      String emoji, String emotionLabel, int confidencePct) {
+    String emoji,
+    String emotionLabel,
+    int confidencePct,
+  ) {
     return Column(
       children: <Widget>[
         Container(
@@ -147,13 +148,14 @@ class EmotionResultScreen extends StatelessWidget {
           Wrap(
             spacing: 8,
             runSpacing: 8,
-            children: emotions
-                .map(
-                  (e) => _EmotionChip(
-                    label: e[0].toUpperCase() + e.substring(1),
-                  ),
-                )
-                .toList(),
+            children:
+                emotions
+                    .map(
+                      (e) => _EmotionChip(
+                        label: e[0].toUpperCase() + e.substring(1),
+                      ),
+                    )
+                    .toList(),
           ),
         ],
       ),
@@ -232,8 +234,7 @@ class EmotionResultScreen extends StatelessWidget {
             Align(
               alignment: Alignment.centerRight,
               child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: const Color(0xFFEFF4FA),
                   borderRadius: BorderRadius.circular(12),
@@ -297,8 +298,8 @@ class EmotionResultScreen extends StatelessWidget {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton.icon(
-                  onPressed: () =>
-                      Navigator.of(context).popUntil((r) => r.isFirst),
+                  onPressed:
+                      () => Navigator.of(context).popUntil((r) => r.isFirst),
                   icon: const Icon(Icons.check_rounded, size: 18),
                   label: const Text('Done'),
                   style: ElevatedButton.styleFrom(

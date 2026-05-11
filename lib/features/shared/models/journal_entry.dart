@@ -15,13 +15,15 @@ class JournalEntry {
   final String id;
   final String userId;
   final String content;
-  final int moodScore;    // 1–5
+  final int moodScore; // 1–5
   final String entryType; // 'text' | 'voice'
   final String? voiceUrl;
   final bool isAnalyzed;
   final DateTime createdAt;
 
-  factory JournalEntry.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory JournalEntry.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     return JournalEntry(
       id: doc.id,
@@ -36,12 +38,12 @@ class JournalEntry {
   }
 
   Map<String, dynamic> toFirestore() => {
-        'userId': userId,
-        'content': content,
-        'moodScore': moodScore,
-        'entryType': entryType,
-        if (voiceUrl != null) 'voiceUrl': voiceUrl,
-        'isAnalyzed': isAnalyzed,
-        'createdAt': Timestamp.fromDate(createdAt),
-      };
+    'userId': userId,
+    'content': content,
+    'moodScore': moodScore,
+    'entryType': entryType,
+    if (voiceUrl != null) 'voiceUrl': voiceUrl,
+    'isAnalyzed': isAnalyzed,
+    'createdAt': Timestamp.fromDate(createdAt),
+  };
 }

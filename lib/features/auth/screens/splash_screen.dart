@@ -93,7 +93,7 @@ class _SplashScreenState extends State<SplashScreen>
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.80),
+                      color: Colors.white.withValues(alpha: 0.80),
                       height: 1.6,
                       fontStyle: FontStyle.italic,
                     ),
@@ -115,7 +115,7 @@ class _SplashScreenState extends State<SplashScreen>
                         Icon(
                           Icons.lock_outline,
                           size: 14,
-                          color: Colors.white.withOpacity(0.55),
+                          color: Colors.white.withValues(alpha: 0.55),
                         ),
                         const SizedBox(width: 8),
                         Text(
@@ -123,7 +123,7 @@ class _SplashScreenState extends State<SplashScreen>
                           style: GoogleFonts.lora(
                             fontSize: 11,
                             letterSpacing: 1.8,
-                            color: Colors.white.withOpacity(0.55),
+                            color: Colors.white.withValues(alpha: 0.55),
                             fontWeight: FontWeight.w600,
                           ),
                         ),

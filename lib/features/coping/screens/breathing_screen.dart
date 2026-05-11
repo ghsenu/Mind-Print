@@ -157,7 +157,7 @@ class _ExerciseCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -169,7 +169,7 @@ class _ExerciseCard extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: exercise.color.withOpacity(0.15),
+              color: exercise.color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
@@ -218,7 +218,7 @@ class _ExerciseCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: exercise.color.withOpacity(0.15),
+                color: exercise.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -446,7 +446,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                     'Session: ${_formatTime(_sessionSecsLeft)} remaining',
                     style: GoogleFonts.lora(
                       fontSize: 13,
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                   Icon(Icons.water_drop_outlined, color: ex.color, size: 20),
@@ -467,7 +467,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                     shape: BoxShape.circle,
                     color: Colors.transparent,
                     border: Border.all(
-                      color: ex.color.withOpacity(0.25),
+                      color: ex.color.withValues(alpha: 0.25),
                       width: 12,
                     ),
                   ),
@@ -481,13 +481,13 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                           shape: BoxShape.circle,
                           gradient: RadialGradient(
                             colors: [
-                              ex.color.withOpacity(0.9),
-                              ex.color.withOpacity(0.4),
+                              ex.color.withValues(alpha: 0.9),
+                              ex.color.withValues(alpha: 0.4),
                             ],
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: ex.color.withOpacity(0.4),
+                              color: ex.color.withValues(alpha: 0.4),
                               blurRadius: 40,
                               spreadRadius: 10,
                             ),
@@ -516,7 +516,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
               _paused ? 'Tap resume to continue' : _phaseHints[_phase],
               style: GoogleFonts.lora(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
               ),
             ),
 
@@ -533,7 +533,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.12),
+                          color: Colors.white.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(26),
                         ),
                         child: Center(
@@ -556,10 +556,10 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
+                          color: Colors.white.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(26),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Center(
@@ -568,7 +568,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                             style: GoogleFonts.lora(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
                           ),
                         ),

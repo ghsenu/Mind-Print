@@ -15,11 +15,13 @@ class NotificationItem {
   final String userId;
   final String title;
   final String body;
-  final String type;    // 'affirmation' | 'reminder' | 'alert'
+  final String type; // 'affirmation' | 'reminder' | 'alert'
   final bool isRead;
   final DateTime createdAt;
 
-  factory NotificationItem.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory NotificationItem.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     return NotificationItem(
       id: doc.id,
@@ -33,21 +35,21 @@ class NotificationItem {
   }
 
   Map<String, dynamic> toFirestore() => {
-        'userId': userId,
-        'title': title,
-        'body': body,
-        'type': type,
-        'isRead': isRead,
-        'createdAt': Timestamp.fromDate(createdAt),
-      };
+    'userId': userId,
+    'title': title,
+    'body': body,
+    'type': type,
+    'isRead': isRead,
+    'createdAt': Timestamp.fromDate(createdAt),
+  };
 
   NotificationItem copyWith({bool? isRead}) => NotificationItem(
-        id: id,
-        userId: userId,
-        title: title,
-        body: body,
-        type: type,
-        isRead: isRead ?? this.isRead,
-        createdAt: createdAt,
-      );
+    id: id,
+    userId: userId,
+    title: title,
+    body: body,
+    type: type,
+    isRead: isRead ?? this.isRead,
+    createdAt: createdAt,
+  );
 }
