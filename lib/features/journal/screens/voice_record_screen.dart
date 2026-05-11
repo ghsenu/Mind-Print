@@ -185,7 +185,7 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
     } finally {
       if (localPath != null) {
         File(localPath).delete().catchError((e) {
-          debugPrint('Failed to delete temp voice file: $e');
+          debugPrint('Failed to delete temp voice file $localPath: $e');
         });
       }
     }
