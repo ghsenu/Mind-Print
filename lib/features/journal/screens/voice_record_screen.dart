@@ -61,10 +61,14 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
     voiceService.isRecording
         .then((recording) {
           if (recording) {
-            voiceService.stopRecording().catchError((_) {});
+            voiceService.stopRecording().catchError((e) {
+              debugPrint('Failed to stop recorder during dispose: $e');
+            });
           }
         })
-        .catchError((_) {});
+        .catchError((e) {
+          debugPrint('Failed to check recorder state during dispose: $e');
+        });
     super.dispose();
   }
 
@@ -180,7 +184,9 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
       }
     } finally {
       if (localPath != null) {
-        File(localPath).delete().catchError((_) {});
+        File(localPath).delete().catchError((e) {
+          debugPrint('Failed to delete temp voice file: $e');
+        });
       }
     }
   }
