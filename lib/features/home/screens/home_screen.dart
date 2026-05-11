@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mind_print/features/analytics/providers/analytics_provider.dart';
 import 'package:mind_print/features/auth/providers/auth_provider.dart';
+import 'package:mind_print/features/notifications/providers/notification_provider.dart';
 import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
@@ -18,6 +19,18 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentMoodIndex = 2;
   bool _showStressBanner = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(notificationServiceProvider).initialize();
+      final user = ref.read(currentUserProvider);
+      if (user != null) {
+        ref.read(notificationServiceProvider).saveTokenToUserProfile(user.uid);
+      }
+    });
+  }
 
   final List<_MoodData> _moods = [
     const _MoodData('😔', 'Stressed'),
@@ -465,11 +478,13 @@ class _AnimatedMoodEmojiState extends State<_AnimatedMoodEmoji>
 // Notification Bell
 // ─────────────────────────────────────────────────────────────
 
-class _NotificationBell extends StatelessWidget {
+class _NotificationBell extends ConsumerWidget {
   const _NotificationBell();
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final unreadCount = ref.watch(unreadNotificationCountProvider);
+
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, AppRoutes.notifications),
       child: Container(
@@ -490,18 +505,19 @@ class _NotificationBell extends StatelessWidget {
           alignment: Alignment.center,
           children: [
             const Icon(Icons.notifications_none, color: Color(0xFF1A1A2E)),
-            Positioned(
-              top: 12,
-              right: 12,
-              child: Container(
-                width: 8,
-                height: 8,
-                decoration: const BoxDecoration(
-                  color: Color(0xFFEF4444),
-                  shape: BoxShape.circle,
+            if (unreadCount > 0)
+              Positioned(
+                top: 12,
+                right: 12,
+                child: Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: Color(0xFFEF4444),
+                    shape: BoxShape.circle,
+                  ),
                 ),
               ),
-            ),
           ],
         ),
       ),

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/activity_models.dart';
+import '../services/audio_service.dart';
 
-class MusicPlayerScreen extends StatefulWidget {
+class MusicPlayerScreen extends ConsumerStatefulWidget {
   const MusicPlayerScreen({
     super.key,
     required this.track,
@@ -16,10 +18,10 @@ class MusicPlayerScreen extends StatefulWidget {
   final int initialIndex;
 
   @override
-  State<MusicPlayerScreen> createState() => _MusicPlayerScreenState();
+  ConsumerState<MusicPlayerScreen> createState() => _MusicPlayerScreenState();
 }
 
-class _MusicPlayerScreenState extends State<MusicPlayerScreen>
+class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
     with TickerProviderStateMixin {
   late int _currentIndex;
   bool _isPlaying = false;
@@ -36,27 +38,55 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
       vsync: this,
       duration: const Duration(seconds: 3),
     )..repeat(reverse: true);
+
+    _loadTrack();
+  }
+
+  void _loadTrack() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(audioServiceProvider).stop();
+      ref
+          .read(audioServiceProvider)
+          .loadAudio(
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
+          )
+          .then((_) {
+            if (_isPlaying) {
+              ref.read(audioServiceProvider).play();
+            }
+          });
+    });
   }
 
   @override
   void dispose() {
     _albumPulse.dispose();
+    ref.read(audioServiceProvider).stop();
     super.dispose();
   }
 
   MusicTrack get _current => widget.playlist[_currentIndex];
 
-  void _playPause() => setState(() => _isPlaying = !_isPlaying);
+  void _playPause() {
+    setState(() => _isPlaying = !_isPlaying);
+    if (_isPlaying) {
+      ref.read(audioServiceProvider).play();
+    } else {
+      ref.read(audioServiceProvider).pause();
+    }
+  }
 
   void _prev() {
     if (_currentIndex > 0) {
       setState(() => _currentIndex--);
+      _loadTrack();
     }
   }
 
   void _next() {
     if (_currentIndex < widget.playlist.length - 1) {
       setState(() => _currentIndex++);
+      _loadTrack();
     }
   }
 
@@ -339,8 +369,10 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                             final t = widget.playlist[index];
                             final isActive = index == _currentIndex;
                             return GestureDetector(
-                              onTap:
-                                  () => setState(() => _currentIndex = index),
+                              onTap: () {
+                                setState(() => _currentIndex = index);
+                                _loadTrack();
+                              },
                               child: Container(
                                 margin: const EdgeInsets.only(bottom: 8),
                                 padding: const EdgeInsets.symmetric(

@@ -1,72 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mind_print/features/notifications/providers/notification_provider.dart';
 import 'package:mind_print/features/notifications/screens/notification_details_screen.dart';
+import 'package:mind_print/features/shared/models/notification_item.dart';
 
-class NotificationScreen extends StatefulWidget {
+class NotificationScreen extends ConsumerStatefulWidget {
   const NotificationScreen({super.key});
 
   @override
-  State<NotificationScreen> createState() => _NotificationScreenState();
+  ConsumerState<NotificationScreen> createState() => _NotificationScreenState();
 }
 
 enum _SortBy { newestFirst, olderFirst, readNotification, unreadNotification }
 
-class _NotificationScreenState extends State<NotificationScreen> {
+class _NotificationScreenState extends ConsumerState<NotificationScreen> {
   _SortBy _selectedSort = _SortBy.newestFirst;
 
-  final List<_NotificationItem> _allNotifications = const <_NotificationItem>[
-    _NotificationItem(
-      title: 'Payment Received',
-      message: 'Earn 5% Cashback on Grocery Purchases this Weekend!',
-      time: '34 Minutes ago',
-      minutesAgo: 34,
-      icon: Icons.account_balance_wallet_outlined,
-      isRead: false,
-    ),
-    _NotificationItem(
-      title: 'Payment Reminder',
-      message: 'Diversify Your Portfolio with Emerging Markets Fund',
-      time: '15 Minutes ago',
-      minutesAgo: 15,
-      icon: Icons.account_balance_wallet_outlined,
-      isRead: false,
-    ),
-    _NotificationItem(
-      title: 'Security Alert',
-      message: 'Suspicious Login Attempt Detected on Your Account',
-      time: '52 Minutes ago',
-      minutesAgo: 52,
-      icon: Icons.security_outlined,
-      isRead: false,
-    ),
-    _NotificationItem(
-      title: 'Loan Reminder',
-      message: 'Your Mortgage Payment is Due in 3 Days',
-      time: '35 Minutes ago',
-      minutesAgo: 35,
-      icon: Icons.currency_exchange_outlined,
-      isRead: true,
-    ),
-    _NotificationItem(
-      title: 'Budget Advisory',
-      message: '80% of Your Monthly Budget Spent - Time for Expense Review!',
-      time: '1 Hour ago',
-      minutesAgo: 60,
-      icon: Icons.savings_outlined,
-      isRead: true,
-    ),
-  ];
-
-  List<_NotificationItem> get _visibleNotifications {
-    final List<_NotificationItem> base = List<_NotificationItem>.from(
-      _allNotifications,
-    );
+  List<NotificationItem> _getVisibleNotifications(List<NotificationItem> all) {
+    final List<NotificationItem> base = List<NotificationItem>.from(all);
 
     switch (_selectedSort) {
       case _SortBy.newestFirst:
-        base.sort((a, b) => a.minutesAgo.compareTo(b.minutesAgo));
+        base.sort((a, b) => b.createdAt.compareTo(a.createdAt));
         return base;
       case _SortBy.olderFirst:
-        base.sort((a, b) => b.minutesAgo.compareTo(a.minutesAgo));
+        base.sort((a, b) => a.createdAt.compareTo(b.createdAt));
         return base;
       case _SortBy.readNotification:
         return base.where((item) => item.isRead).toList();
@@ -184,8 +142,29 @@ class _NotificationScreenState extends State<NotificationScreen> {
     }
   }
 
+  IconData _getIconForType(String type) {
+    switch (type) {
+      case 'affirmation':
+        return Icons.favorite_outline;
+      case 'alert':
+        return Icons.warning_amber_outlined;
+      case 'reminder':
+      default:
+        return Icons.edit_notifications_outlined;
+    }
+  }
+
+  String _formatTime(DateTime time) {
+    final diff = DateTime.now().difference(time);
+    if (diff.inMinutes < 60) return '${diff.inMinutes} Minutes ago';
+    if (diff.inHours < 24) return '${diff.inHours} Hours ago';
+    return '${diff.inDays} Days ago';
+  }
+
   @override
   Widget build(BuildContext context) {
+    final notificationsAsync = ref.watch(notificationListProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFAFCFE8),
       body: SafeArea(
@@ -234,7 +213,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           const Text(
                             'Latest notification',
                             style: TextStyle(
-                              fontSize: 30,
+                              fontSize: 22,
                               fontWeight: FontWeight.w600,
                               color: Color(0xFF111827),
                             ),
@@ -260,7 +239,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                                   Text(
                                     'Sort By',
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       color: Color(0xFF374151),
                                     ),
                                   ),
@@ -279,38 +258,58 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                     const Divider(height: 1, color: Color(0xFFE5E7EB)),
                     Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 14,
-                          vertical: 4,
-                        ),
-                        itemCount: _visibleNotifications.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          final _NotificationItem item =
-                              _visibleNotifications[index];
-                          return InkWell(
-                            onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder:
-                                      (context) => NotificationDetailsScreen(
-                                        title: item.title,
-                                        message: item.message,
-                                        time: item.time,
-                                      ),
+                      child: notificationsAsync.when(
+                        data: (allNotifications) {
+                          final visible = _getVisibleNotifications(
+                            allNotifications,
+                          );
+                          if (visible.isEmpty) {
+                            return const Center(
+                              child: Text('No notifications right now'),
+                            );
+                          }
+                          return ListView.builder(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 4,
+                            ),
+                            itemCount: visible.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              final item = visible[index];
+                              return InkWell(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder:
+                                          (context) =>
+                                              NotificationDetailsScreen(
+                                                title: item.title,
+                                                message: item.body,
+                                                time: _formatTime(
+                                                  item.createdAt,
+                                                ),
+                                              ),
+                                    ),
+                                  );
+                                },
+                                child: _NotificationTile(
+                                  title: item.title,
+                                  message: item.body,
+                                  time: _formatTime(item.createdAt),
+                                  icon: _getIconForType(item.type),
+                                  isUnread: !item.isRead,
                                 ),
                               );
                             },
-                            child: _NotificationTile(
-                              title: item.title,
-                              message: item.message,
-                              time: item.time,
-                              icon: item.icon,
-                              isUnread: !item.isRead,
-                            ),
                           );
                         },
+                        loading:
+                            () => const Center(
+                              child: CircularProgressIndicator(),
+                            ),
+                        error:
+                            (err, stack) => Center(child: Text('Error: $err')),
                       ),
                     ),
                   ],
@@ -489,22 +488,4 @@ class _SortOptionTile extends StatelessWidget {
       ),
     );
   }
-}
-
-class _NotificationItem {
-  const _NotificationItem({
-    required this.title,
-    required this.message,
-    required this.time,
-    required this.minutesAgo,
-    required this.icon,
-    required this.isRead,
-  });
-
-  final String title;
-  final String message;
-  final String time;
-  final int minutesAgo;
-  final IconData icon;
-  final bool isRead;
 }

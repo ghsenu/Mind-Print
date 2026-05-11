@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/activity_models.dart';
+import '../services/audio_service.dart';
 
 class MeditationScreen extends StatefulWidget {
   const MeditationScreen({super.key});
@@ -413,7 +415,7 @@ class _SessionCard extends StatelessWidget {
 
 // ── Active meditation timer ──────────────────────────────────────────────────
 
-class _ActiveMeditationScreen extends StatefulWidget {
+class _ActiveMeditationScreen extends ConsumerStatefulWidget {
   const _ActiveMeditationScreen({
     required this.session,
     required this.durationMinutes,
@@ -429,11 +431,12 @@ class _ActiveMeditationScreen extends StatefulWidget {
   final VoidCallback onQuit;
 
   @override
-  State<_ActiveMeditationScreen> createState() =>
+  ConsumerState<_ActiveMeditationScreen> createState() =>
       _ActiveMeditationScreenState();
 }
 
-class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
+class _ActiveMeditationScreenState
+    extends ConsumerState<_ActiveMeditationScreen>
     with SingleTickerProviderStateMixin {
   late int _secsLeft;
   Timer? _timer;
@@ -449,6 +452,17 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
       duration: const Duration(seconds: 4),
     )..repeat();
     _startTimer();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(audioServiceProvider)
+          .loadAudio(
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+          )
+          .then((_) {
+            ref.read(audioServiceProvider).play();
+          });
+    });
   }
 
   void _startTimer() {
@@ -456,6 +470,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
       if (_paused) return;
       if (_secsLeft <= 0) {
         _timer?.cancel();
+        ref.read(audioServiceProvider).stop();
         _showMoodAfterDialog();
         return;
       }
@@ -537,6 +552,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
   void dispose() {
     _timer?.cancel();
     _ripple.dispose();
+    ref.read(audioServiceProvider).stop();
     super.dispose();
   }
 
@@ -655,7 +671,14 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                 children: [
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => setState(() => _paused = !_paused),
+                      onTap: () {
+                        setState(() => _paused = !_paused);
+                        if (_paused) {
+                          ref.read(audioServiceProvider).pause();
+                        } else {
+                          ref.read(audioServiceProvider).play();
+                        }
+                      },
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
