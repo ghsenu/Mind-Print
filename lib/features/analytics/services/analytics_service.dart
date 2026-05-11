@@ -65,8 +65,6 @@ class AnalyticsService {
     'Sun',
   ];
   static const _defaultTrend = 'stable';
-  static const _defaultAverageMood = 0.0;
-  static const _defaultAlertNeeded = false;
 
   Future<AnalyticsSummary> getAnalyticsSummary(String userId) async {
     // Fetch last 30 journals
@@ -173,17 +171,9 @@ class AnalyticsService {
     List<JournalEntry> journals,
   ) async {
     if (journals.isEmpty) {
-      final ref = _db.predictions(userId).doc();
-      final prediction = Prediction(
-        id: ref.id,
-        userId: userId,
-        averageMood: _defaultAverageMood,
-        trend: _defaultTrend,
-        alertNeeded: _defaultAlertNeeded,
-        generatedAt: DateTime.now(),
+      throw StateError(
+        'Cannot generate a prediction without journal entries.',
       );
-      await ref.set(prediction.toFirestore());
-      return prediction;
     }
 
     final recent = journals.take(7).toList();
