@@ -94,7 +94,7 @@ class ActivitiesScreen extends StatelessWidget {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: const Color(0xFF6ACFEF).withOpacity(0.3),
+                        color: const Color(0xFF6ACFEF).withValues(alpha: 0.3),
                         blurRadius: 16,
                         offset: const Offset(0, 8),
                       ),
@@ -111,7 +111,7 @@ class ActivitiesScreen extends StatelessWidget {
                               style: GoogleFonts.lora(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white.withOpacity(0.85),
+                                color: Colors.white.withValues(alpha: 0.85),
                                 letterSpacing: 0.8,
                               ),
                             ),
@@ -129,7 +129,7 @@ class ActivitiesScreen extends StatelessWidget {
                               'Great for winding down before sleep',
                               style: GoogleFonts.lora(
                                 fontSize: 12,
-                                color: Colors.white.withOpacity(0.85),
+                                color: Colors.white.withValues(alpha: 0.85),
                               ),
                             ),
                           ],
@@ -147,7 +147,7 @@ class ActivitiesScreen extends StatelessWidget {
                             vertical: 10,
                           ),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.25),
+                            color: Colors.white.withValues(alpha: 0.25),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -176,7 +176,7 @@ class ActivitiesScreen extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
-                    color: const Color(0xFF6B6B8A).withOpacity(0.7),
+                    color: const Color(0xFF6B6B8A).withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -221,7 +221,7 @@ class _CategoryRow extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 14,
               offset: const Offset(0, 6),
             ),

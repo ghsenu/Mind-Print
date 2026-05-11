@@ -120,11 +120,11 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                   height: 200,
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(24),
-                    color: _current.moodColor.withOpacity(0.2),
+                    color: _current.moodColor.withValues(alpha: 0.2),
                     boxShadow: [
                       BoxShadow(
-                        color: _current.moodColor.withOpacity(
-                          0.15 + _albumPulse.value * 0.2,
+                        color: _current.moodColor.withValues(
+                          alpha: 0.15 + _albumPulse.value * 0.2,
                         ),
                         blurRadius: 40 + _albumPulse.value * 20,
                         spreadRadius: 4,
@@ -166,7 +166,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                           _current.duration,
                           style: GoogleFonts.lora(
                             fontSize: 13,
-                            color: Colors.white.withOpacity(0.5),
+                            color: Colors.white.withValues(alpha: 0.5),
                           ),
                         ),
                       ],
@@ -178,7 +178,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                       vertical: 5,
                     ),
                     decoration: BoxDecoration(
-                      color: _current.moodColor.withOpacity(0.2),
+                      color: _current.moodColor.withValues(alpha: 0.2),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
@@ -204,7 +204,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                   SliderTheme(
                     data: SliderTheme.of(context).copyWith(
                       activeTrackColor: _current.moodColor,
-                      inactiveTrackColor: Colors.white.withOpacity(0.15),
+                      inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
                       thumbColor: Colors.white,
                       thumbShape: const RoundSliderThumbShape(
                         enabledThumbRadius: 6,
@@ -226,14 +226,14 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                           _durationLabel(_seekValue, _current.duration),
                           style: GoogleFonts.lora(
                             fontSize: 12,
-                            color: Colors.white.withOpacity(0.5),
+                            color: Colors.white.withValues(alpha: 0.5),
                           ),
                         ),
                         Text(
                           _current.duration,
                           style: GoogleFonts.lora(
                             fontSize: 12,
-                            color: Colors.white.withOpacity(0.5),
+                            color: Colors.white.withValues(alpha: 0.5),
                           ),
                         ),
                       ],
@@ -266,7 +266,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                       color: _current.moodColor,
                       boxShadow: [
                         BoxShadow(
-                          color: _current.moodColor.withOpacity(0.4),
+                          color: _current.moodColor.withValues(alpha: 0.4),
                           blurRadius: 20,
                           offset: const Offset(0, 6),
                         ),
@@ -324,7 +324,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                               _playlistExpanded
                                   ? Icons.keyboard_arrow_down_rounded
                                   : Icons.keyboard_arrow_up_rounded,
-                              color: Colors.white.withOpacity(0.5),
+                              color: Colors.white.withValues(alpha: 0.5),
                             ),
                           ],
                         ),
@@ -350,7 +350,7 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                                 decoration: BoxDecoration(
                                   color:
                                       isActive
-                                          ? t.moodColor.withOpacity(0.15)
+                                          ? t.moodColor.withValues(alpha: 0.15)
                                           : Colors.transparent,
                                   borderRadius: BorderRadius.circular(14),
                                 ),
@@ -360,7 +360,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                                       width: 36,
                                       height: 36,
                                       decoration: BoxDecoration(
-                                        color: t.moodColor.withOpacity(0.15),
+                                        color: t.moodColor.withValues(
+                                          alpha: 0.15,
+                                        ),
                                         borderRadius: BorderRadius.circular(10),
                                       ),
                                       child: Icon(
@@ -370,7 +372,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                                         color:
                                             isActive
                                                 ? t.moodColor
-                                                : Colors.white.withOpacity(0.4),
+                                                : Colors.white.withValues(
+                                                  alpha: 0.4,
+                                                ),
                                         size: 18,
                                       ),
                                     ),
@@ -391,16 +395,17 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                                               color:
                                                   isActive
                                                       ? Colors.white
-                                                      : Colors.white
-                                                          .withOpacity(0.7),
+                                                      : Colors.white.withValues(
+                                                        alpha: 0.7,
+                                                      ),
                                             ),
                                           ),
                                           Text(
                                             t.duration,
                                             style: GoogleFonts.lora(
                                               fontSize: 11,
-                                              color: Colors.white.withOpacity(
-                                                0.4,
+                                              color: Colors.white.withValues(
+                                                alpha: 0.4,
                                               ),
                                             ),
                                           ),
@@ -413,7 +418,9 @@ class _MusicPlayerScreenState extends State<MusicPlayerScreen>
                                         vertical: 3,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: t.moodColor.withOpacity(0.15),
+                                        color: t.moodColor.withValues(
+                                          alpha: 0.15,
+                                        ),
                                         borderRadius: BorderRadius.circular(8),
                                       ),
                                       child: Text(
@@ -462,7 +469,7 @@ class _ControlButton extends StatelessWidget {
       onTap: enabled ? onTap : null,
       child: Icon(
         icon,
-        color: enabled ? Colors.white : Colors.white.withOpacity(0.3),
+        color: enabled ? Colors.white : Colors.white.withValues(alpha: 0.3),
         size: size,
       ),
     );

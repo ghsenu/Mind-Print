@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:record/record.dart';
 
@@ -30,24 +28,6 @@ class VoiceService {
   }
 
   Future<bool> get isRecording => _recorder.isRecording();
-
-  Future<String> uploadToStorage(
-    String userId,
-    String fileId,
-    String filePath,
-  ) async {
-    final ref = FirebaseStorage.instance
-        .ref()
-        .child('voice')
-        .child(userId)
-        .child('$fileId.m4a');
-
-    final snapshot = await ref.putFile(
-      File(filePath),
-      SettableMetadata(contentType: 'audio/mp4'),
-    );
-    return snapshot.ref.getDownloadURL();
-  }
 
   Future<void> dispose() => _recorder.dispose();
 }
