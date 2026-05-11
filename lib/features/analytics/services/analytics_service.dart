@@ -64,6 +64,9 @@ class AnalyticsService {
     'Sat',
     'Sun',
   ];
+  static const _defaultTrend = 'stable';
+  static const _defaultAverageMood = 0.0;
+  static const _defaultAlertNeeded = false;
 
   Future<AnalyticsSummary> getAnalyticsSummary(String userId) async {
     // Fetch last 30 journals
@@ -174,9 +177,9 @@ class AnalyticsService {
       final prediction = Prediction(
         id: ref.id,
         userId: userId,
-        averageMood: 0,
-        trend: 'stable',
-        alertNeeded: false,
+        averageMood: _defaultAverageMood,
+        trend: _defaultTrend,
+        alertNeeded: _defaultAlertNeeded,
         generatedAt: DateTime.now(),
       );
       await ref.set(prediction.toFirestore());
@@ -189,7 +192,7 @@ class AnalyticsService {
     double averageMood =
         recent.map((j) => j.moodScore).reduce((a, b) => a + b) / count;
 
-    String trend = 'stable';
+    String trend = _defaultTrend;
     bool alertNeeded = false;
 
     if (count >= 6) {
