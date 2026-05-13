@@ -44,15 +44,14 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
   void _loadTrack() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(audioServiceProvider).stop();
-      final audioUrl = _current.audioUrl ?? 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
-      ref
-          .read(audioServiceProvider)
-          .loadAudio(audioUrl)
-          .then((_) {
-            if (_isPlaying) {
-              ref.read(audioServiceProvider).play();
-            }
-          });
+      final audioUrl =
+          _current.audioUrl ??
+          'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
+      ref.read(audioServiceProvider).loadAudio(audioUrl).then((_) {
+        if (_isPlaying) {
+          ref.read(audioServiceProvider).play();
+        }
+      });
     });
   }
 
@@ -232,8 +231,10 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
                     stream: player.positionStream,
                     builder: (context, snapshot) {
                       final position = snapshot.data ?? Duration.zero;
-                      final duration = player.duration ?? const Duration(seconds: 1);
-                      double seekValue = position.inMilliseconds / duration.inMilliseconds;
+                      final duration =
+                          player.duration ?? const Duration(seconds: 1);
+                      double seekValue =
+                          position.inMilliseconds / duration.inMilliseconds;
                       if (seekValue < 0.0) seekValue = 0.0;
                       if (seekValue > 1.0) seekValue = 1.0;
 
@@ -242,7 +243,9 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
                           SliderTheme(
                             data: SliderTheme.of(context).copyWith(
                               activeTrackColor: _current.moodColor,
-                              inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
+                              inactiveTrackColor: Colors.white.withValues(
+                                alpha: 0.15,
+                              ),
                               thumbColor: Colors.white,
                               thumbShape: const RoundSliderThumbShape(
                                 enabledThumbRadius: 6,
@@ -253,7 +256,10 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
                             child: Slider(
                               value: seekValue,
                               onChanged: (v) {
-                                final seekTo = Duration(milliseconds: (v * duration.inMilliseconds).round());
+                                final seekTo = Duration(
+                                  milliseconds:
+                                      (v * duration.inMilliseconds).round(),
+                                );
                                 player.seek(seekTo);
                               },
                             ),
@@ -282,7 +288,7 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
                           ),
                         ],
                       );
-                    }
+                    },
                   ),
                 ],
               ),
@@ -322,11 +328,13 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
                       builder: (context, snapshot) {
                         final isPlaying = snapshot.data ?? false;
                         return Icon(
-                          isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                          isPlaying
+                              ? Icons.pause_rounded
+                              : Icons.play_arrow_rounded,
                           color: Colors.white,
                           size: 36,
                         );
-                      }
+                      },
                     ),
                   ),
                 ),
