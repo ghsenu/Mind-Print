@@ -26,7 +26,6 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
   late int _currentIndex;
   bool _isPlaying = false;
   bool _playlistExpanded = true;
-  double _seekValue = 0.2;
 
   late AnimationController _albumPulse;
 

@@ -133,6 +133,8 @@ class NotificationService {
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.time,
     );
+
+    debugPrint('✅ Local notifications scheduled: 8 AM & 7 PM (repeating daily)');
   }
 
   tz.TZDateTime _nextInstanceOfTime(int hour, int minute) {
