@@ -45,11 +45,10 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
   void _loadTrack() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(audioServiceProvider).stop();
+      final audioUrl = _current.audioUrl ?? 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
       ref
           .read(audioServiceProvider)
-          .loadAudio(
-            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
-          )
+          .loadAudio(audioUrl)
           .then((_) {
             if (_isPlaying) {
               ref.read(audioServiceProvider).play();
@@ -90,19 +89,18 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
     }
   }
 
-  String _durationLabel(double val, String total) {
-    // UI only — derive a fake current position from seek value
-    final parts = total.split(':');
-    if (parts.length != 2) return '0:00';
-    final totalSecs = int.parse(parts[0]) * 60 + int.parse(parts[1]);
-    final currentSecs = (totalSecs * val).round();
-    final m = currentSecs ~/ 60;
-    final s = currentSecs % 60;
-    return '$m:${s.toString().padLeft(2, '0')}';
+  String _formatDuration(Duration? duration) {
+    if (duration == null) return "0:00";
+    String twoDigits(int n) => n.toString().padLeft(2, "0");
+    String twoDigitMinutes = duration.inMinutes.toString();
+    String twoDigitSeconds = twoDigits(duration.inSeconds.remainder(60));
+    return "$twoDigitMinutes:$twoDigitSeconds";
   }
 
   @override
   Widget build(BuildContext context) {
+    final player = ref.watch(audioServiceProvider).player;
+
     return Scaffold(
       backgroundColor: const Color(0xFF0F172A),
       body: SafeArea(
@@ -231,43 +229,61 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
               padding: const EdgeInsets.symmetric(horizontal: 28),
               child: Column(
                 children: [
-                  SliderTheme(
-                    data: SliderTheme.of(context).copyWith(
-                      activeTrackColor: _current.moodColor,
-                      inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
-                      thumbColor: Colors.white,
-                      thumbShape: const RoundSliderThumbShape(
-                        enabledThumbRadius: 6,
-                      ),
-                      trackHeight: 3,
-                      overlayShape: SliderComponentShape.noOverlay,
-                    ),
-                    child: Slider(
-                      value: _seekValue,
-                      onChanged: (v) => setState(() => _seekValue = v),
-                    ),
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 4),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _durationLabel(_seekValue, _current.duration),
-                          style: GoogleFonts.lora(
-                            fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.5),
+                  StreamBuilder<Duration>(
+                    stream: player.positionStream,
+                    builder: (context, snapshot) {
+                      final position = snapshot.data ?? Duration.zero;
+                      final duration = player.duration ?? const Duration(seconds: 1);
+                      double seekValue = position.inMilliseconds / duration.inMilliseconds;
+                      if (seekValue < 0.0) seekValue = 0.0;
+                      if (seekValue > 1.0) seekValue = 1.0;
+
+                      return Column(
+                        children: [
+                          SliderTheme(
+                            data: SliderTheme.of(context).copyWith(
+                              activeTrackColor: _current.moodColor,
+                              inactiveTrackColor: Colors.white.withValues(alpha: 0.15),
+                              thumbColor: Colors.white,
+                              thumbShape: const RoundSliderThumbShape(
+                                enabledThumbRadius: 6,
+                              ),
+                              trackHeight: 3,
+                              overlayShape: SliderComponentShape.noOverlay,
+                            ),
+                            child: Slider(
+                              value: seekValue,
+                              onChanged: (v) {
+                                final seekTo = Duration(milliseconds: (v * duration.inMilliseconds).round());
+                                player.seek(seekTo);
+                              },
+                            ),
                           ),
-                        ),
-                        Text(
-                          _current.duration,
-                          style: GoogleFonts.lora(
-                            fontSize: 12,
-                            color: Colors.white.withValues(alpha: 0.5),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              children: [
+                                Text(
+                                  _formatDuration(position),
+                                  style: GoogleFonts.lora(
+                                    fontSize: 12,
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                                Text(
+                                  _formatDuration(player.duration),
+                                  style: GoogleFonts.lora(
+                                    fontSize: 12,
+                                    color: Colors.white.withValues(alpha: 0.5),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      );
+                    }
                   ),
                 ],
               ),
@@ -302,12 +318,16 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
                         ),
                       ],
                     ),
-                    child: Icon(
-                      _isPlaying
-                          ? Icons.pause_rounded
-                          : Icons.play_arrow_rounded,
-                      color: Colors.white,
-                      size: 36,
+                    child: StreamBuilder<bool>(
+                      stream: player.playingStream,
+                      builder: (context, snapshot) {
+                        final isPlaying = snapshot.data ?? false;
+                        return Icon(
+                          isPlaying ? Icons.pause_rounded : Icons.play_arrow_rounded,
+                          color: Colors.white,
+                          size: 36,
+                        );
+                      }
                     ),
                   ),
                 ),
