@@ -154,4 +154,25 @@ class AuthService {
       rethrow;
     }
   }
+
+  Future<void> updatePassword(String newPassword) async {
+    try {
+      if (currentUser != null) {
+        await currentUser!.updatePassword(newPassword);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      if (currentUser != null) {
+        await _firestore.collection('users').doc(currentUser!.uid).delete();
+        await currentUser!.delete();
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
 }

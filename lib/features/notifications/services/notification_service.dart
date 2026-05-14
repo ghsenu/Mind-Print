@@ -4,6 +4,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
+import 'package:mind_print/features/shared/models/notification_item.dart';
 
 class NotificationService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
@@ -153,5 +154,28 @@ class NotificationService {
       scheduledDate = scheduledDate.add(const Duration(days: 1));
     }
     return scheduledDate;
+  }
+
+  Future<void> createNotification({
+    required String userId,
+    required String title,
+    required String body,
+    required String type,
+  }) async {
+    final notification = NotificationItem(
+      id: '',
+      userId: userId,
+      title: title,
+      body: body,
+      type: type,
+      isRead: false,
+      createdAt: DateTime.now(),
+    );
+
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('notifications')
+        .add(notification.toFirestore());
   }
 }
