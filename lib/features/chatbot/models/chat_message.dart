@@ -29,11 +29,11 @@ class ChatMessage {
       '${DateTime.now().millisecondsSinceEpoch}_${Object().hashCode}';
 
   static ChatMessage userMessage(String text) => ChatMessage(
-        id: _newId(),
-        text: text,
-        sender: MessageSender.user,
-        createdAt: DateTime.now(),
-      );
+    id: _newId(),
+    text: text,
+    sender: MessageSender.user,
+    createdAt: DateTime.now(),
+  );
 
   static ChatMessage botMessage({String text = '', bool isStreaming = true}) =>
       ChatMessage(

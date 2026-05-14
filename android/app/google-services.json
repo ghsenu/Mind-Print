@@ -12,7 +12,20 @@
           "package_name": "com.example.mind_print"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "987595589557-dkse9part9pv6orfp530o6ckr9k8lmh7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.mind_print",
+            "certificate_hash": "4f6bc1916310bf03e45651284049df1c31d08d3d"
+          }
+        },
+        {
+          "client_id": "987595589557-7thmcslnhu57q7i4et5m00hc1n882vej.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyDlt2qjlks7Yz9QPgx3WaZjTMmlKjx_tlo"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "987595589557-7thmcslnhu57q7i4et5m00hc1n882vej.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "987595589557-8dmij9g95ir254tav1011aulnqkr01do.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.mindPrint"
+              }
+            }
+          ]
         }
       }
     }

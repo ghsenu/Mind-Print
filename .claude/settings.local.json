@@ -3,7 +3,10 @@
     "allow": [
       "PowerShell(Get-ChildItem -Path \"c:\\\\Users\\\\hp\\\\Desktop\\\\Mind Print\\\\mind_print\" -Force | Select-Object Name, @{Name=\"Type\"; Expression={if \\($_.PSIsContainer\\) {\"DIR\"} else {\"FILE\"}}} | Format-Table -AutoSize)",
       "Bash(flutter analyze *)",
-      "Bash(Select-String -Pattern \"error|warning|No issues\")"
+      "Bash(Select-String -Pattern \"error|warning|No issues\")",
+      "PowerShell(& \"C:\\\\Program Files\\\\Android\\\\Android Studio\\\\jbr\\\\bin\\\\keytool.exe\" -list -v -keystore \"$env:USERPROFILE\\\\.android\\\\debug.keystore\" -alias androiddebugkey -storepass android -keypass android 2>&1 | Select-String \"SHA1\")",
+      "Bash(dir -r)",
+      "Bash(xargs grep -l \"onboardingQuestionnaire\\\\|onboarding_questionnaire\")"
     ]
   }
 }

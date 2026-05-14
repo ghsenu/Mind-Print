@@ -9,6 +9,8 @@ class UserProfile {
     this.fcmToken,
     this.language = 'en',
     this.yearOfStudy = '',
+    this.dateOfBirth,
+    this.country,
     this.biometricEnabled = false,
     this.notificationsEnabled = true,
     this.offlineSyncEnabled = true,
@@ -23,6 +25,8 @@ class UserProfile {
   final String? profilePhoto;
   final String language; // 'en' | 'si' | 'ta'
   final String yearOfStudy;
+  final String? dateOfBirth;
+  final String? country;
   final String? fcmToken;
   final bool biometricEnabled;
   final bool notificationsEnabled;
@@ -59,6 +63,8 @@ class UserProfile {
       fcmToken: data['fcmToken'] as String?,
       language: data['language'] as String? ?? 'en',
       yearOfStudy: data['yearOfStudy'] as String? ?? '',
+      dateOfBirth: data['dateOfBirth'] as String?,
+      country: data['country'] as String?,
       biometricEnabled: data['biometricEnabled'] as bool? ?? false,
       notificationsEnabled: data['notificationsEnabled'] as bool? ?? true,
       offlineSyncEnabled: data['offlineSyncEnabled'] as bool? ?? true,
@@ -75,6 +81,8 @@ class UserProfile {
     if (fcmToken != null) 'fcmToken': fcmToken,
     'language': language,
     'yearOfStudy': yearOfStudy,
+    if (dateOfBirth != null) 'dateOfBirth': dateOfBirth,
+    if (country != null) 'country': country,
     'biometricEnabled': biometricEnabled,
     'notificationsEnabled': notificationsEnabled,
     'offlineSyncEnabled': offlineSyncEnabled,
@@ -90,6 +98,8 @@ class UserProfile {
     String? fcmToken,
     String? language,
     String? yearOfStudy,
+    String? dateOfBirth,
+    String? country,
     bool? biometricEnabled,
     bool? notificationsEnabled,
     bool? offlineSyncEnabled,
@@ -103,6 +113,8 @@ class UserProfile {
     fcmToken: fcmToken ?? this.fcmToken,
     language: language ?? this.language,
     yearOfStudy: yearOfStudy ?? this.yearOfStudy,
+    dateOfBirth: dateOfBirth ?? this.dateOfBirth,
+    country: country ?? this.country,
     biometricEnabled: biometricEnabled ?? this.biometricEnabled,
     notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     offlineSyncEnabled: offlineSyncEnabled ?? this.offlineSyncEnabled,
