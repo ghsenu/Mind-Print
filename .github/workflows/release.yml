@@ -3,10 +3,10 @@ name: Release APK
 on:
   push:
     branches:
-      - release/development # Trigger on merges/pushes to release/development
+      - release/development
     tags:
-      - 'v*' # Trigger on tags like v1.0.0
-  workflow_dispatch: # Allow manual triggering
+      - 'v*'
+  workflow_dispatch:
 
 jobs:
   build:
@@ -26,15 +26,33 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.7.2'
           channel: 'stable'
           cache: true
+
+      - name: Create .env file
+        run: |
+          if [ -z "${{ secrets.DOTENV_FILE }}" ]; then
+            echo "No DOTENV_FILE secret found. Creating an empty .env file."
+            touch .env
+          else
+            echo "${{ secrets.DOTENV_FILE }}" > .env
+          fi
 
       - name: Get Dependencies
         run: flutter pub get
 
-      - name: Build APK
-        run: flutter build apk --release --split-per-abi
+      - name: Build APKs
+        run: |
+          # Build split APKs for smaller sizes
+          flutter build apk --release --split-per-abi
+          # Build one universal APK for easy sharing
+          flutter build apk --release
+
+      - name: Get SHA Fingerprints
+        run: |
+          echo "### SHA-1 and SHA-256 Fingerprints for Firebase ###"
+          keytool -list -v -keystore ~/.android/debug.keystore -alias androiddebugkey -storepass android -keypass android | grep -E "SHA1|SHA256"
+          echo "#################################################"
 
       - name: Create Release
         id: create_release
@@ -44,6 +62,7 @@ jobs:
             build/app/outputs/flutter-apk/app-armeabi-v7a-release.apk
             build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
             build/app/outputs/flutter-apk/app-x86_64-release.apk
+            build/app/outputs/flutter-apk/app-release.apk
           name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'Latest Main Build' }}
           tag_name: ${{ startsWith(github.ref, 'refs/tags/') && github.ref_name || 'latest' }}
           draft: false
