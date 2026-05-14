@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mind_print/features/auth/providers/auth_provider.dart';
 import 'package:mind_print/features/notifications/providers/notification_provider.dart';
 import 'package:mind_print/features/notifications/screens/notification_details_screen.dart';
 import 'package:mind_print/features/shared/models/notification_item.dart';
@@ -278,6 +279,14 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                               final item = visible[index];
                               return InkWell(
                                 onTap: () {
+                                  // Mark as read
+                                  final user = ref.read(currentUserProvider);
+                                  if (user != null) {
+                                    ref
+                                        .read(notificationServiceProvider)
+                                        .markAsRead(user.uid, item.id);
+                                  }
+
                                   Navigator.push(
                                     context,
                                     MaterialPageRoute(

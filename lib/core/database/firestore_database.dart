@@ -35,4 +35,12 @@ class FirestoreDatabase {
   CollectionReference<Map<String, dynamic>> reports(String userId) {
     return _firestore.collection('users').doc(userId).collection('reports');
   }
+
+  Future<void> setNetworkEnabled(bool enabled) async {
+    if (enabled) {
+      await _firestore.enableNetwork();
+    } else {
+      await _firestore.disableNetwork();
+    }
+  }
 }

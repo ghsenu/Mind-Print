@@ -7,6 +7,8 @@ import '../widgets/music_player.dart';
 class MusicTherapyScreen extends StatelessWidget {
   const MusicTherapyScreen({super.key});
 
+  // TODO: Replace each audioUrl with the Firebase Storage download URL after
+  // uploading the files. Run MusicStorageService.printAllUrls() once to get them.
   static const List<MusicTrack> _playlist = [
     MusicTrack(
       title: 'Ocean Calm',

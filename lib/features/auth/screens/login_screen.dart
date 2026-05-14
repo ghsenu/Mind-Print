@@ -31,7 +31,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     if (input.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter both email/username and password')),
+        const SnackBar(
+          content: Text('Please enter both email/username and password'),
+        ),
       );
       return;
     }

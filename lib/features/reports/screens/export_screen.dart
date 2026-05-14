@@ -57,7 +57,7 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
             Row(
               children: [
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: ElevatedButton(
                     onPressed: () async {
                       final picked = await showDatePicker(
                         context: context,
@@ -69,17 +69,26 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                       );
                       if (picked != null) setState(() => _startDate = picked);
                     },
-                    icon: const Icon(Icons.date_range),
-                    label: Text(
-                      _startDate == null
-                          ? 'Start Date'
-                          : DateFormat('MMM d, y').format(_startDate!),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.date_range, size: 18),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            _startDate == null
+                                ? 'Start Date'
+                                : DateFormat('MMM d, y').format(_startDate!),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: ElevatedButton.icon(
+                  child: ElevatedButton(
                     onPressed: () async {
                       final picked = await showDatePicker(
                         context: context,
@@ -89,11 +98,20 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
                       );
                       if (picked != null) setState(() => _endDate = picked);
                     },
-                    icon: const Icon(Icons.date_range),
-                    label: Text(
-                      _endDate == null
-                          ? 'End Date'
-                          : DateFormat('MMM d, y').format(_endDate!),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        const Icon(Icons.date_range, size: 18),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            _endDate == null
+                                ? 'End Date'
+                                : DateFormat('MMM d, y').format(_endDate!),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),

@@ -14,7 +14,12 @@ class NotificationService {
 
   NotificationService(this._firestore);
 
-  Future<void> initialize() async {
+  Future<void> initialize({bool isEnabled = true}) async {
+    if (!isEnabled) {
+      await _localNotifications.cancelAll();
+      return;
+    }
+
     // 1. Request permissions for FCM
     await _firebaseMessaging.requestPermission(
       alert: true,
@@ -66,18 +71,16 @@ class NotificationService {
   Future<void> saveTokenToUserProfile(String userId) async {
     final token = await getFcmToken();
     if (token != null) {
-      await _firestore.collection('users').doc(userId).set(
-        {'fcmToken': token},
-        SetOptions(merge: true),
-      );
+      await _firestore.collection('users').doc(userId).set({
+        'fcmToken': token,
+      }, SetOptions(merge: true));
     }
 
     // Listen for token refreshes
     _firebaseMessaging.onTokenRefresh.listen((newToken) {
-      _firestore.collection('users').doc(userId).set(
-        {'fcmToken': newToken},
-        SetOptions(merge: true),
-      );
+      _firestore.collection('users').doc(userId).set({
+        'fcmToken': newToken,
+      }, SetOptions(merge: true));
     });
   }
 
@@ -182,4 +185,20 @@ class NotificationService {
         .collection('notifications')
         .add(notification.toFirestore());
   }
+
+  Future<void> markAsRead(String userId, String notificationId) async {
+    await _firestore
+        .collection('users')
+        .doc(userId)
+        .collection('notifications')
+        .doc(notificationId)
+        .update({'isRead': true});
+  }
+}
+
+@pragma('vm:entry-point')
+Future<void> firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  // If you're going to use other Firebase services in the background, such as Firestore,
+  // make sure you call `Firebase.initializeApp()` before using other Firebase services.
+  debugPrint('Handling a background message: ${message.messageId}');
 }

@@ -457,9 +457,10 @@ class _ActiveMeditationScreenState
       ref
           .read(audioServiceProvider)
           .loadAudio(
-            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3',
           )
           .then((_) {
+            if (!mounted) return;
             ref.read(audioServiceProvider).play();
           });
     });

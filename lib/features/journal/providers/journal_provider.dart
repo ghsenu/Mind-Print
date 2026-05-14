@@ -6,7 +6,9 @@ import 'package:mind_print/features/journal/services/hugging_face_service.dart';
 import 'package:mind_print/features/journal/services/journal_service.dart';
 import 'package:mind_print/features/journal/services/voice_service.dart';
 import 'package:mind_print/features/shared/models/journal_entry.dart';
+import 'package:mind_print/features/shared/providers/service_providers.dart';
 import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
+import 'package:mind_print/features/notifications/providers/notification_provider.dart';
 
 final huggingFaceServiceProvider = Provider<HuggingFaceService>((ref) {
   return HuggingFaceService(Env.hfApiKey);
@@ -16,6 +18,10 @@ final journalServiceProvider = Provider<JournalService>((ref) {
   return JournalService(
     ref.watch(firestoreDatabaseProvider),
     ref.watch(huggingFaceServiceProvider),
+    Env.geminiApiKey,
+    ref.watch(rateLimiterServiceProvider),
+    ref.watch(localStorageServiceProvider),
+    ref.watch(notificationServiceProvider),
   );
 });
 
@@ -26,7 +32,10 @@ final journalsProvider = StreamProvider<List<JournalEntry>>((ref) {
 });
 
 final assemblyAiServiceProvider = Provider<AssemblyAiService>((ref) {
-  return AssemblyAiService(Env.assemblyAiApiKey);
+  return AssemblyAiService(
+    Env.assemblyAiApiKey,
+    ref.watch(rateLimiterServiceProvider),
+  );
 });
 
 final voiceServiceProvider = Provider<VoiceService>((ref) {
