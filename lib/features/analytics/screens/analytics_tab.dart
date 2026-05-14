@@ -6,6 +6,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mind_print/features/analytics/providers/analytics_provider.dart';
 import 'package:mind_print/features/analytics/services/analytics_service.dart';
 import 'package:mind_print/features/shared/models/prediction.dart';
+import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
+import 'package:mind_print/features/shared/constants/route_names.dart';
 
 class AnalyticsTab extends ConsumerWidget {
   const AnalyticsTab({super.key});
@@ -59,34 +61,42 @@ class AnalyticsTab extends ConsumerWidget {
     final summaryAsync = ref.watch(analyticsSummaryProvider);
     final predictionAsync = ref.watch(latestPredictionProvider);
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0FBFF),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            child: summaryAsync.when(
-              loading:
-                  () => const SizedBox(
-                    height: 400,
-                    child: Center(
-                      child: CircularProgressIndicator(
-                        color: Color(0xFF5A8DFF),
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF0FBFF),
+        body: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              child: summaryAsync.when(
+                loading:
+                    () => const SizedBox(
+                      height: 400,
+                      child: Center(
+                        child: CircularProgressIndicator(
+                          color: Color(0xFF5A8DFF),
+                        ),
                       ),
                     ),
-                  ),
-              error:
-                  (_, __) =>
-                      _buildContent(context, AnalyticsSummary.empty(), null),
-              data:
-                  (summary) => _buildContent(
-                    context,
-                    summary,
-                    predictionAsync.valueOrNull,
-                  ),
+                error:
+                    (_, __) =>
+                        _buildContent(context, AnalyticsSummary.empty(), null),
+                data:
+                    (summary) => _buildContent(
+                      context,
+                      summary,
+                      predictionAsync.valueOrNull,
+                    ),
+              ),
             ),
           ),
         ),
+        bottomNavigationBar: const CustomBottomNav(selectedIndex: 3),
       ),
     );
   }

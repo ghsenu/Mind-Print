@@ -71,15 +71,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
       };
       await ref.read(profileServiceProvider).updateFields(user.uid, fields);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile saved')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Profile saved')));
       Navigator.pop(context);
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Save failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Save failed: $e')));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -93,7 +93,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     // Populate once when data arrives
     WidgetsBinding.instance.addPostFrameCallback((_) => _populateFromProfile());
 
-    final avatarUrl = profile?.profilePhoto ??
+    final avatarUrl =
+        profile?.profilePhoto ??
         'https://api.dicebear.com/7.x/avataaars/png?seed=${profile?.displayName ?? 'user'}';
 
     return Scaffold(
@@ -142,9 +143,10 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                             child: CircleAvatar(
                               radius: 60,
                               backgroundColor: Colors.white,
-                              backgroundImage: _imageFile != null
-                                  ? FileImage(_imageFile!) as ImageProvider
-                                  : NetworkImage(avatarUrl),
+                              backgroundImage:
+                                  _imageFile != null
+                                      ? FileImage(_imageFile!) as ImageProvider
+                                      : NetworkImage(avatarUrl),
                             ),
                           ),
                           Positioned(
@@ -217,23 +219,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     ),
                     elevation: 2,
                   ),
-                  child: _isSaving
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
+                  child:
+                      _isSaving
+                          ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                          : Text(
+                            'Save changes',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
-                        )
-                      : Text(
-                          'Save changes',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
                 ),
               ),
             ),
@@ -287,8 +290,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
 class _OutlineBorder extends OutlineInputBorder {
   _OutlineBorder({required Color color})
-      : super(
-          borderSide: BorderSide(color: color, width: 1),
-          borderRadius: BorderRadius.circular(8),
-        );
+    : super(
+        borderSide: BorderSide(color: color, width: 1),
+        borderRadius: BorderRadius.circular(8),
+      );
 }

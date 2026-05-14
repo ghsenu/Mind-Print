@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mind_print/features/auth/providers/auth_provider.dart';
 import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
+import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -22,6 +25,51 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  Future<void> _toggleBiometric(bool value) async {
+    if (value) {
+      final LocalAuthentication auth = LocalAuthentication();
+      final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+      final bool canAuthenticate =
+          canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+
+      if (canAuthenticate) {
+        try {
+          final bool didAuthenticate = await auth.authenticate(
+            localizedReason: 'Please authenticate to enable biometric login',
+            options: const AuthenticationOptions(
+              biometricOnly: false,
+              stickyAuth: true,
+            ),
+          );
+          if (didAuthenticate) {
+            await _updateProfileField('biometricEnabled', true);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Biometric login enabled')),
+              );
+            }
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Authentication error: $e')));
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Biometrics not available on this device'),
+            ),
+          );
+        }
+      }
+    } else {
+      await _updateProfileField('biometricEnabled', false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final profileAsync = ref.watch(userProfileProvider);
@@ -37,10 +85,16 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         profile?.profilePhoto ??
         'https://api.dicebear.com/7.x/avataaars/png?seed=$displayName';
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0FBFF),
-      body: SafeArea(
-        child: SingleChildScrollView(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF0FBFF),
+        body: SafeArea(
+          child: SingleChildScrollView(
           child: Column(
             children: [
               // ── Header ────────────────────────────────────────────────
@@ -50,7 +104,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed:
+                          () => Navigator.pushReplacementNamed(
+                            context,
+                            AppRoutes.home,
+                          ),
                       padding: EdgeInsets.zero,
                     ),
                     const SizedBox(width: 12),
@@ -98,8 +156,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 title: 'Biometric Login',
                 subtitle: 'Face ID or fingerprint',
                 value: biometricLogin,
-                onChanged:
-                    (value) => _updateProfileField('biometricEnabled', value),
+                onChanged: _toggleBiometric,
               ),
               _buildSettingsTile(
                 icon: Icons.lock,
@@ -171,6 +228,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const CustomBottomNav(selectedIndex: 4),
     );
   }
 
@@ -256,7 +314,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
-          onTap: () => onChanged(!value),
+          onTap: () {
+            HapticFeedback.lightImpact();
+            onChanged(!value);
+          },
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -298,7 +359,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   scale: 0.8,
                   child: Switch.adaptive(
                     value: value,
-                    onChanged: onChanged,
+                    onChanged: (val) {
+                      HapticFeedback.lightImpact();
+                      onChanged(val);
+                    },
                     activeColor: const Color(0xFF6A8DFF),
                   ),
                 ),

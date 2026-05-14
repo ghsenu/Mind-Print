@@ -38,13 +38,15 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
       Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
       return;
     }
-    final profile =
-        await ref.read(profileServiceProvider).getProfile(user.uid);
+    final profile = await ref.read(profileServiceProvider).getProfile(user.uid);
     if (!mounted) return;
     if (profile?.onboardingCompleted == true) {
       Navigator.pushReplacementNamed(context, AppRoutes.home);
     } else {
-      Navigator.pushReplacementNamed(context, AppRoutes.onboardingQuestionnaire);
+      Navigator.pushReplacementNamed(
+        context,
+        AppRoutes.onboardingQuestionnaire,
+      );
     }
   }
 

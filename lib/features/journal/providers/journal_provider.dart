@@ -16,6 +16,7 @@ final journalServiceProvider = Provider<JournalService>((ref) {
   return JournalService(
     ref.watch(firestoreDatabaseProvider),
     ref.watch(huggingFaceServiceProvider),
+    Env.geminiApiKey,
   );
 });
 

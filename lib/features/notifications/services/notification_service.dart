@@ -66,18 +66,16 @@ class NotificationService {
   Future<void> saveTokenToUserProfile(String userId) async {
     final token = await getFcmToken();
     if (token != null) {
-      await _firestore.collection('users').doc(userId).set(
-        {'fcmToken': token},
-        SetOptions(merge: true),
-      );
+      await _firestore.collection('users').doc(userId).set({
+        'fcmToken': token,
+      }, SetOptions(merge: true));
     }
 
     // Listen for token refreshes
     _firebaseMessaging.onTokenRefresh.listen((newToken) {
-      _firestore.collection('users').doc(userId).set(
-        {'fcmToken': newToken},
-        SetOptions(merge: true),
-      );
+      _firestore.collection('users').doc(userId).set({
+        'fcmToken': newToken,
+      }, SetOptions(merge: true));
     });
   }
 

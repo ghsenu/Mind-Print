@@ -32,11 +32,12 @@ class ProfileService {
   }
 
   Future<String?> findEmailByUsername(String username) async {
-    final snap = await FirebaseFirestore.instance
-        .collection('users')
-        .where('username', isEqualTo: username)
-        .limit(1)
-        .get();
+    final snap =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .where('username', isEqualTo: username)
+            .limit(1)
+            .get();
     if (snap.docs.isEmpty) return null;
     return snap.docs.first.data()['email'] as String?;
   }

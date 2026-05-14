@@ -77,23 +77,25 @@ class _OnboardingQuestionnaireScreenState
     if (_isSaving) return;
     setState(() => _isSaving = true);
 
+    final user = ref.read(currentUserProvider);
     try {
-      final user = ref.read(currentUserProvider);
-      if (user != null && _selectedMood != null) {
-        final mood = _moods[_selectedMood!];
-        await ref
-            .read(moodCheckinServiceProvider)
-            .saveMoodCheckin(user.uid, mood.score, mood.label);
-        await ref
-            .read(profileServiceProvider)
-            .updateFields(user.uid, {'onboardingCompleted': true});
+      if (user != null) {
+        if (_selectedMood != null) {
+          final mood = _moods[_selectedMood!];
+          await ref
+              .read(moodCheckinServiceProvider)
+              .saveMoodCheckin(user.uid, mood.score, mood.label);
+        }
+        await ref.read(profileServiceProvider).updateFields(user.uid, {
+          'onboardingCompleted': true,
+        });
       }
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
     } catch (_) {
-      if (!mounted) return;
-      // Even on error, let user proceed
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+      // Firestore failure — user still proceeds; questionnaire may reappear next session
+    } finally {
+      if (mounted) {
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      }
     }
   }
 
@@ -152,17 +154,15 @@ class _OnboardingQuestionnaireScreenState
             Expanded(
               child: AnimatedSwitcher(
                 duration: const Duration(milliseconds: 280),
-                transitionBuilder: (child, anim) => SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0.08, 0),
-                    end: Offset.zero,
-                  ).animate(anim),
-                  child: FadeTransition(opacity: anim, child: child),
-                ),
-                child: KeyedSubtree(
-                  key: ValueKey(_page),
-                  child: _buildPage(),
-                ),
+                transitionBuilder:
+                    (child, anim) => SlideTransition(
+                      position: Tween<Offset>(
+                        begin: const Offset(0.08, 0),
+                        end: Offset.zero,
+                      ).animate(anim),
+                      child: FadeTransition(opacity: anim, child: child),
+                    ),
+                child: KeyedSubtree(key: ValueKey(_page), child: _buildPage()),
               ),
             ),
 
@@ -176,30 +176,32 @@ class _OnboardingQuestionnaireScreenState
                   onPressed: _canProceed ? _next : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF4C557E),
-                    disabledBackgroundColor:
-                        const Color(0xFF4C557E).withValues(alpha: 0.3),
+                    disabledBackgroundColor: const Color(
+                      0xFF4C557E,
+                    ).withValues(alpha: 0.3),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                     elevation: 0,
                   ),
-                  child: _isSaving
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
+                  child:
+                      _isSaving
+                          ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                          : Text(
+                            _page == 3 ? 'Get Started' : 'Continue',
+                            style: GoogleFonts.lora(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
-                        )
-                      : Text(
-                          _page == 3 ? 'Get Started' : 'Continue',
-                          style: GoogleFonts.lora(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
                 ),
               ),
             ),
@@ -240,9 +242,10 @@ class _OnboardingQuestionnaireScreenState
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: selected
-                      ? const Color(0xFF4C557E).withValues(alpha: 0.12)
-                      : Colors.transparent,
+                  color:
+                      selected
+                          ? const Color(0xFF4C557E).withValues(alpha: 0.12)
+                          : Colors.transparent,
                   shape: BoxShape.circle,
                 ),
                 child: Column(
@@ -259,9 +262,10 @@ class _OnboardingQuestionnaireScreenState
                         fontSize: 10,
                         fontWeight:
                             selected ? FontWeight.bold : FontWeight.normal,
-                        color: selected
-                            ? const Color(0xFF1A1A2E)
-                            : const Color(0xFF6B6B8A),
+                        color:
+                            selected
+                                ? const Color(0xFF1A1A2E)
+                                : const Color(0xFF6B6B8A),
                       ),
                     ),
                   ],
@@ -282,49 +286,52 @@ class _OnboardingQuestionnaireScreenState
       child: Wrap(
         spacing: 10,
         runSpacing: 10,
-        children: _mindOptions.map((opt) {
-          final selected = _mindSelections.contains(opt);
-          return GestureDetector(
-            onTap: () => setState(() {
-              if (selected) {
-                _mindSelections.remove(opt);
-              } else {
-                _mindSelections.add(opt);
-              }
-            }),
-            child: AnimatedContainer(
-              duration: const Duration(milliseconds: 180),
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 18, vertical: 12),
-              decoration: BoxDecoration(
-                color: selected
-                    ? const Color(0xFF4C557E)
-                    : Colors.white,
-                borderRadius: BorderRadius.circular(30),
-                border: Border.all(
-                  color: selected
-                      ? const Color(0xFF4C557E)
-                      : const Color(0xFFDDE3EE),
-                ),
-                boxShadow: [
-                  if (!selected)
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.04),
-                      blurRadius: 6,
+        children:
+            _mindOptions.map((opt) {
+              final selected = _mindSelections.contains(opt);
+              return GestureDetector(
+                onTap:
+                    () => setState(() {
+                      if (selected) {
+                        _mindSelections.remove(opt);
+                      } else {
+                        _mindSelections.add(opt);
+                      }
+                    }),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 180),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 18,
+                    vertical: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: selected ? const Color(0xFF4C557E) : Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    border: Border.all(
+                      color:
+                          selected
+                              ? const Color(0xFF4C557E)
+                              : const Color(0xFFDDE3EE),
                     ),
-                ],
-              ),
-              child: Text(
-                opt,
-                style: GoogleFonts.inter(
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
-                  color: selected ? Colors.white : const Color(0xFF1A1A2E),
+                    boxShadow: [
+                      if (!selected)
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 6,
+                        ),
+                    ],
+                  ),
+                  child: Text(
+                    opt,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: selected ? Colors.white : const Color(0xFF1A1A2E),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
       ),
     );
   }
@@ -451,9 +458,7 @@ class _OptionRow extends StatelessWidget {
           color: selected ? const Color(0xFF4C557E) : Colors.white,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: selected
-                ? const Color(0xFF4C557E)
-                : const Color(0xFFDDE3EE),
+            color: selected ? const Color(0xFF4C557E) : const Color(0xFFDDE3EE),
           ),
           boxShadow: [
             if (!selected)

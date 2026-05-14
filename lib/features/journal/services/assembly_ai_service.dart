@@ -49,7 +49,10 @@ class AssemblyAiService {
         .post(
           Uri.parse('$_base/transcript'),
           headers: _jsonHeaders,
-          body: jsonEncode({'audio_url': audioUrl}),
+          body: jsonEncode({
+            'audio_url': audioUrl,
+            'speech_models': ['universal-3-pro', 'universal-2'],
+          }),
         )
         .timeout(const Duration(seconds: 30));
 

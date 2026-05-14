@@ -321,6 +321,7 @@ class _BreathingActiveScreenState extends ConsumerState<_BreathingActiveScreen>
             'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
           )
           .then((_) {
+            if (!mounted) return;
             ref.read(audioServiceProvider).play();
           });
     });

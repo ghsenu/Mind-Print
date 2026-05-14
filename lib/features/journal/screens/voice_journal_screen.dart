@@ -63,6 +63,20 @@ class _VoiceJournalScreenState extends ConsumerState<VoiceJournalScreen> {
       return;
     }
 
+    final wordCount =
+        text.split(RegExp(r'\s+')).where((w) => w.isNotEmpty).length;
+    if (wordCount < 10) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'Tell us a bit more — a few sentences help us understand your feelings better.',
+          ),
+          duration: Duration(seconds: 3),
+        ),
+      );
+      return;
+    }
+
     final user = ref.read(currentUserProvider);
     if (user == null) {
       ScaffoldMessenger.of(context).showSnackBar(

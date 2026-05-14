@@ -48,6 +48,7 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
           _current.audioUrl ??
           'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
       ref.read(audioServiceProvider).loadAudio(audioUrl).then((_) {
+        if (!mounted) return;
         if (_isPlaying) {
           ref.read(audioServiceProvider).play();
         }
