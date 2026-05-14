@@ -16,19 +16,26 @@ class AssemblyAiService {
 
   /// Uploads a local audio [filePath] directly to AssemblyAI, then
   /// transcribes it. No external storage service required.
-  Future<String> transcribeFile(String filePath) async {
-    final bytes = await File(filePath).readAsBytes();
+  Future<String> transcribeFile(
+    String filePath, {
+    void Function(String status)? onStatus,
+  }) async {
+    onStatus?.call('uploading');
+    final uploadRequest = http.StreamedRequest(
+      'POST',
+      Uri.parse('$_base/upload'),
+    );
+    uploadRequest.headers.addAll({
+      'authorization': _apiKey,
+      'content-type': 'application/octet-stream',
+    });
+    await uploadRequest.sink.addStream(File(filePath).openRead());
+    await uploadRequest.sink.close();
 
-    final upload = await http
-        .post(
-          Uri.parse('$_base/upload'),
-          headers: {
-            'authorization': _apiKey,
-            'content-type': 'application/octet-stream',
-          },
-          body: bytes,
-        )
-        .timeout(const Duration(seconds: 60));
+    final uploadStreamed = await uploadRequest.send().timeout(
+      const Duration(seconds: 60),
+    );
+    final upload = await http.Response.fromStream(uploadStreamed);
 
     if (upload.statusCode != 200) {
       throw Exception(
@@ -41,6 +48,7 @@ class AssemblyAiService {
       throw Exception('AssemblyAI returned no upload URL.');
     }
 
+    onStatus?.call('transcribing');
     return _submitAndPoll(uploadUrl);
   }
 
@@ -73,6 +81,12 @@ class AssemblyAiService {
       final poll = await http
           .get(Uri.parse('$_base/transcript/$id'), headers: _jsonHeaders)
           .timeout(const Duration(seconds: 30));
+
+      if (poll.statusCode != 200) {
+        throw Exception(
+          'AssemblyAI poll failed ${poll.statusCode}: ${poll.body}',
+        );
+      }
 
       final body = jsonDecode(poll.body) as Map;
       final status = body['status'] as String?;
