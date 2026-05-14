@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:local_auth/local_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mind_print/features/auth/providers/auth_provider.dart';
+import 'package:mind_print/features/notifications/providers/notification_provider.dart';
 import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
+import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -13,12 +17,77 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  bool? _notificationsOverride;
+  bool? _offlineSyncOverride;
+  bool? _biometricOverride;
+
   Future<void> _updateProfileField(String field, dynamic value) async {
     final user = ref.read(currentUserProvider);
     if (user != null) {
-      await ref.read(profileServiceProvider).updateFields(user.uid, {
-        field: value,
+      // Optimistic Update
+      setState(() {
+        if (field == 'notificationsEnabled') _notificationsOverride = value;
+        if (field == 'offlineSyncEnabled') _offlineSyncOverride = value;
+        if (field == 'biometricEnabled') _biometricOverride = value;
       });
+
+      try {
+        await ref.read(profileServiceProvider).updateFields(user.uid, {
+          field: value,
+        });
+      } catch (e) {
+        // Rollback on error
+        setState(() {
+          if (field == 'notificationsEnabled') _notificationsOverride = !value;
+          if (field == 'offlineSyncEnabled') _offlineSyncOverride = !value;
+          if (field == 'biometricEnabled') _biometricOverride = !value;
+        });
+      }
+    }
+  }
+
+  Future<void> _toggleBiometric(bool value) async {
+    if (value) {
+      final LocalAuthentication auth = LocalAuthentication();
+      final bool canAuthenticateWithBiometrics = await auth.canCheckBiometrics;
+      final bool canAuthenticate =
+          canAuthenticateWithBiometrics || await auth.isDeviceSupported();
+
+      if (canAuthenticate) {
+        try {
+          final bool didAuthenticate = await auth.authenticate(
+            localizedReason: 'Please authenticate to enable biometric login',
+            options: const AuthenticationOptions(
+              biometricOnly: false,
+              stickyAuth: true,
+            ),
+          );
+          if (didAuthenticate) {
+            await _updateProfileField('biometricEnabled', true);
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Biometric login enabled')),
+              );
+            }
+          }
+        } catch (e) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(SnackBar(content: Text('Authentication error: $e')));
+          }
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Biometrics not available on this device'),
+            ),
+          );
+        }
+      }
+    } else {
+      await _updateProfileField('biometricEnabled', false);
     }
   }
 
@@ -27,20 +96,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final profileAsync = ref.watch(userProfileProvider);
     final profile = profileAsync.value;
 
-    final pushNotifications = profile?.notificationsEnabled ?? true;
-    final offlineSync = profile?.offlineSyncEnabled ?? true;
-    final biometricLogin = profile?.biometricEnabled ?? true;
+    final pushNotifications = _notificationsOverride ?? (profile?.notificationsEnabled ?? true);
+    final offlineSync = _offlineSyncOverride ?? (profile?.offlineSyncEnabled ?? true);
+    final biometricLogin = _biometricOverride ?? (profile?.biometricEnabled ?? false);
 
     final displayName = profile?.displayName ?? 'User';
     final email = profile?.email ?? '';
-    final avatarUrl =
-        profile?.profilePhoto ??
-        'https://api.dicebear.com/7.x/avataaars/png?seed=$displayName';
+    
+    final avatarType = profile?.avatarType ?? 'default';
+    final avatarUrl = avatarType == 'boy'
+        ? 'https://api.dicebear.com/7.x/avataaars/png?seed=Oliver'
+        : avatarType == 'girl'
+            ? 'https://api.dicebear.com/7.x/avataaars/png?seed=Willow'
+            : 'https://api.dicebear.com/7.x/avataaars/png?seed=$displayName';
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0FBFF),
-      body: SafeArea(
-        child: SingleChildScrollView(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF0FBFF),
+        body: SafeArea(
+          child: SingleChildScrollView(
           child: Column(
             children: [
               // ── Header ────────────────────────────────────────────────
@@ -50,7 +129,11 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back),
-                      onPressed: () => Navigator.pop(context),
+                      onPressed:
+                          () => Navigator.pushReplacementNamed(
+                            context,
+                            AppRoutes.home,
+                          ),
                       padding: EdgeInsets.zero,
                     ),
                     const SizedBox(width: 12),
@@ -77,17 +160,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 title: 'Push Notifications',
                 subtitle: 'Announcements, reminders, and more',
                 value: pushNotifications,
-                onChanged:
-                    (value) =>
-                        _updateProfileField('notificationsEnabled', value),
+                onChanged: (value) async {
+                  await _updateProfileField('notificationsEnabled', value);
+                  ref.read(notificationServiceProvider).initialize(isEnabled: value);
+                },
               ),
               _buildToggleTile(
                 icon: Icons.cloud_off,
                 title: 'Offline Sync',
                 subtitle: 'Automatically sync your data on connection',
                 value: offlineSync,
-                onChanged:
-                    (value) => _updateProfileField('offlineSyncEnabled', value),
+                onChanged: (value) async {
+                  await _updateProfileField('offlineSyncEnabled', value);
+                  await ref.read(firestoreDatabaseProvider).setNetworkEnabled(value);
+                },
               ),
               const SizedBox(height: 24),
 
@@ -98,8 +184,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 title: 'Biometric Login',
                 subtitle: 'Face ID or fingerprint',
                 value: biometricLogin,
-                onChanged:
-                    (value) => _updateProfileField('biometricEnabled', value),
+                onChanged: _toggleBiometric,
               ),
               _buildSettingsTile(
                 icon: Icons.lock,
@@ -171,6 +256,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           ),
         ),
       ),
+      bottomNavigationBar: const CustomBottomNav(selectedIndex: 4),
+      ),
     );
   }
 
@@ -178,47 +265,47 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget _buildProfileSection(String name, String email, String avatar) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
+      child: Material(
         color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          CircleAvatar(radius: 32, backgroundImage: NetworkImage(avatar)),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+        elevation: 0,
+        child: InkWell(
+          onTap: () => Navigator.pushNamed(context, AppRoutes.editProfile),
+          borderRadius: BorderRadius.circular(12),
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Row(
               children: [
-                Text(
-                  name,
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: const Color(0xFF1A1A2E),
+                CircleAvatar(radius: 32, backgroundImage: NetworkImage(avatar)),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: const Color(0xFF1A1A2E),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        email,
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: const Color(0xFFACAEBD),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  email,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: const Color(0xFFACAEBD),
-                  ),
-                ),
+                const Icon(Icons.chevron_right, color: Color(0xFFACAEBD)),
               ],
             ),
           ),
-          const Icon(Icons.chevron_right, color: Color(0xFFACAEBD)),
-        ],
+        ),
       ),
     );
   }
@@ -256,7 +343,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         color: Colors.white,
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
-          onTap: () => onChanged(!value),
+          onTap: () {
+            HapticFeedback.lightImpact();
+            onChanged(!value);
+          },
           borderRadius: BorderRadius.circular(8),
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -298,7 +388,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   scale: 0.8,
                   child: Switch.adaptive(
                     value: value,
-                    onChanged: onChanged,
+                    onChanged: (val) {
+                      HapticFeedback.lightImpact();
+                      onChanged(val);
+                    },
                     activeColor: const Color(0xFF6A8DFF),
                   ),
                 ),

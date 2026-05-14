@@ -109,23 +109,6 @@ class NotificationDetailsScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    const Text(
-                      "Take advantage of our exclusive weekend offer and earn 5% cashback on all your grocery purchases! Whether you're stocking up on essentials or indulging in your favorite treats, now is the perfect time to enjoy extra savings. With this limited-time promotion, every dollar you spend on groceries will earn you cashback rewards, allowing you to stretch your budget further and make the most of your shopping experience.",
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Color(0xFF6B7280),
-                        height: 1.6,
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    const Text(
-                      "Make your weekend grocery shopping even more rewarding by participating in this special offer. Simply shop at your favorite grocery stores, swipe your registered card, and watch the cashback rewards accumulate. Don't miss out on this opportunity to save while you shop for your household needs. Hurry and start earning cashback today!",
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: Color(0xFF6B7280),
-                        height: 1.6,
-                      ),
-                    ),
                     const Spacer(),
                     Container(
                       width: double.infinity,

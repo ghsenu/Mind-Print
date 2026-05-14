@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import 'package:mind_print/features/auth/providers/auth_provider.dart';
+import 'package:mind_print/features/shared/constants/route_names.dart';
 import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 
 class EditProfileScreen extends ConsumerStatefulWidget {
@@ -19,10 +18,15 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
   final _dobController = TextEditingController();
   final _countryController = TextEditingController();
 
-  File? _imageFile;
-  final ImagePicker _picker = ImagePicker();
   bool _loaded = false;
   bool _isSaving = false;
+  String _selectedAvatar = 'default';
+
+  final Map<String, String> _avatarUrls = {
+    'boy': 'https://api.dicebear.com/7.x/avataaars/png?seed=Oliver',
+    'girl': 'https://api.dicebear.com/7.x/avataaars/png?seed=Willow',
+    'default': 'https://api.dicebear.com/7.x/avataaars/png?seed=user',
+  };
 
   @override
   void dispose() {
@@ -41,23 +45,28 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     _emailController.text = profile.email;
     _dobController.text = profile.dateOfBirth ?? '';
     _countryController.text = profile.country ?? '';
+    _selectedAvatar = profile.avatarType;
   }
 
-  Future<void> _pickImage() async {
-    try {
-      final XFile? picked = await _picker.pickImage(
-        source: ImageSource.gallery,
-        imageQuality: 80,
-      );
-      if (picked != null) setState(() => _imageFile = File(picked.path));
-    } catch (e) {
-      debugPrint('Image pick error: $e');
-    }
-  }
+
 
   Future<void> _save() async {
     final user = ref.read(currentUserProvider);
     if (user == null) return;
+
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final isOnboarding = args?['isOnboarding'] == true;
+
+    // Validation for onboarding
+    if (isOnboarding) {
+      if (_nameController.text.trim().isEmpty || 
+          _countryController.text.trim().isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please complete your name and country')),
+        );
+        return;
+      }
+    }
 
     setState(() => _isSaving = true);
     try {
@@ -68,18 +77,26 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
           'dateOfBirth': _dobController.text.trim(),
         if (_countryController.text.trim().isNotEmpty)
           'country': _countryController.text.trim(),
+        'avatarType': _selectedAvatar,
+        if (isOnboarding) 'profileCompleted': true,
       };
+
       await ref.read(profileServiceProvider).updateFields(user.uid, fields);
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Profile saved')),
-      );
-      Navigator.pop(context);
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Profile saved successfully!')));
+      
+      if (isOnboarding) {
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      } else {
+        Navigator.pop(context);
+      }
     } catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Save failed: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Save failed: $e')));
     } finally {
       if (mounted) setState(() => _isSaving = false);
     }
@@ -93,20 +110,24 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     // Populate once when data arrives
     WidgetsBinding.instance.addPostFrameCallback((_) => _populateFromProfile());
 
-    final avatarUrl = profile?.profilePhoto ??
-        'https://api.dicebear.com/7.x/avataaars/png?seed=${profile?.displayName ?? 'user'}';
+    final avatarUrl = _avatarUrls[_selectedAvatar] ?? _avatarUrls['default']!;
+
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final isOnboarding = args?['isOnboarding'] == true;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0FBFF),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
+        leading: isOnboarding 
+          ? const SizedBox.shrink()
+          : IconButton(
+              icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+              onPressed: () => Navigator.pop(context),
+            ),
         title: Text(
-          'Edit Profile',
+          isOnboarding ? 'Complete Your Profile' : 'Edit Profile',
           style: GoogleFonts.lora(
             fontSize: 20,
             fontWeight: FontWeight.w700,
@@ -127,54 +148,45 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Avatar
+                    // Avatar Display
                     Center(
-                      child: Stack(
-                        children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: Colors.blueAccent.withValues(alpha: 0.3),
-                                width: 2,
-                              ),
-                            ),
-                            child: CircleAvatar(
-                              radius: 60,
-                              backgroundColor: Colors.white,
-                              backgroundImage: _imageFile != null
-                                  ? FileImage(_imageFile!) as ImageProvider
-                                  : NetworkImage(avatarUrl),
-                            ),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.blueAccent.withValues(alpha: 0.3),
+                            width: 2,
                           ),
-                          Positioned(
-                            bottom: 0,
-                            right: 4,
-                            child: GestureDetector(
-                              onTap: _pickImage,
-                              child: Container(
-                                padding: const EdgeInsets.all(8),
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFF4C557E),
-                                  shape: BoxShape.circle,
-                                  border: Border.all(
-                                    color: const Color(0xFFF0FBFF),
-                                    width: 2,
-                                  ),
-                                ),
-                                child: const Icon(
-                                  Icons.camera_alt_outlined,
-                                  size: 16,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
+                        ),
+                        child: CircleAvatar(
+                          radius: 60,
+                          backgroundColor: Colors.white,
+                          backgroundImage: NetworkImage(avatarUrl),
+                        ),
                       ),
                     ),
+                    const SizedBox(height: 24),
+                    
+                    // Avatar Selection
+                    Text(
+                      'Choose Avatar',
+                      style: GoogleFonts.inter(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                        color: const Color(0xFF1A1A2E),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        _buildAvatarOption('boy', 'Boy'),
+                        const SizedBox(width: 24),
+                        _buildAvatarOption('girl', 'Girl'),
+                      ],
+                    ),
 
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 32),
 
                     _buildTextField(label: 'Name', controller: _nameController),
                     const SizedBox(height: 20),
@@ -217,28 +229,64 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
                     ),
                     elevation: 2,
                   ),
-                  child: _isSaving
-                      ? const SizedBox(
-                          width: 22,
-                          height: 22,
-                          child: CircularProgressIndicator(
-                            color: Colors.white,
-                            strokeWidth: 2,
+                  child:
+                      _isSaving
+                          ? const SizedBox(
+                            width: 22,
+                            height: 22,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                          : Text(
+                            'Save changes',
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
                           ),
-                        )
-                      : Text(
-                          'Save changes',
-                          style: GoogleFonts.inter(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.white,
-                          ),
-                        ),
                 ),
               ),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildAvatarOption(String type, String label) {
+    final isSelected = _selectedAvatar == type;
+    return GestureDetector(
+      onTap: () => setState(() => _selectedAvatar = type),
+      child: Column(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color: isSelected ? const Color(0xFF0EA5E9) : Colors.transparent,
+                width: 3,
+              ),
+            ),
+            child: CircleAvatar(
+              radius: 35,
+              backgroundColor: Colors.white,
+              backgroundImage: NetworkImage(_avatarUrls[type]!),
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              color: isSelected ? const Color(0xFF0EA5E9) : const Color(0xFF4C557E),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -287,8 +335,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
 
 class _OutlineBorder extends OutlineInputBorder {
   _OutlineBorder({required Color color})
-      : super(
-          borderSide: BorderSide(color: color, width: 1),
-          borderRadius: BorderRadius.circular(8),
-        );
+    : super(
+        borderSide: BorderSide(color: color, width: 1),
+        borderRadius: BorderRadius.circular(8),
+      );
 }

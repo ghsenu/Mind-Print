@@ -171,9 +171,7 @@ class AnalyticsService {
     List<JournalEntry> journals,
   ) async {
     if (journals.isEmpty) {
-      throw StateError(
-        'Cannot generate a prediction without journal entries.',
-      );
+      throw StateError('Cannot generate a prediction without journal entries.');
     }
 
     final recent = journals.take(7).toList();

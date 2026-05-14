@@ -7,6 +7,7 @@ import 'package:mind_print/features/journal/screens/voice_journal_screen.dart';
 import 'package:mind_print/features/journal/screens/voice_record_screen.dart';
 import 'package:mind_print/features/shared/models/journal_entry.dart';
 import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
+import 'package:mind_print/features/shared/constants/route_names.dart';
 
 class JournalTab extends ConsumerStatefulWidget {
   const JournalTab({super.key});
@@ -101,7 +102,13 @@ class _JournalTabState extends ConsumerState<JournalTab>
   Widget build(BuildContext context) {
     final journalsAsync = ref.watch(journalsProvider);
 
-    return Scaffold(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      },
+      child: Scaffold(
       backgroundColor: const Color(0xFFF9FAFC),
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -216,6 +223,7 @@ class _JournalTabState extends ConsumerState<JournalTab>
         child: const Icon(Icons.add, color: Colors.white, size: 28),
       ),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: -1),
+      ),
     );
   }
 

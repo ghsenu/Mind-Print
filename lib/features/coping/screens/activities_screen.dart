@@ -45,10 +45,16 @@ class ActivitiesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFF0FBFF),
-      body: SafeArea(
-        child: SingleChildScrollView(
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      },
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF0FBFF),
+        body: SafeArea(
+          child: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -200,6 +206,7 @@ class ActivitiesScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: 1),
+      ),
     );
   }
 }

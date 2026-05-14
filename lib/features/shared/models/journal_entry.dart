@@ -46,4 +46,28 @@ class JournalEntry {
     'isAnalyzed': isAnalyzed,
     'createdAt': Timestamp.fromDate(createdAt),
   };
+
+  Map<String, dynamic> toMap() => {
+    'id': id,
+    'userId': userId,
+    'content': content,
+    'moodScore': moodScore,
+    'entryType': entryType,
+    'voiceUrl': voiceUrl,
+    'isAnalyzed': isAnalyzed ? 1 : 0,
+    'createdAt': createdAt.toIso8601String(),
+  };
+
+  factory JournalEntry.fromMap(Map<String, dynamic> map) {
+    return JournalEntry(
+      id: map['id'] as String,
+      userId: map['userId'] as String,
+      content: map['content'] as String,
+      moodScore: map['moodScore'] as int,
+      entryType: map['entryType'] as String,
+      voiceUrl: map['voiceUrl'] as String?,
+      isAnalyzed: (map['isAnalyzed'] as int) == 1,
+      createdAt: DateTime.parse(map['createdAt'] as String),
+    );
+  }
 }

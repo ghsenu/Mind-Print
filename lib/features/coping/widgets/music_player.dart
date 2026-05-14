@@ -44,10 +44,10 @@ class _MusicPlayerScreenState extends ConsumerState<MusicPlayerScreen>
   void _loadTrack() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref.read(audioServiceProvider).stop();
-      final audioUrl =
-          _current.audioUrl ??
-          'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3';
+      final audioUrl = _current.audioUrl;
+      if (audioUrl == null) return;
       ref.read(audioServiceProvider).loadAudio(audioUrl).then((_) {
+        if (!mounted) return;
         if (_isPlaying) {
           ref.read(audioServiceProvider).play();
         }

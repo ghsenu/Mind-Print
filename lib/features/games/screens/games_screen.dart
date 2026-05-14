@@ -35,6 +35,20 @@ class GamesScreen extends StatelessWidget {
       gradientColors: [Color(0xFF2E7D32), Color(0xFF00838F)],
       route: AppRoutes.breathingBall,
     ),
+    _GameData(
+      title: 'Ripple Pond',
+      subtitle: 'Create calming ripples',
+      icon: Icons.waves,
+      gradientColors: [Color(0xFF003C8F), Color(0xFF1565C0)],
+      route: AppRoutes.ripplePond,
+    ),
+    _GameData(
+      title: 'Zen Canvas',
+      subtitle: 'Draw fading thoughts',
+      icon: Icons.gesture,
+      gradientColors: [Color(0xFF424242), Color(0xFF757575)],
+      route: AppRoutes.zenCanvas,
+    ),
   ];
 
   @override

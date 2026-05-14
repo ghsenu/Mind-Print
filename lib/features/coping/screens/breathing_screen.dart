@@ -200,14 +200,13 @@ class _ExerciseCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 8),
-                Row(
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
                   children: [
                     _PhaseChip(label: 'Inhale ${exercise.inhaleSecs}s'),
-                    if (exercise.holdSecs > 0) ...[
-                      const SizedBox(width: 6),
+                    if (exercise.holdSecs > 0)
                       _PhaseChip(label: 'Hold ${exercise.holdSecs}s'),
-                    ],
-                    const SizedBox(width: 6),
                     _PhaseChip(label: 'Exhale ${exercise.exhaleSecs}s'),
                   ],
                 ),
@@ -318,9 +317,10 @@ class _BreathingActiveScreenState extends ConsumerState<_BreathingActiveScreen>
       ref
           .read(audioServiceProvider)
           .loadAudio(
-            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-11.mp3',
           )
           .then((_) {
+            if (!mounted) return;
             ref.read(audioServiceProvider).play();
           });
     });

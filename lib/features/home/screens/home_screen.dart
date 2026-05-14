@@ -5,6 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:mind_print/features/analytics/providers/analytics_provider.dart';
 import 'package:mind_print/features/auth/providers/auth_provider.dart';
 import 'package:mind_print/features/notifications/providers/notification_provider.dart';
+import 'package:mind_print/features/shared/models/mood_checkin.dart';
+import 'package:mind_print/features/shared/models/prediction.dart';
 import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
@@ -19,12 +21,20 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentMoodIndex = 2;
   bool _showStressBanner = true;
+  bool _hasSyncedMood = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(notificationServiceProvider).initialize();
+      if (!mounted) return;
+      final profile = ref.read(userProfileProvider).value;
+      ref.read(notificationServiceProvider).initialize(
+        isEnabled: profile?.notificationsEnabled ?? true,
+      );
+      ref.read(firestoreDatabaseProvider).setNetworkEnabled(
+        profile?.offlineSyncEnabled ?? true,
+      );
       final user = ref.read(currentUserProvider);
       if (user != null) {
         ref.read(notificationServiceProvider).saveTokenToUserProfile(user.uid);
@@ -36,138 +46,143 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final isStressed = moodIndex == 0;
     final emoji = isStressed ? '😔' : '😯';
     final label = isStressed ? 'Stressed' : 'Sad';
-    final subtitle = isStressed
-        ? "Let's help you reset and find some calm"
-        : "You're not alone — here's something that might help";
+    final subtitle =
+        isStressed
+            ? "Let's help you reset and find some calm"
+            : "You're not alone — here's something that might help";
 
-    final recommendations = isStressed
-        ? [
-            _Recommendation(
-              icon: Icons.air_outlined,
-              color: const Color(0xFF0EA5E9),
-              title: 'Breathing Exercise',
-              description: 'Calm your nervous system in minutes',
-              route: AppRoutes.breathing,
-            ),
-            _Recommendation(
-              icon: Icons.sports_esports_outlined,
-              color: const Color(0xFF8E54E9),
-              title: 'Play a Game',
-              description: 'Distract your mind with a fun activity',
-              route: AppRoutes.games,
-            ),
-            _Recommendation(
-              icon: Icons.self_improvement_outlined,
-              color: const Color(0xFF11998E),
-              title: 'Meditate',
-              description: 'Ground yourself with a guided session',
-              route: AppRoutes.meditation,
-            ),
-          ]
-        : [
-            _Recommendation(
-              icon: Icons.music_note_outlined,
-              color: const Color(0xFFFF6B6B),
-              title: 'Music Therapy',
-              description: 'Let music lift your spirits',
-              route: AppRoutes.musicTherapy,
-            ),
-            _Recommendation(
-              icon: Icons.edit_outlined,
-              color: const Color(0xFF667EEA),
-              title: 'Journal',
-              description: 'Write out what you are feeling',
-              route: AppRoutes.journal,
-            ),
-            _Recommendation(
-              icon: Icons.sports_esports_outlined,
-              color: const Color(0xFF8E54E9),
-              title: 'Play a Game',
-              description: 'Take a fun break to reset',
-              route: AppRoutes.games,
-            ),
-          ];
+    final recommendations =
+        isStressed
+            ? [
+              _Recommendation(
+                icon: Icons.air_outlined,
+                color: const Color(0xFF0EA5E9),
+                title: 'Breathing Exercise',
+                description: 'Calm your nervous system in minutes',
+                route: AppRoutes.breathing,
+              ),
+              _Recommendation(
+                icon: Icons.sports_esports_outlined,
+                color: const Color(0xFF8E54E9),
+                title: 'Play a Game',
+                description: 'Distract your mind with a fun activity',
+                route: AppRoutes.games,
+              ),
+              _Recommendation(
+                icon: Icons.self_improvement_outlined,
+                color: const Color(0xFF11998E),
+                title: 'Meditate',
+                description: 'Ground yourself with a guided session',
+                route: AppRoutes.meditation,
+              ),
+            ]
+            : [
+              _Recommendation(
+                icon: Icons.music_note_outlined,
+                color: const Color(0xFFFF6B6B),
+                title: 'Music Therapy',
+                description: 'Let music lift your spirits',
+                route: AppRoutes.musicTherapy,
+              ),
+              _Recommendation(
+                icon: Icons.edit_outlined,
+                color: const Color(0xFF667EEA),
+                title: 'Journal',
+                description: 'Write out what you are feeling',
+                route: AppRoutes.journal,
+              ),
+              _Recommendation(
+                icon: Icons.sports_esports_outlined,
+                color: const Color(0xFF8E54E9),
+                title: 'Play a Game',
+                description: 'Take a fun break to reset',
+                route: AppRoutes.games,
+              ),
+            ];
 
     showDialog<void>(
       context: context,
       barrierColor: Colors.black.withValues(alpha: 0.4),
-      builder: (ctx) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(24, 20, 16, 24),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Header row
-              Row(
+      builder:
+          (ctx) => Dialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(24),
+            ),
+            insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(24, 20, 16, 24),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(emoji, style: const TextStyle(fontSize: 36)),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'You seem $label',
-                          style: GoogleFonts.lora(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF1A1A2E),
-                          ),
+                  // Header row
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(emoji, style: const TextStyle(fontSize: 36)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'You seem $label',
+                              style: GoogleFonts.lora(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: const Color(0xFF1A1A2E),
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            Text(
+                              subtitle,
+                              style: GoogleFonts.inter(
+                                fontSize: 12,
+                                color: const Color(0xFF6B6B8A),
+                              ),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 2),
-                        Text(
-                          subtitle,
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            color: const Color(0xFF6B6B8A),
-                          ),
-                        ),
-                      ],
+                      ),
+                      IconButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        icon: const Icon(Icons.close, size: 20),
+                        color: const Color(0xFF6B6B8A),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(),
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 4),
+                  const Divider(),
+                  const SizedBox(height: 8),
+
+                  Text(
+                    'Things that might help',
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.8,
+                      color: const Color(0xFF6B6B8A),
                     ),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    icon: const Icon(Icons.close, size: 20),
-                    color: const Color(0xFF6B6B8A),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
+                  const SizedBox(height: 12),
+
+                  // Activity rows
+                  ...recommendations.map(
+                    (rec) => _RecommendationTile(
+                      recommendation: rec,
+                      onTap: () {
+                        Navigator.pop(ctx);
+                        Navigator.pushNamed(context, rec.route);
+                      },
+                    ),
                   ),
                 ],
               ),
-
-              const SizedBox(height: 4),
-              const Divider(),
-              const SizedBox(height: 8),
-
-              Text(
-                'Things that might help',
-                style: GoogleFonts.inter(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.8,
-                  color: const Color(0xFF6B6B8A),
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Activity rows
-              ...recommendations.map(
-                (rec) => _RecommendationTile(
-                  recommendation: rec,
-                  onTap: () {
-                    Navigator.pop(ctx);
-                    Navigator.pushNamed(context, rec.route);
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
     );
   }
 
@@ -187,6 +202,19 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         profile?.profilePhoto ??
         'https://api.dicebear.com/7.x/avataaars/png?seed=${profile?.userId ?? 'user'}';
     final prediction = ref.watch(latestPredictionProvider).valueOrNull;
+
+    // Sync initial mood from the latest checkin (questionnaire or prior manual tap)
+    ref.listen<AsyncValue<MoodCheckin?>>(latestMoodCheckinProvider, (_, next) {
+      if (_hasSyncedMood) return;
+      next.whenData((checkin) {
+        if (checkin != null && mounted) {
+          setState(() {
+            _currentMoodIndex = (checkin.score - 1).clamp(0, 4);
+            _hasSyncedMood = true;
+          });
+        }
+      });
+    });
 
     return Scaffold(
       backgroundColor: const Color(0xFFF0FBFF),
@@ -363,8 +391,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       floatPhase: i * 0.2,
                       onTap: () async {
                         setState(() => _currentMoodIndex = i);
+                        
+                        // Show recommendations immediately for Stressed or Sad moods
+                        if (i == 0 || i == 1) {
+                          _showMoodRecommendation(context, i);
+                        }
+
                         final user = ref.read(currentUserProvider);
                         if (user != null) {
+                          if (i == 0) {
+                            ref.read(notificationServiceProvider).createNotification(
+                              userId: user.uid,
+                              title: 'High Stress Detected',
+                              body: 'Take a moment to breathe. We have recommended some activities for you.',
+                              type: 'alert',
+                            );
+                          }
                           try {
                             await ref
                                 .read(moodCheckinServiceProvider)
@@ -377,9 +419,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             debugPrint('Failed to save mood check-in: $e');
                           }
                         }
-                        if (i == 0 || i == 1) {
-                          _showMoodRecommendation(context, i);
-                        }
                       },
                     ),
                   ),
@@ -389,7 +428,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 28),
 
               // ── Insight Card ──────────────────────────────────────────
-              _InsightCard(dominantEmotion: _moods[_currentMoodIndex].label),
+              _InsightCard(
+                dominantEmotion: _moods[_currentMoodIndex].label,
+                prediction: prediction,
+              ),
 
               const SizedBox(height: 24),
 
@@ -676,8 +718,13 @@ class _NotificationBell extends ConsumerWidget {
 // ─────────────────────────────────────────────────────────────
 
 class _InsightCard extends StatelessWidget {
-  const _InsightCard({required this.dominantEmotion});
+  const _InsightCard({
+    required this.dominantEmotion,
+    required this.prediction,
+  });
+
   final String dominantEmotion;
+  final Prediction? prediction;
 
   @override
   Widget build(BuildContext context) {
@@ -712,25 +759,25 @@ class _InsightCard extends StatelessWidget {
                           color: const Color(0xFF1A1A2E),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFDCFCE7),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '98% match',
-                          style: GoogleFonts.lora(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF15803D),
+                      if (prediction != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDCFCE7),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Real-time',
+                            style: GoogleFonts.lora(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF15803D),
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -769,14 +816,18 @@ class _InsightCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.eco_outlined,
+                        Icon(
+                          prediction?.trend == 'declining'
+                              ? Icons.trending_down
+                              : Icons.trending_up,
                           size: 14,
-                          color: Color(0xFF0EA5E9),
+                          color: const Color(0xFF0EA5E9),
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Calm · 78%',
+                          prediction == null
+                              ? 'No data yet'
+                              : prediction!.trend.toUpperCase(),
                           style: GoogleFonts.lora(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -801,7 +852,9 @@ class _InsightCard extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  '78%',
+                  prediction == null
+                      ? '--'
+                      : '${((prediction!.averageMood / 5.0) * 100).toInt()}%',
                   style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
