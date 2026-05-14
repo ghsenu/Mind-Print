@@ -456,9 +456,8 @@ class _ActiveMeditationScreenState
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(audioServiceProvider)
-          // TODO: paste Firebase Storage URL for meditation-ambient.mp3
           .loadAudio(
-            'https://placeholder.invalid/meditation-ambient.mp3',
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-10.mp3',
           )
           .then((_) {
             if (!mounted) return;

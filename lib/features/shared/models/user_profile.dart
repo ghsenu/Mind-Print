@@ -15,6 +15,8 @@ class UserProfile {
     this.notificationsEnabled = true,
     this.offlineSyncEnabled = true,
     this.onboardingCompleted = false,
+    this.profileCompleted = false,
+    this.avatarType = 'default',
     required this.createdAt,
     required this.updatedAt,
   });
@@ -32,6 +34,8 @@ class UserProfile {
   final bool notificationsEnabled;
   final bool offlineSyncEnabled;
   final bool onboardingCompleted;
+  final bool profileCompleted;
+  final String avatarType; // 'boy' | 'girl' | 'default'
   final DateTime createdAt;
   final DateTime updatedAt;
 
@@ -69,6 +73,8 @@ class UserProfile {
       notificationsEnabled: data['notificationsEnabled'] as bool? ?? true,
       offlineSyncEnabled: data['offlineSyncEnabled'] as bool? ?? true,
       onboardingCompleted: data['onboardingCompleted'] as bool? ?? false,
+      profileCompleted: data['profileCompleted'] as bool? ?? false,
+      avatarType: (data['avatarType'] as String?) ?? 'default',
       createdAt: (data['createdAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
       updatedAt: (data['updatedAt'] as Timestamp?)?.toDate() ?? DateTime.now(),
     );
@@ -87,6 +93,8 @@ class UserProfile {
     'notificationsEnabled': notificationsEnabled,
     'offlineSyncEnabled': offlineSyncEnabled,
     'onboardingCompleted': onboardingCompleted,
+    'profileCompleted': profileCompleted,
+    'avatarType': avatarType,
     'createdAt': Timestamp.fromDate(createdAt),
     'updatedAt': Timestamp.fromDate(updatedAt),
   };
@@ -104,6 +112,8 @@ class UserProfile {
     bool? notificationsEnabled,
     bool? offlineSyncEnabled,
     bool? onboardingCompleted,
+    bool? profileCompleted,
+    String? avatarType,
     DateTime? updatedAt,
   }) => UserProfile(
     userId: userId,
@@ -119,6 +129,8 @@ class UserProfile {
     notificationsEnabled: notificationsEnabled ?? this.notificationsEnabled,
     offlineSyncEnabled: offlineSyncEnabled ?? this.offlineSyncEnabled,
     onboardingCompleted: onboardingCompleted ?? this.onboardingCompleted,
+    profileCompleted: profileCompleted ?? this.profileCompleted,
+    avatarType: avatarType ?? this.avatarType,
     createdAt: createdAt,
     updatedAt: updatedAt ?? DateTime.now(),
   );

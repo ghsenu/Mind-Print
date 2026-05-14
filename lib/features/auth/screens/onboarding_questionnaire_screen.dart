@@ -94,7 +94,11 @@ class _OnboardingQuestionnaireScreenState
       // Firestore failure — user still proceeds; questionnaire may reappear next session
     } finally {
       if (mounted) {
-        Navigator.pushReplacementNamed(context, AppRoutes.home);
+        Navigator.pushReplacementNamed(
+          context,
+          AppRoutes.editProfile,
+          arguments: {'isOnboarding': true},
+        );
       }
     }
   }

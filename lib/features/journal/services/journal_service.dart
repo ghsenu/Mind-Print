@@ -10,6 +10,7 @@ import 'package:mind_print/features/shared/models/journal_entry.dart';
 import 'hugging_face_service.dart';
 import '../../shared/services/rate_limiter_service.dart';
 import '../../shared/services/local_storage_service.dart';
+import '../../notifications/services/notification_service.dart';
 
 class _GeminiAnalysis {
   _GeminiAnalysis({
@@ -32,13 +33,21 @@ class _GeminiAnalysis {
 }
 
 class JournalService {
-  JournalService(this._db, this._hf, this._geminiApiKey, this._rateLimiter, this._localStorage);
+  JournalService(
+    this._db,
+    this._hf,
+    this._geminiApiKey,
+    this._rateLimiter,
+    this._localStorage,
+    this._notifications,
+  );
 
   final FirestoreDatabase _db;
   final HuggingFaceService _hf;
   final String _geminiApiKey;
   final RateLimiterService _rateLimiter;
   final LocalStorageService _localStorage;
+  final NotificationService _notifications;
 
   static const Map<String, String> _emotionInsights = {
     'joy':
@@ -213,6 +222,14 @@ Journal entry:''';
     await resultRef.set(result.toFirestore());
     await journalRef.update({'isAnalyzed': true});
 
+    // Send notification
+    await _notifications.createNotification(
+      userId: userId,
+      title: 'Analysis Complete',
+      body: 'Your entry has been analyzed. You felt $primaryEmotion.',
+      type: 'analysis',
+    );
+
     return result;
   }
 
@@ -266,6 +283,14 @@ Journal entry:''';
 
     await resultRef.set(result.toFirestore());
     await journalRef.update({'isAnalyzed': true});
+
+    // Send notification
+    await _notifications.createNotification(
+      userId: userId,
+      title: 'Voice Entry Analyzed',
+      body: 'Your recording has been processed. You felt $primaryEmotion.',
+      type: 'analysis',
+    );
     return result;
   }
 

@@ -6,6 +6,7 @@ import 'package:mind_print/features/analytics/providers/analytics_provider.dart'
 import 'package:mind_print/features/auth/providers/auth_provider.dart';
 import 'package:mind_print/features/notifications/providers/notification_provider.dart';
 import 'package:mind_print/features/shared/models/mood_checkin.dart';
+import 'package:mind_print/features/shared/models/prediction.dart';
 import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 import 'package:mind_print/features/shared/widgets/custom_bottom_nav.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
@@ -27,7 +28,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
-      ref.read(notificationServiceProvider).initialize();
+      final profile = ref.read(userProfileProvider).value;
+      ref.read(notificationServiceProvider).initialize(
+        isEnabled: profile?.notificationsEnabled ?? true,
+      );
+      ref.read(firestoreDatabaseProvider).setNetworkEnabled(
+        profile?.offlineSyncEnabled ?? true,
+      );
       final user = ref.read(currentUserProvider);
       if (user != null) {
         ref.read(notificationServiceProvider).saveTokenToUserProfile(user.uid);
@@ -384,8 +391,22 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                       floatPhase: i * 0.2,
                       onTap: () async {
                         setState(() => _currentMoodIndex = i);
+                        
+                        // Show recommendations immediately for Stressed or Sad moods
+                        if (i == 0 || i == 1) {
+                          _showMoodRecommendation(context, i);
+                        }
+
                         final user = ref.read(currentUserProvider);
                         if (user != null) {
+                          if (i == 0) {
+                            ref.read(notificationServiceProvider).createNotification(
+                              userId: user.uid,
+                              title: 'High Stress Detected',
+                              body: 'Take a moment to breathe. We have recommended some activities for you.',
+                              type: 'alert',
+                            );
+                          }
                           try {
                             await ref
                                 .read(moodCheckinServiceProvider)
@@ -398,11 +419,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                             debugPrint('Failed to save mood check-in: $e');
                           }
                         }
-                        if (i == 0 || i == 1) {
-                          if (context.mounted) {
-                            _showMoodRecommendation(context, i);
-                          }
-                        }
                       },
                     ),
                   ),
@@ -412,7 +428,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               const SizedBox(height: 28),
 
               // ── Insight Card ──────────────────────────────────────────
-              _InsightCard(dominantEmotion: _moods[_currentMoodIndex].label),
+              _InsightCard(
+                dominantEmotion: _moods[_currentMoodIndex].label,
+                prediction: prediction,
+              ),
 
               const SizedBox(height: 24),
 
@@ -699,8 +718,13 @@ class _NotificationBell extends ConsumerWidget {
 // ─────────────────────────────────────────────────────────────
 
 class _InsightCard extends StatelessWidget {
-  const _InsightCard({required this.dominantEmotion});
+  const _InsightCard({
+    required this.dominantEmotion,
+    required this.prediction,
+  });
+
   final String dominantEmotion;
+  final Prediction? prediction;
 
   @override
   Widget build(BuildContext context) {
@@ -735,25 +759,25 @@ class _InsightCard extends StatelessWidget {
                           color: const Color(0xFF1A1A2E),
                         ),
                       ),
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFDCFCE7),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '98% match',
-                          style: GoogleFonts.lora(
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                            color: const Color(0xFF15803D),
+                      if (prediction != null)
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDCFCE7),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            'Real-time',
+                            style: GoogleFonts.lora(
+                              fontSize: 10,
+                              fontWeight: FontWeight.bold,
+                              color: const Color(0xFF15803D),
+                            ),
                           ),
                         ),
-                      ),
                     ],
                   ),
                   const SizedBox(height: 16),
@@ -792,14 +816,18 @@ class _InsightCard extends StatelessWidget {
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        const Icon(
-                          Icons.eco_outlined,
+                        Icon(
+                          prediction?.trend == 'declining'
+                              ? Icons.trending_down
+                              : Icons.trending_up,
                           size: 14,
-                          color: Color(0xFF0EA5E9),
+                          color: const Color(0xFF0EA5E9),
                         ),
                         const SizedBox(width: 4),
                         Text(
-                          'Calm · 78%',
+                          prediction == null
+                              ? 'No data yet'
+                              : prediction!.trend.toUpperCase(),
                           style: GoogleFonts.lora(
                             fontSize: 12,
                             fontWeight: FontWeight.w600,
@@ -824,7 +852,9 @@ class _InsightCard extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  '78%',
+                  prediction == null
+                      ? '--'
+                      : '${((prediction!.averageMood / 5.0) * 100).toInt()}%',
                   style: GoogleFonts.lora(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,

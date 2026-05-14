@@ -40,13 +40,20 @@ class _SplashScreenState extends ConsumerState<SplashScreen>
     }
     final profile = await ref.read(profileServiceProvider).getProfile(user.uid);
     if (!mounted) return;
-    if (profile?.onboardingCompleted == true) {
-      Navigator.pushReplacementNamed(context, AppRoutes.home);
+    
+    if (profile != null) {
+      if (profile.profileCompleted == true) {
+        Navigator.pushReplacementNamed(context, AppRoutes.home);
+      } else {
+        Navigator.pushReplacementNamed(
+          context,
+          AppRoutes.editProfile,
+          arguments: {'isOnboarding': true},
+        );
+      }
     } else {
-      Navigator.pushReplacementNamed(
-        context,
-        AppRoutes.onboardingQuestionnaire,
-      );
+      // Not logged in or no profile found
+      Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
     }
   }
 

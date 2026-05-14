@@ -8,6 +8,7 @@ import 'package:mind_print/features/journal/services/voice_service.dart';
 import 'package:mind_print/features/shared/models/journal_entry.dart';
 import 'package:mind_print/features/shared/providers/service_providers.dart';
 import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
+import 'package:mind_print/features/notifications/providers/notification_provider.dart';
 
 final huggingFaceServiceProvider = Provider<HuggingFaceService>((ref) {
   return HuggingFaceService(Env.hfApiKey);
@@ -20,6 +21,7 @@ final journalServiceProvider = Provider<JournalService>((ref) {
     Env.geminiApiKey,
     ref.watch(rateLimiterServiceProvider),
     ref.watch(localStorageServiceProvider),
+    ref.watch(notificationServiceProvider),
   );
 });
 

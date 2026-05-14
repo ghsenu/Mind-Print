@@ -15,56 +15,56 @@ class MusicTherapyScreen extends StatelessWidget {
       duration: '04:20',
       moodTag: 'ANXIOUS',
       moodColor: Color(0xFF6ACFEF),
-      audioUrl: null, // TODO: paste Firebase Storage URL for ocean-calm.mp3
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     ),
     MusicTrack(
       title: 'Forest Rain',
       duration: '06:45',
       moodTag: 'STRESSED',
       moodColor: Color(0xFF22C55E),
-      audioUrl: null, // TODO: paste Firebase Storage URL for forest-rain.mp3
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
     ),
     MusicTrack(
       title: 'Zen Focus',
       duration: '08:00',
       moodTag: 'RESTLESS',
       moodColor: Color(0xFFA855F7),
-      audioUrl: null, // TODO: paste Firebase Storage URL for zen-focus.mp3
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
     ),
     MusicTrack(
       title: 'Deep Sleep',
       duration: '15:00',
       moodTag: 'INSOMNIA',
       moodColor: Color(0xFF0EA5E9),
-      audioUrl: null, // TODO: paste Firebase Storage URL for deep-sleep.mp3
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
     ),
     MusicTrack(
       title: 'Morning Light',
       duration: '05:30',
       moodTag: 'SAD',
       moodColor: Color(0xFFEAB308),
-      audioUrl: null, // TODO: paste Firebase Storage URL for morning-light.mp3
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
     ),
     MusicTrack(
       title: 'Gentle Flow',
       duration: '07:15',
       moodTag: 'TENSE',
       moodColor: Color(0xFFF97316),
-      audioUrl: null, // TODO: paste Firebase Storage URL for gentle-flow.mp3
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
     ),
     MusicTrack(
       title: 'Soft Horizon',
       duration: '09:00',
       moodTag: 'OVERWHELMED',
       moodColor: Color(0xFFEC4899),
-      audioUrl: null, // TODO: paste Firebase Storage URL for soft-horizon.mp3
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
     ),
     MusicTrack(
       title: 'Still Waters',
       duration: '11:20',
       moodTag: 'ANXIOUS',
       moodColor: Color(0xFF6ACFEF),
-      audioUrl: null, // TODO: paste Firebase Storage URL for still-waters.mp3
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
     ),
   ];
 
