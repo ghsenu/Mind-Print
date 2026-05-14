@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:http/http.dart' as http;
+import '../../shared/services/rate_limiter_service.dart';
 
 class AssemblyAiService {
-  AssemblyAiService(this._apiKey);
+  AssemblyAiService(this._apiKey, this._rateLimiter);
 
   final String _apiKey;
+  final RateLimiterService _rateLimiter;
 
   static const _base = 'https://api.assemblyai.com/v2';
 
@@ -20,6 +22,12 @@ class AssemblyAiService {
     String filePath, {
     void Function(String status)? onStatus,
   }) async {
+    // Check rate limit
+    final isAllowed = await _rateLimiter.isAllowed('assembly_ai');
+    if (!isAllowed) {
+      throw Exception('Transcription rate limit exceeded. Please try again in a minute.');
+    }
+
     onStatus?.call('uploading');
     final uploadRequest = http.StreamedRequest(
       'POST',

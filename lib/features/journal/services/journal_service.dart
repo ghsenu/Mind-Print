@@ -8,6 +8,8 @@ import 'package:mind_print/features/shared/models/emotion_result.dart';
 import 'package:mind_print/features/shared/models/journal_entry.dart';
 
 import 'hugging_face_service.dart';
+import '../../shared/services/rate_limiter_service.dart';
+import '../../shared/services/local_storage_service.dart';
 
 class _GeminiAnalysis {
   _GeminiAnalysis({
@@ -30,11 +32,13 @@ class _GeminiAnalysis {
 }
 
 class JournalService {
-  JournalService(this._db, this._hf, this._geminiApiKey);
+  JournalService(this._db, this._hf, this._geminiApiKey, this._rateLimiter, this._localStorage);
 
   final FirestoreDatabase _db;
   final HuggingFaceService _hf;
   final String _geminiApiKey;
+  final RateLimiterService _rateLimiter;
+  final LocalStorageService _localStorage;
 
   static const Map<String, String> _emotionInsights = {
     'joy':
@@ -68,8 +72,15 @@ class JournalService {
 
   Future<_GeminiAnalysis?> _analyzeWithGemini(String text) async {
     try {
+      // Check rate limit before calling Gemini
+      final isAllowed = await _rateLimiter.isAllowed('gemini');
+      if (!isAllowed) {
+        debugPrint('[JournalService] Gemini rate limit exceeded');
+        return null;
+      }
+
       final model = GenerativeModel(
-        model: 'gemini-2.5-flash',
+        model: 'gemini-2.0-flash',
         apiKey: _geminiApiKey,
       );
 
@@ -124,21 +135,33 @@ Journal entry:''';
     }
   }
 
-  Stream<List<JournalEntry>> watchJournals(String userId) {
-    return _db
+  Stream<List<JournalEntry>> watchJournals(String userId) async* {
+    // 1. Yield cached data immediately for instant load
+    final cached = await _localStorage.getCachedJournalEntries(userId);
+    if (cached.isNotEmpty) {
+      yield cached;
+    }
+
+    // 2. Listen to Firestore and update cache
+    yield* _db
         .journals(userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
-        .map(
-          (snap) =>
-              snap.docs
-                  .map(
-                    (d) => JournalEntry.fromFirestore(
-                      d as DocumentSnapshot<Map<String, dynamic>>,
-                    ),
-                  )
-                  .toList(),
-        );
+        .map((snap) {
+      final entries =
+          snap.docs
+              .map(
+                (d) => JournalEntry.fromFirestore(
+                  d as DocumentSnapshot<Map<String, dynamic>>,
+                ),
+              )
+              .toList();
+
+      // Update local cache in background
+      _localStorage.saveJournalEntries(entries);
+
+      return entries;
+    });
   }
 
   Future<EmotionResult> analyzeAndSave(
@@ -158,6 +181,7 @@ Journal entry:''';
       createdAt: DateTime.now(),
     );
     await journalRef.set(entry.toFirestore());
+    await _localStorage.saveJournalEntries([entry]);
 
     final (
       primaryEmotion,
@@ -211,6 +235,7 @@ Journal entry:''';
       createdAt: DateTime.now(),
     );
     await journalRef.set(entry.toFirestore());
+    await _localStorage.saveJournalEntries([entry]);
 
     final (
       primaryEmotion,
