@@ -1,39 +1,28 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:mind_print/features/auth/providers/auth_provider.dart';
+import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 
-class EditProfileScreen extends StatefulWidget {
+class EditProfileScreen extends ConsumerStatefulWidget {
   const EditProfileScreen({super.key});
 
   @override
-  State<EditProfileScreen> createState() => _EditProfileScreenState();
+  ConsumerState<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
-  final _nameController = TextEditingController(text: 'Melissa Peters');
-  final _emailController = TextEditingController(text: 'melpeters@gmail.com');
-  final _dobController = TextEditingController(text: '23/05/1995');
-  final _countryController = TextEditingController(text: 'Nigeria');
+class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
+  final _nameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _dobController = TextEditingController();
+  final _countryController = TextEditingController();
 
   File? _imageFile;
   final ImagePicker _picker = ImagePicker();
-
-  Future<void> _pickImage() async {
-    try {
-      final XFile? pickedFile = await _picker.pickImage(
-        source: ImageSource.gallery,
-      );
-      if (pickedFile != null) {
-        setState(() {
-          _imageFile = File(pickedFile.path);
-        });
-      }
-    } catch (e) {
-      debugPrint('Error picking image: $e');
-    }
-  }
+  bool _loaded = false;
+  bool _isSaving = false;
 
   @override
   void dispose() {
@@ -44,8 +33,69 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     super.dispose();
   }
 
+  void _populateFromProfile() {
+    final profile = ref.read(userProfileProvider).value;
+    if (profile == null || _loaded) return;
+    _loaded = true;
+    _nameController.text = profile.displayName;
+    _emailController.text = profile.email;
+    _dobController.text = profile.dateOfBirth ?? '';
+    _countryController.text = profile.country ?? '';
+  }
+
+  Future<void> _pickImage() async {
+    try {
+      final XFile? picked = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 80,
+      );
+      if (picked != null) setState(() => _imageFile = File(picked.path));
+    } catch (e) {
+      debugPrint('Image pick error: $e');
+    }
+  }
+
+  Future<void> _save() async {
+    final user = ref.read(currentUserProvider);
+    if (user == null) return;
+
+    setState(() => _isSaving = true);
+    try {
+      final fields = <String, dynamic>{
+        'displayName': _nameController.text.trim(),
+        'email': _emailController.text.trim(),
+        if (_dobController.text.trim().isNotEmpty)
+          'dateOfBirth': _dobController.text.trim(),
+        if (_countryController.text.trim().isNotEmpty)
+          'country': _countryController.text.trim(),
+      };
+      await ref.read(profileServiceProvider).updateFields(user.uid, fields);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Profile saved')),
+      );
+      Navigator.pop(context);
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Save failed: $e')),
+      );
+    } finally {
+      if (mounted) setState(() => _isSaving = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final profileAsync = ref.watch(userProfileProvider);
+    final profile = profileAsync.value;
+
+    // Populate once when data arrives
+    WidgetsBinding.instance.addPostFrameCallback((_) => _populateFromProfile());
+
+    final avatarUrl = profile?.profilePhoto ??
+        'https://api.dicebear.com/7.x/avataaars/png?seed=${profile?.displayName ?? 'user'}';
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0FBFF),
       appBar: AppBar(
@@ -77,7 +127,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Avatar Section
+                    // Avatar
                     Center(
                       child: Stack(
                         children: [
@@ -92,12 +142,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                             child: CircleAvatar(
                               radius: 60,
                               backgroundColor: Colors.white,
-                              backgroundImage:
-                                  _imageFile != null
-                                      ? FileImage(_imageFile!) as ImageProvider
-                                      : const NetworkImage(
-                                        'https://api.dicebear.com/7.x/avataaars/png?seed=Michael',
-                                      ),
+                              backgroundImage: _imageFile != null
+                                  ? FileImage(_imageFile!) as ImageProvider
+                                  : NetworkImage(avatarUrl),
                             ),
                           ),
                           Positioned(
@@ -129,7 +176,6 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
                     const SizedBox(height: 40),
 
-                    // Forms
                     _buildTextField(label: 'Name', controller: _nameController),
                     const SizedBox(height: 20),
                     _buildTextField(
@@ -142,6 +188,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       label: 'Date of Birth',
                       controller: _dobController,
                       keyboardType: TextInputType.datetime,
+                      hint: 'DD/MM/YYYY',
                     ),
                     const SizedBox(height: 20),
                     _buildTextField(
@@ -162,26 +209,31 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: Implement save logic
-                  },
+                  onPressed: _isSaving ? null : _save,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(
-                      0xFFF28C8C,
-                    ), // Light coral/red color
+                    backgroundColor: const Color(0xFFF28C8C),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                     elevation: 2,
                   ),
-                  child: Text(
-                    'Save changes',
-                    style: GoogleFonts.inter(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.white,
-                    ),
-                  ),
+                  child: _isSaving
+                      ? const SizedBox(
+                          width: 22,
+                          height: 22,
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
+                        )
+                      : Text(
+                          'Save changes',
+                          style: GoogleFonts.inter(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                 ),
               ),
             ),
@@ -195,6 +247,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     required String label,
     required TextEditingController controller,
     TextInputType keyboardType = TextInputType.text,
+    String? hint,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -204,7 +257,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           style: GoogleFonts.inter(
             fontSize: 14,
             fontWeight: FontWeight.w600,
-            color: const Color(0xFF1A1A2E), // Dark color for label
+            color: const Color(0xFF1A1A2E),
           ),
         ),
         const SizedBox(height: 8),
@@ -216,16 +269,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             color: const Color(0xFF4A4A68),
           ),
           decoration: InputDecoration(
+            hintText: hint,
             filled: true,
-            fillColor:
-                Colors
-                    .transparent, // Background transparent like design? Actually looks slightly lighter or transparent. We'll use transparent or #F8FBFD
+            fillColor: Colors.transparent,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 16,
               vertical: 14,
             ),
-            enabledBorder: OutlineBorder(color: const Color(0xFFE0E5ED)),
-            focusedBorder: OutlineBorder(color: const Color(0xFF0EA5E9)),
+            enabledBorder: _OutlineBorder(color: const Color(0xFFE0E5ED)),
+            focusedBorder: _OutlineBorder(color: const Color(0xFF0EA5E9)),
           ),
         ),
       ],
@@ -233,10 +285,10 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   }
 }
 
-class OutlineBorder extends OutlineInputBorder {
-  OutlineBorder({required Color color})
-    : super(
-        borderSide: BorderSide(color: color, width: 1),
-        borderRadius: BorderRadius.circular(8),
-      );
+class _OutlineBorder extends OutlineInputBorder {
+  _OutlineBorder({required Color color})
+      : super(
+          borderSide: BorderSide(color: color, width: 1),
+          borderRadius: BorderRadius.circular(8),
+        );
 }

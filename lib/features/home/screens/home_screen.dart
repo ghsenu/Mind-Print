@@ -32,6 +32,145 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
+  void _showMoodRecommendation(BuildContext context, int moodIndex) {
+    final isStressed = moodIndex == 0;
+    final emoji = isStressed ? '😔' : '😯';
+    final label = isStressed ? 'Stressed' : 'Sad';
+    final subtitle = isStressed
+        ? "Let's help you reset and find some calm"
+        : "You're not alone — here's something that might help";
+
+    final recommendations = isStressed
+        ? [
+            _Recommendation(
+              icon: Icons.air_outlined,
+              color: const Color(0xFF0EA5E9),
+              title: 'Breathing Exercise',
+              description: 'Calm your nervous system in minutes',
+              route: AppRoutes.breathing,
+            ),
+            _Recommendation(
+              icon: Icons.sports_esports_outlined,
+              color: const Color(0xFF8E54E9),
+              title: 'Play a Game',
+              description: 'Distract your mind with a fun activity',
+              route: AppRoutes.games,
+            ),
+            _Recommendation(
+              icon: Icons.self_improvement_outlined,
+              color: const Color(0xFF11998E),
+              title: 'Meditate',
+              description: 'Ground yourself with a guided session',
+              route: AppRoutes.meditation,
+            ),
+          ]
+        : [
+            _Recommendation(
+              icon: Icons.music_note_outlined,
+              color: const Color(0xFFFF6B6B),
+              title: 'Music Therapy',
+              description: 'Let music lift your spirits',
+              route: AppRoutes.musicTherapy,
+            ),
+            _Recommendation(
+              icon: Icons.edit_outlined,
+              color: const Color(0xFF667EEA),
+              title: 'Journal',
+              description: 'Write out what you are feeling',
+              route: AppRoutes.journal,
+            ),
+            _Recommendation(
+              icon: Icons.sports_esports_outlined,
+              color: const Color(0xFF8E54E9),
+              title: 'Play a Game',
+              description: 'Take a fun break to reset',
+              route: AppRoutes.games,
+            ),
+          ];
+
+    showDialog<void>(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.4),
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        insetPadding: const EdgeInsets.symmetric(horizontal: 24),
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(24, 20, 16, 24),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header row
+              Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(emoji, style: const TextStyle(fontSize: 36)),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'You seem $label',
+                          style: GoogleFonts.lora(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: const Color(0xFF1A1A2E),
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          subtitle,
+                          style: GoogleFonts.inter(
+                            fontSize: 12,
+                            color: const Color(0xFF6B6B8A),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pop(ctx),
+                    icon: const Icon(Icons.close, size: 20),
+                    color: const Color(0xFF6B6B8A),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+                ],
+              ),
+
+              const SizedBox(height: 4),
+              const Divider(),
+              const SizedBox(height: 8),
+
+              Text(
+                'Things that might help',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.8,
+                  color: const Color(0xFF6B6B8A),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Activity rows
+              ...recommendations.map(
+                (rec) => _RecommendationTile(
+                  recommendation: rec,
+                  onTap: () {
+                    Navigator.pop(ctx);
+                    Navigator.pushNamed(context, rec.route);
+                  },
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
   final List<_MoodData> _moods = [
     const _MoodData('😔', 'Stressed'),
     const _MoodData('😯', 'Sad'),
@@ -237,6 +376,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           } catch (e) {
                             debugPrint('Failed to save mood check-in: $e');
                           }
+                        }
+                        if (i == 0 || i == 1) {
+                          _showMoodRecommendation(context, i);
                         }
                       },
                     ),
@@ -842,4 +984,95 @@ class _BubblePainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_BubblePainter old) => old.progress != progress;
+}
+
+// ─────────────────────────────────────────────────────────────
+// Mood Recommendation helpers
+// ─────────────────────────────────────────────────────────────
+
+class _Recommendation {
+  const _Recommendation({
+    required this.icon,
+    required this.color,
+    required this.title,
+    required this.description,
+    required this.route,
+  });
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String description;
+  final String route;
+}
+
+class _RecommendationTile extends StatelessWidget {
+  const _RecommendationTile({
+    required this.recommendation,
+    required this.onTap,
+  });
+  final _Recommendation recommendation;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: recommendation.color.withValues(alpha: 0.07),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: recommendation.color.withValues(alpha: 0.18),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                color: recommendation.color.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                recommendation.icon,
+                color: recommendation.color,
+                size: 20,
+              ),
+            ),
+            const SizedBox(width: 14),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    recommendation.title,
+                    style: GoogleFonts.inter(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: const Color(0xFF1A1A2E),
+                    ),
+                  ),
+                  Text(
+                    recommendation.description,
+                    style: GoogleFonts.inter(
+                      fontSize: 11,
+                      color: const Color(0xFF6B6B8A),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.arrow_forward_ios,
+              size: 14,
+              color: recommendation.color,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

@@ -66,9 +66,10 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
                   final msg = messages[index];
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 20),
-                    child: msg.sender == MessageSender.bot
-                        ? _BotBubble(message: msg)
-                        : _UserBubble(text: msg.text),
+                    child:
+                        msg.sender == MessageSender.bot
+                            ? _BotBubble(message: msg)
+                            : _UserBubble(text: msg.text),
                   );
                 },
               ),
@@ -115,30 +116,31 @@ class _ChatBotScreenState extends ConsumerState<ChatBotScreen> {
             onPressed: () {
               showDialog(
                 context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Clear conversation'),
-                  content: const Text(
-                    'Start a new conversation? This cannot be undone.',
-                  ),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx),
-                      child: const Text('Cancel'),
-                    ),
-                    TextButton(
-                      onPressed: () {
-                        ref
-                            .read(chatMessagesProvider.notifier)
-                            .clearHistory();
-                        Navigator.pop(ctx);
-                      },
-                      child: const Text(
-                        'Clear',
-                        style: TextStyle(color: Colors.red),
+                builder:
+                    (ctx) => AlertDialog(
+                      title: const Text('Clear conversation'),
+                      content: const Text(
+                        'Start a new conversation? This cannot be undone.',
                       ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(ctx),
+                          child: const Text('Cancel'),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            ref
+                                .read(chatMessagesProvider.notifier)
+                                .clearHistory();
+                            Navigator.pop(ctx);
+                          },
+                          child: const Text(
+                            'Clear',
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
               );
             },
           ),
@@ -242,16 +244,17 @@ class _BotBubble extends StatelessWidget {
                 bottomLeft: Radius.circular(4),
               ),
             ),
-            child: message.isStreaming && message.text.isEmpty
-                ? const _TypingDots()
-                : Text(
-                    message.text,
-                    style: const TextStyle(
-                      color: Color(0xFF374151),
-                      fontSize: 16,
-                      height: 1.5,
+            child:
+                message.isStreaming && message.text.isEmpty
+                    ? const _TypingDots()
+                    : Text(
+                      message.text,
+                      style: const TextStyle(
+                        color: Color(0xFF374151),
+                        fontSize: 16,
+                        height: 1.5,
+                      ),
                     ),
-                  ),
           ),
         ),
         const SizedBox(width: 40),
@@ -334,8 +337,10 @@ class _TypingDotsState extends State<_TypingDots>
           mainAxisSize: MainAxisSize.min,
           children: List.generate(3, (i) {
             final phase = (t - i * 0.2).clamp(0.0, 1.0);
-            final opacity = (phase < 0.5 ? phase * 2 : (1 - phase) * 2)
-                .clamp(0.3, 1.0);
+            final opacity = (phase < 0.5 ? phase * 2 : (1 - phase) * 2).clamp(
+              0.3,
+              1.0,
+            );
             return Padding(
               padding: const EdgeInsets.symmetric(horizontal: 3),
               child: Opacity(

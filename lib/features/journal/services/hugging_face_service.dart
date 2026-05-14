@@ -37,32 +37,32 @@ class HuggingFaceService {
           await Future.delayed(const Duration(seconds: 20));
           continue;
         }
-        throw Exception('HuggingFace model $model is unavailable (503).');
+        return null;
       }
 
       if (response.statusCode != 200) {
-        throw Exception(
-          'HuggingFace error ${response.statusCode}: ${response.body}',
-        );
+        return null; // Degrade gracefully on 4xx / unexpected errors
       }
 
       return jsonDecode(response.body);
     }
+    return null;
   }
 
   // text-classification models return [[{label, score}, ...]]
-  Future<List<Map<String, dynamic>>> _classify(
+  Future<List<Map<String, dynamic>>?> _classify(
     String model,
     String text,
   ) async {
     final raw = await _post(model, {'inputs': text});
+    if (raw == null) return null;
     final outer = raw as List<dynamic>;
     final inner = outer[0] as List<dynamic>;
     return inner.map((e) => Map<String, dynamic>.from(e as Map)).toList();
   }
 
   // zero-shot classification returns {sequence, labels, scores}
-  Future<Map<String, dynamic>> _zeroShot(
+  Future<Map<String, dynamic>?> _zeroShot(
     String model,
     String text,
     List<String> candidates,
@@ -71,6 +71,7 @@ class HuggingFaceService {
       'inputs': text,
       'parameters': {'candidate_labels': candidates},
     });
+    if (raw == null) return null;
     return Map<String, dynamic>.from(raw as Map);
   }
 
@@ -79,6 +80,10 @@ class HuggingFaceService {
       'j-hartmann/emotion-english-distilroberta-base',
       text,
     );
+
+    if (results == null || results.isEmpty) {
+      return _EmotionAnalysis('neutral', 0.5, []);
+    }
 
     results.sort(
       (a, b) => (b['score'] as double).compareTo(a['score'] as double),
@@ -106,6 +111,8 @@ class HuggingFaceService {
       text,
     );
 
+    if (results == null || results.isEmpty) return 'neutral';
+
     results.sort(
       (a, b) => (b['score'] as double).compareTo(a['score'] as double),
     );
@@ -131,6 +138,8 @@ class HuggingFaceService {
       text,
       candidates,
     );
+
+    if (result == null) return null;
 
     final labels = List<String>.from(result['labels'] as List);
     final scores = List<double>.from(

@@ -9,8 +9,8 @@ final geminiServiceProvider = Provider<GeminiService>(
 
 final chatMessagesProvider =
     StateNotifierProvider<ChatNotifier, List<ChatMessage>>(
-  (ref) => ChatNotifier(ref.watch(geminiServiceProvider)),
-);
+      (ref) => ChatNotifier(ref.watch(geminiServiceProvider)),
+    );
 
 class ChatNotifier extends StateNotifier<List<ChatMessage>> {
   ChatNotifier(this._gemini) : super([]) {
@@ -50,10 +50,7 @@ class ChatNotifier extends StateNotifier<List<ChatMessage>> {
         // Find the bot placeholder and append the token
         state = [
           for (final m in state)
-            if (m.id == botMsg.id)
-              m.copyWith(text: m.text + token)
-            else
-              m,
+            if (m.id == botMsg.id) m.copyWith(text: m.text + token) else m,
         ];
       }
     } catch (_) {
