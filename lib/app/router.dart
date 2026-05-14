@@ -27,6 +27,9 @@ import 'package:mind_print/features/journal/screens/journal_tab.dart';
 import 'package:mind_print/features/notifications/screens/notification_screen.dart';
 import 'package:mind_print/features/reports/screens/export_screen.dart';
 import 'package:mind_print/features/settings/screens/settings_screen.dart';
+import 'package:mind_print/features/settings/screens/privacy_security_screen.dart';
+import 'package:mind_print/features/settings/screens/help_center_screen.dart';
+import 'package:mind_print/features/settings/screens/about_screen.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
 
 final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
@@ -63,4 +66,7 @@ final Map<String, WidgetBuilder> appRoutes = <String, WidgetBuilder>{
   AppRoutes.musicTherapy: (_) => const MusicTherapyScreen(),
   AppRoutes.meditation: (_) => const MeditationScreen(),
   AppRoutes.cbtExercises: (_) => const CbtScreen(),
+  AppRoutes.privacySecurity: (_) => const PrivacySecurityScreen(),
+  AppRoutes.helpCenter: (_) => const HelpCenterScreen(),
+  AppRoutes.about: (_) => const AboutScreen(),
 };

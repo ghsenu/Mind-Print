@@ -6,6 +6,7 @@ class UserProfile {
     required this.displayName,
     required this.email,
     this.profilePhoto,
+    this.fcmToken,
     this.language = 'en',
     this.yearOfStudy = '',
     this.biometricEnabled = false,
@@ -22,6 +23,7 @@ class UserProfile {
   final String? profilePhoto;
   final String language; // 'en' | 'si' | 'ta'
   final String yearOfStudy;
+  final String? fcmToken;
   final bool biometricEnabled;
   final bool notificationsEnabled;
   final bool offlineSyncEnabled;
@@ -54,6 +56,7 @@ class UserProfile {
       displayName: data['displayName'] as String? ?? '',
       email: data['email'] as String? ?? '',
       profilePhoto: data['profilePhoto'] as String?,
+      fcmToken: data['fcmToken'] as String?,
       language: data['language'] as String? ?? 'en',
       yearOfStudy: data['yearOfStudy'] as String? ?? '',
       biometricEnabled: data['biometricEnabled'] as bool? ?? false,
@@ -69,6 +72,7 @@ class UserProfile {
     'displayName': displayName,
     'email': email,
     if (profilePhoto != null) 'profilePhoto': profilePhoto,
+    if (fcmToken != null) 'fcmToken': fcmToken,
     'language': language,
     'yearOfStudy': yearOfStudy,
     'biometricEnabled': biometricEnabled,
@@ -83,6 +87,7 @@ class UserProfile {
     String? displayName,
     String? email,
     String? profilePhoto,
+    String? fcmToken,
     String? language,
     String? yearOfStudy,
     bool? biometricEnabled,
@@ -95,6 +100,7 @@ class UserProfile {
     displayName: displayName ?? this.displayName,
     email: email ?? this.email,
     profilePhoto: profilePhoto ?? this.profilePhoto,
+    fcmToken: fcmToken ?? this.fcmToken,
     language: language ?? this.language,
     yearOfStudy: yearOfStudy ?? this.yearOfStudy,
     biometricEnabled: biometricEnabled ?? this.biometricEnabled,

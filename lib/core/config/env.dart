@@ -1,4 +1,4 @@
-import 'package:firebase_core/firebase_core.dart';
+...../.././/import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
@@ -79,6 +79,8 @@ class Env {
   static String get hfApiKey => dotenv.get('HUGGINGFACE_API_KEY', fallback: '');
 
   static String get assemblyAiApiKey => _require('ASSEMBLYAI_API_KEY');
+
+  static String get geminiApiKey => dotenv.get('GEMINI_API_KEY', fallback: '');
 
   static String _require(String key) {
     final String? value = dotenv.maybeGet(key);

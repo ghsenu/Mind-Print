@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/activity_models.dart';
+import '../services/audio_service.dart';
 
 class BreathingScreen extends StatefulWidget {
   const BreathingScreen({super.key});
@@ -263,17 +265,18 @@ class _PhaseChip extends StatelessWidget {
 
 // ── Active breathing session ─────────────────────────────────────────────────
 
-class _BreathingActiveScreen extends StatefulWidget {
+class _BreathingActiveScreen extends ConsumerStatefulWidget {
   const _BreathingActiveScreen({required this.exercise, required this.onQuit});
 
   final BreathingExercise exercise;
   final VoidCallback onQuit;
 
   @override
-  State<_BreathingActiveScreen> createState() => _BreathingActiveScreenState();
+  ConsumerState<_BreathingActiveScreen> createState() =>
+      _BreathingActiveScreenState();
 }
 
-class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
+class _BreathingActiveScreenState extends ConsumerState<_BreathingActiveScreen>
     with TickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _scaleAnim;
@@ -310,6 +313,17 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     _startPhase(0);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(audioServiceProvider)
+          .loadAudio(
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+          )
+          .then((_) {
+            ref.read(audioServiceProvider).play();
+          });
+    });
   }
 
   void _startPhase(int phase) {
@@ -336,6 +350,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
       if (_sessionSecsLeft <= 0) {
         _phaseTimer?.cancel();
         _sessionTimer?.cancel();
+        ref.read(audioServiceProvider).stop();
         _showCompletionDialog();
         return;
       }
@@ -368,7 +383,9 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
     setState(() => _paused = !_paused);
     if (_paused) {
       _pulseController.stop();
+      ref.read(audioServiceProvider).pause();
     } else {
+      ref.read(audioServiceProvider).play();
       if (_phase == 0) {
         _pulseController.forward();
       } else if (_phase == 2) {
@@ -424,6 +441,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
     _pulseController.dispose();
     _phaseTimer?.cancel();
     _sessionTimer?.cancel();
+    ref.read(audioServiceProvider).stop();
     super.dispose();
   }
 

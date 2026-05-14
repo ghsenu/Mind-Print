@@ -1,1 +1,27 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"mindprint-db","appId":"1:987595589557:android:21f7da80a56bfb7ca37bfc","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"mindprint-db","configurations":{"android":"1:987595589557:android:21f7da80a56bfb7ca37bfc","ios":"1:987595589557:ios:1469061a6540ecfea37bfc","web":"1:987595589557:web:c2f7e7d7cdec5c73a37bfc","windows":"1:987595589557:web:81621a5d452367eaa37bfc"}}}}}}
+{
+	"firestore": {
+		"rules": "firestore.rules"
+	},
+	"flutter": {
+		"platforms": {
+			"android": {
+				"default": {
+					"projectId": "mindprint-db",
+					"appId": "1:987595589557:android:21f7da80a56bfb7ca37bfc",
+					"fileOutput": "android/app/google-services.json"
+				}
+			},
+			"dart": {
+				"lib/firebase_options.dart": {
+					"projectId": "mindprint-db",
+					"configurations": {
+						"android": "1:987595589557:android:21f7da80a56bfb7ca37bfc",
+						"ios": "1:987595589557:ios:1469061a6540ecfea37bfc",
+						"web": "1:987595589557:web:c2f7e7d7cdec5c73a37bfc",
+						"windows": "1:987595589557:web:81621a5d452367eaa37bfc"
+					}
+				}
+			}
+		}
+	}
+}

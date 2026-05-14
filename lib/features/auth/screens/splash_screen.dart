@@ -109,25 +109,28 @@ class _SplashScreenState extends State<SplashScreen>
                   // Bottom row
                   Padding(
                     padding: const EdgeInsets.only(bottom: 36.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.lock_outline,
-                          size: 14,
-                          color: Colors.white.withValues(alpha: 0.55),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'PRIVATE   •   SECURE   •   OFFLINE',
-                          style: GoogleFonts.lora(
-                            fontSize: 11,
-                            letterSpacing: 1.8,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.lock_outline,
+                            size: 14,
                             color: Colors.white.withValues(alpha: 0.55),
-                            fontWeight: FontWeight.w600,
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Text(
+                            'PRIVATE   •   SECURE   •   OFFLINE',
+                            style: GoogleFonts.lora(
+                              fontSize: 11,
+                              letterSpacing: 1.8,
+                              color: Colors.white.withValues(alpha: 0.55),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],
