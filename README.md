@@ -1,4 +1,4 @@
-# mind_print
+# Mind_Print
 
 MindPrint Flutter application.
 
