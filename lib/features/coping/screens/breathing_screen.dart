@@ -317,8 +317,9 @@ class _BreathingActiveScreenState extends ConsumerState<_BreathingActiveScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) {
       ref
           .read(audioServiceProvider)
+          // TODO: paste Firebase Storage URL for breathing-ambient.mp3
           .loadAudio(
-            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+            'https://placeholder.invalid/breathing-ambient.mp3',
           )
           .then((_) {
             if (!mounted) return;

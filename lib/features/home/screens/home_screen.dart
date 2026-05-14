@@ -399,7 +399,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                           }
                         }
                         if (i == 0 || i == 1) {
-                          _showMoodRecommendation(context, i);
+                          if (context.mounted) {
+                            _showMoodRecommendation(context, i);
+                          }
                         }
                       },
                     ),

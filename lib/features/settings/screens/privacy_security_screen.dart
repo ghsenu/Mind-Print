@@ -95,7 +95,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
       decoration: BoxDecoration(
         color: const Color(0xFFE8EFFF),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: const Color(0xFF6A8DFF).withOpacity(0.3)),
+        border: Border.all(color: const Color(0xFF6A8DFF).withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -198,7 +198,7 @@ class _PrivacySecurityScreenState extends State<PrivacySecurityScreen> {
   }) {
     final color = isDestructive ? Colors.red : const Color(0xFF4B5563);
     final bgColor =
-        isDestructive ? Colors.red.withOpacity(0.1) : const Color(0xFFF3F4F6);
+        isDestructive ? Colors.red.withValues(alpha: 0.1) : const Color(0xFFF3F4F6);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),

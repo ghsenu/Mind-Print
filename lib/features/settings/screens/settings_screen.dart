@@ -229,6 +229,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: 4),
+      ),
     );
   }
 

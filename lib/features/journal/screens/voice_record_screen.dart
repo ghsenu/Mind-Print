@@ -57,19 +57,19 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
   @override
   void dispose() {
     _timer?.cancel();
-    final voiceService = ref.read(voiceServiceProvider);
-    voiceService.isRecording
-        .then((recording) {
-          if (recording) {
-            voiceService.stopRecording().catchError((e) {
-              debugPrint('Failed to stop recorder during dispose: $e');
-            });
-          }
-        })
-        .catchError((e) {
-          debugPrint('Failed to check recorder state during dispose: $e');
-        });
+    _cleanupRecorder();
     super.dispose();
+  }
+
+  Future<void> _cleanupRecorder() async {
+    final voiceService = ref.read(voiceServiceProvider);
+    try {
+      if (await voiceService.isRecording) {
+        await voiceService.stopRecording();
+      }
+    } catch (e) {
+      debugPrint('Failed to cleanup recorder: $e');
+    }
   }
 
   String get _timerLabel {
@@ -184,9 +184,14 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
       }
     } finally {
       if (localPath != null) {
-        File(localPath).delete().catchError((e) {
+        try {
+          final file = File(localPath);
+          if (await file.exists()) {
+            await file.delete();
+          }
+        } catch (e) {
           debugPrint('Failed to delete temp voice file $localPath: $e');
-        });
+        }
       }
     }
   }

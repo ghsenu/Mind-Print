@@ -206,6 +206,7 @@ class ActivitiesScreen extends StatelessWidget {
         ),
       ),
       bottomNavigationBar: const CustomBottomNav(selectedIndex: 1),
+      ),
     );
   }
 }
