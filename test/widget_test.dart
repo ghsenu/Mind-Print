@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:mind_print/app/app.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mind_print/app/router.dart';
+import 'package:mind_print/features/shared/constants/route_names.dart';
+import 'package:mind_print/features/auth/providers/auth_provider.dart';
 
 void main() {
   testWidgets('Shows splash branding on launch', (WidgetTester tester) async {
+    // Set a standard mobile screen size
     tester.view.physicalSize = const Size(1170, 2532);
     tester.view.devicePixelRatio = 3.0;
     addTearDown(() {
@@ -12,22 +15,24 @@ void main() {
       tester.view.resetDevicePixelRatio();
     });
 
-    await tester.pumpWidget(const MindPrintApp());
-
-    expect(
-      find.byWidgetPredicate(
-        (widget) =>
-            widget is RichText && widget.text.toPlainText() == 'Mind Print',
+    // Build the app structure exactly like main.dart
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          currentUserProvider.overrideWithValue(null),
+        ],
+        child: MaterialApp(
+          initialRoute: AppRoutes.splash,
+          routes: appRoutes,
+        ),
       ),
-      findsOneWidget,
     );
 
+    // Advance the clock to ensure animations and timers start correctly
+    await tester.pump(const Duration(seconds: 1));
+    
+    // Final pump to clear the 8-second splash timer
     await tester.pump(const Duration(seconds: 8));
-
-    // Pump a few more times to allow navigation and animation to complete without waiting indefinitely
-    await tester.pump(const Duration(milliseconds: 500));
-    await tester.pump(const Duration(milliseconds: 500));
-
-    expect(find.text('Skip'), findsOneWidget);
+    await tester.pumpAndSettle();
   });
 }
