@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -57,9 +58,17 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
   void dispose() {
     _timer?.cancel();
     final voiceService = ref.read(voiceServiceProvider);
-    voiceService.isRecording.then((recording) {
-      if (recording) voiceService.stopRecording();
-    });
+    voiceService.isRecording
+        .then((recording) {
+          if (recording) {
+            voiceService.stopRecording().catchError((e) {
+              debugPrint('Failed to stop recorder during dispose: $e');
+            });
+          }
+        })
+        .catchError((e) {
+          debugPrint('Failed to check recorder state during dispose: $e');
+        });
     super.dispose();
   }
 
@@ -133,14 +142,21 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
     final voiceService = ref.read(voiceServiceProvider);
     final assemblyAi = ref.read(assemblyAiServiceProvider);
     final journalService = ref.read(journalServiceProvider);
+    String? localPath;
 
     try {
-      final localPath = await voiceService.stopRecording();
+      localPath = await voiceService.stopRecording();
 
       setState(() => _processingLabel = 'Uploading audio...');
-      // Audio is uploaded directly to AssemblyAI — no Firebase Storage needed.
-      setState(() => _processingLabel = 'Transcribing...');
-      final transcript = await assemblyAi.transcribeFile(localPath);
+      final transcript = await assemblyAi.transcribeFile(
+        localPath,
+        onStatus: (status) {
+          if (!mounted) return;
+          if (status == 'transcribing') {
+            setState(() => _processingLabel = 'Transcribing...');
+          }
+        },
+      );
 
       setState(() => _processingLabel = 'Analyzing emotions...');
       final moodScore = _feelingScores[_selectedFeeling] ?? 3;
@@ -164,6 +180,12 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
           _state = _RecordState.idle;
           _elapsedSeconds = 0;
           _errorMessage = e.toString().replaceFirst('Exception: ', '');
+        });
+      }
+    } finally {
+      if (localPath != null) {
+        File(localPath).delete().catchError((e) {
+          debugPrint('Failed to delete temp voice file $localPath: $e');
         });
       }
     }

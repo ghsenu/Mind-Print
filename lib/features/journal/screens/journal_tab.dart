@@ -191,9 +191,7 @@ class _JournalTabState extends ConsumerState<JournalTab>
                   ),
               data: (entries) {
                 // Cache for search delegate.
-                WidgetsBinding.instance.addPostFrameCallback(
-                  (_) => setState(() => _allEntries = entries),
-                );
+                _allEntries = entries;
 
                 final textEntries =
                     entries.where((e) => e.entryType == 'text').toList();

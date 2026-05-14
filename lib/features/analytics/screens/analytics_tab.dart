@@ -1,5 +1,6 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -727,5 +728,6 @@ class _RadarChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant _RadarChartPainter old) => old.values != values;
+  bool shouldRepaint(covariant _RadarChartPainter old) =>
+      !listEquals(old.values, values);
 }

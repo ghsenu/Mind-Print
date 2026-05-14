@@ -64,6 +64,7 @@ class AnalyticsService {
     'Sat',
     'Sun',
   ];
+  static const _defaultTrend = 'stable';
 
   Future<AnalyticsSummary> getAnalyticsSummary(String userId) async {
     // Fetch last 30 journals
@@ -169,13 +170,19 @@ class AnalyticsService {
     String userId,
     List<JournalEntry> journals,
   ) async {
+    if (journals.isEmpty) {
+      throw StateError(
+        'Cannot generate a prediction without journal entries.',
+      );
+    }
+
     final recent = journals.take(7).toList();
     final count = recent.length;
 
     double averageMood =
         recent.map((j) => j.moodScore).reduce((a, b) => a + b) / count;
 
-    String trend = 'stable';
+    String trend = _defaultTrend;
     bool alertNeeded = false;
 
     if (count >= 6) {

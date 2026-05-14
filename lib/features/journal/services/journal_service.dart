@@ -175,6 +175,7 @@ class JournalService {
             .journals(userId)
             .doc(journalId)
             .collection('emotionResults')
+            .orderBy('analyzedAt', descending: true)
             .limit(1)
             .get();
     if (snap.docs.isEmpty) return null;
