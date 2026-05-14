@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/activity_models.dart';
+import '../services/audio_service.dart';
 
 class BreathingScreen extends StatefulWidget {
   const BreathingScreen({super.key});
@@ -157,7 +159,7 @@ class _ExerciseCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -169,7 +171,7 @@ class _ExerciseCard extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: exercise.color.withOpacity(0.15),
+              color: exercise.color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
@@ -218,7 +220,7 @@ class _ExerciseCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: exercise.color.withOpacity(0.15),
+                color: exercise.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -263,17 +265,18 @@ class _PhaseChip extends StatelessWidget {
 
 // ── Active breathing session ─────────────────────────────────────────────────
 
-class _BreathingActiveScreen extends StatefulWidget {
+class _BreathingActiveScreen extends ConsumerStatefulWidget {
   const _BreathingActiveScreen({required this.exercise, required this.onQuit});
 
   final BreathingExercise exercise;
   final VoidCallback onQuit;
 
   @override
-  State<_BreathingActiveScreen> createState() => _BreathingActiveScreenState();
+  ConsumerState<_BreathingActiveScreen> createState() =>
+      _BreathingActiveScreenState();
 }
 
-class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
+class _BreathingActiveScreenState extends ConsumerState<_BreathingActiveScreen>
     with TickerProviderStateMixin {
   late AnimationController _pulseController;
   late Animation<double> _scaleAnim;
@@ -310,6 +313,17 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
       CurvedAnimation(parent: _pulseController, curve: Curves.easeInOut),
     );
     _startPhase(0);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(audioServiceProvider)
+          .loadAudio(
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
+          )
+          .then((_) {
+            ref.read(audioServiceProvider).play();
+          });
+    });
   }
 
   void _startPhase(int phase) {
@@ -336,6 +350,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
       if (_sessionSecsLeft <= 0) {
         _phaseTimer?.cancel();
         _sessionTimer?.cancel();
+        ref.read(audioServiceProvider).stop();
         _showCompletionDialog();
         return;
       }
@@ -368,7 +383,9 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
     setState(() => _paused = !_paused);
     if (_paused) {
       _pulseController.stop();
+      ref.read(audioServiceProvider).pause();
     } else {
+      ref.read(audioServiceProvider).play();
       if (_phase == 0) {
         _pulseController.forward();
       } else if (_phase == 2) {
@@ -424,6 +441,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
     _pulseController.dispose();
     _phaseTimer?.cancel();
     _sessionTimer?.cancel();
+    ref.read(audioServiceProvider).stop();
     super.dispose();
   }
 
@@ -446,7 +464,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                     'Session: ${_formatTime(_sessionSecsLeft)} remaining',
                     style: GoogleFonts.lora(
                       fontSize: 13,
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                   Icon(Icons.water_drop_outlined, color: ex.color, size: 20),
@@ -467,7 +485,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                     shape: BoxShape.circle,
                     color: Colors.transparent,
                     border: Border.all(
-                      color: ex.color.withOpacity(0.25),
+                      color: ex.color.withValues(alpha: 0.25),
                       width: 12,
                     ),
                   ),
@@ -481,13 +499,13 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                           shape: BoxShape.circle,
                           gradient: RadialGradient(
                             colors: [
-                              ex.color.withOpacity(0.9),
-                              ex.color.withOpacity(0.4),
+                              ex.color.withValues(alpha: 0.9),
+                              ex.color.withValues(alpha: 0.4),
                             ],
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: ex.color.withOpacity(0.4),
+                              color: ex.color.withValues(alpha: 0.4),
                               blurRadius: 40,
                               spreadRadius: 10,
                             ),
@@ -516,7 +534,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
               _paused ? 'Tap resume to continue' : _phaseHints[_phase],
               style: GoogleFonts.lora(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.6),
+                color: Colors.white.withValues(alpha: 0.6),
               ),
             ),
 
@@ -533,7 +551,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.12),
+                          color: Colors.white.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(26),
                         ),
                         child: Center(
@@ -556,10 +574,10 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
+                          color: Colors.white.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(26),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Center(
@@ -568,7 +586,7 @@ class _BreathingActiveScreenState extends State<_BreathingActiveScreen>
                             style: GoogleFonts.lora(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
                           ),
                         ),

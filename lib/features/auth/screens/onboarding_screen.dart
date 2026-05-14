@@ -134,7 +134,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.10),
+                          color: Colors.black.withValues(alpha: 0.10),
                           blurRadius: 18,
                           offset: const Offset(0, 4),
                         ),
@@ -238,30 +238,32 @@ class _TextSlide extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            page.title,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.lora(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: const Color(0xFF1A1A2E),
-              height: 1.3,
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              page.title,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.lora(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF1A1A2E),
+                height: 1.3,
+              ),
             ),
-          ),
-          const SizedBox(height: 10),
-          Text(
-            page.description,
-            textAlign: TextAlign.center,
-            style: GoogleFonts.lora(
-              fontSize: 13,
-              color: const Color(0xFF6B6B8A),
-              height: 1.6,
+            const SizedBox(height: 10),
+            Text(
+              page.description,
+              textAlign: TextAlign.center,
+              style: GoogleFonts.lora(
+                fontSize: 13,
+                color: const Color(0xFF6B6B8A),
+                height: 1.6,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

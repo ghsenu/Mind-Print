@@ -1,0 +1,35 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // All user data lives under users/{userId}
+    // Only the authenticated owner can read or write their own data
+    match /users/{userId} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+
+      // journals + emotion results
+      match /journals/{journalId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+
+        match /emotionResults/{resultId} {
+          allow read, write: if request.auth != null && request.auth.uid == userId;
+        }
+      }
+
+      // notifications
+      match /notifications/{notificationId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // analytics predictions
+      match /predictions/{predictionId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+
+      // mood check-ins
+      match /moodCheckins/{checkinId} {
+        allow read, write: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+  }
+}

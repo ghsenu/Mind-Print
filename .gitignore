@@ -46,3 +46,4 @@ app.*.map.json
 
 # Local environment configuration
 .env
+.claude/settings.local.json

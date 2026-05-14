@@ -28,4 +28,7 @@ class AppRoutes {
   static const String bubblePop = '/games/bubble-pop';
   static const String memoryMatch = '/games/memory-match';
   static const String breathingBall = '/games/breathing-ball';
+  static const String privacySecurity = '/settings/privacy-security';
+  static const String helpCenter = '/settings/help-center';
+  static const String about = '/settings/about';
 }

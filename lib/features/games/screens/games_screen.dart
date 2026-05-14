@@ -79,17 +79,18 @@ class GamesScreen extends StatelessWidget {
                 childAspectRatio: 0.85,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                children: _games
-                    .map(
-                      (g) => GameCard(
-                        title: g.title,
-                        subtitle: g.subtitle,
-                        icon: g.icon,
-                        gradientColors: g.gradientColors,
-                        onTap: () => Navigator.pushNamed(context, g.route),
-                      ),
-                    )
-                    .toList(),
+                children:
+                    _games
+                        .map(
+                          (g) => GameCard(
+                            title: g.title,
+                            subtitle: g.subtitle,
+                            icon: g.icon,
+                            gradientColors: g.gradientColors,
+                            onTap: () => Navigator.pushNamed(context, g.route),
+                          ),
+                        )
+                        .toList(),
               ),
               const SizedBox(height: 32),
             ],

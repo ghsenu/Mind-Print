@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:path_provider/path_provider.dart';
@@ -57,9 +58,17 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
   void dispose() {
     _timer?.cancel();
     final voiceService = ref.read(voiceServiceProvider);
-    voiceService.isRecording.then((recording) {
-      if (recording) voiceService.stopRecording();
-    });
+    voiceService.isRecording
+        .then((recording) {
+          if (recording) {
+            voiceService.stopRecording().catchError((e) {
+              debugPrint('Failed to stop recorder during dispose: $e');
+            });
+          }
+        })
+        .catchError((e) {
+          debugPrint('Failed to check recorder state during dispose: $e');
+        });
     super.dispose();
   }
 
@@ -94,8 +103,11 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
     final granted = await voiceService.requestMicPermission();
     if (!granted) {
       if (mounted) {
-        setState(() => _errorMessage =
-            'Microphone permission denied. Please enable it in Settings.');
+        setState(
+          () =>
+              _errorMessage =
+                  'Microphone permission denied. Please enable it in Settings.',
+        );
       }
       return;
     }
@@ -122,30 +134,35 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
     }
 
     _stopTimer();
-    setState(() => _state = _RecordState.processing);
+    setState(() {
+      _state = _RecordState.processing;
+      _processingLabel = 'Stopping...';
+    });
 
     final voiceService = ref.read(voiceServiceProvider);
     final assemblyAi = ref.read(assemblyAiServiceProvider);
     final journalService = ref.read(journalServiceProvider);
+    String? localPath;
 
     try {
-      setState(() => _processingLabel = 'Uploading...');
-      final localPath = await voiceService.stopRecording();
+      localPath = await voiceService.stopRecording();
 
-      final fileId =
-          '${user.uid}_${DateTime.now().millisecondsSinceEpoch}';
-      final voiceUrl =
-          await voiceService.uploadToStorage(user.uid, fileId, localPath);
+      setState(() => _processingLabel = 'Uploading audio...');
+      final transcript = await assemblyAi.transcribeFile(
+        localPath,
+        onStatus: (status) {
+          if (!mounted) return;
+          if (status == 'transcribing') {
+            setState(() => _processingLabel = 'Transcribing...');
+          }
+        },
+      );
 
-      setState(() => _processingLabel = 'Transcribing...');
-      final transcript = await assemblyAi.transcribe(voiceUrl);
-
-      setState(() => _processingLabel = 'Analyzing...');
+      setState(() => _processingLabel = 'Analyzing emotions...');
       final moodScore = _feelingScores[_selectedFeeling] ?? 3;
       final result = await journalService.analyzeVoiceEntry(
         user.uid,
         transcript,
-        voiceUrl,
         moodScore,
       );
 
@@ -165,6 +182,12 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
           _errorMessage = e.toString().replaceFirst('Exception: ', '');
         });
       }
+    } finally {
+      if (localPath != null) {
+        File(localPath).delete().catchError((e) {
+          debugPrint('Failed to delete temp voice file $localPath: $e');
+        });
+      }
     }
   }
 
@@ -172,12 +195,27 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     const months = [
-      'JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN',
-      'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC',
+      'JAN',
+      'FEB',
+      'MAR',
+      'APR',
+      'MAY',
+      'JUN',
+      'JUL',
+      'AUG',
+      'SEP',
+      'OCT',
+      'NOV',
+      'DEC',
     ];
     const weekdays = [
-      'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY',
-      'FRIDAY', 'SATURDAY', 'SUNDAY',
+      'MONDAY',
+      'TUESDAY',
+      'WEDNESDAY',
+      'THURSDAY',
+      'FRIDAY',
+      'SATURDAY',
+      'SUNDAY',
     ];
     final dateString =
         '${weekdays[now.weekday - 1]} ${months[now.month - 1]} ${now.day}';
@@ -192,8 +230,10 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
           children: [
             // Top bar
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+              padding: const EdgeInsets.symmetric(
+                horizontal: 16.0,
+                vertical: 12.0,
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -211,8 +251,11 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
                       letterSpacing: 0.5,
                     ),
                   ),
-                  const Icon(Icons.lock_outline,
-                      color: Colors.black54, size: 20),
+                  const Icon(
+                    Icons.lock_outline,
+                    color: Colors.black54,
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -229,14 +272,15 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
                       isProcessing
                           ? _processingLabel
                           : isRecording
-                              ? 'Recording...'
-                              : 'Tap to Record',
+                          ? 'Recording...'
+                          : 'Tap to Record',
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.w600,
-                        color: isRecording
-                            ? const Color(0xFFD5473D)
-                            : const Color(0xFF6B7280),
+                        color:
+                            isRecording
+                                ? const Color(0xFFD5473D)
+                                : const Color(0xFF6B7280),
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -250,9 +294,10 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
                         height: 120,
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
-                          color: isProcessing
-                              ? const Color(0xFFE5E7EB)
-                              : isRecording
+                          color:
+                              isProcessing
+                                  ? const Color(0xFFE5E7EB)
+                                  : isRecording
                                   ? const Color(0xFFD5473D)
                                   : const Color(0xFFD3E3F1),
                           boxShadow: [
@@ -266,24 +311,26 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
                             ),
                           ],
                         ),
-                        child: isProcessing
-                            ? const Center(
-                                child: SizedBox(
-                                  width: 36,
-                                  height: 36,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 3,
-                                    color: Color(0xFF89A8C8),
+                        child:
+                            isProcessing
+                                ? const Center(
+                                  child: SizedBox(
+                                    width: 36,
+                                    height: 36,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 3,
+                                      color: Color(0xFF89A8C8),
+                                    ),
                                   ),
+                                )
+                                : Icon(
+                                  isRecording ? Icons.stop : Icons.mic,
+                                  size: 52,
+                                  color:
+                                      isRecording
+                                          ? Colors.white
+                                          : const Color(0xFF4A7FA5),
                                 ),
-                              )
-                            : Icon(
-                                isRecording ? Icons.stop : Icons.mic,
-                                size: 52,
-                                color: isRecording
-                                    ? Colors.white
-                                    : const Color(0xFF4A7FA5),
-                              ),
                       ),
                     ),
                     const SizedBox(height: 40),
@@ -294,9 +341,10 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
                       style: TextStyle(
                         fontSize: 52,
                         fontWeight: FontWeight.w300,
-                        color: isRecording
-                            ? const Color(0xFF374151)
-                            : const Color(0xFFD1D5DB),
+                        color:
+                            isRecording
+                                ? const Color(0xFF374151)
+                                : const Color(0xFFD1D5DB),
                       ),
                     ),
 
@@ -308,8 +356,7 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
                         decoration: BoxDecoration(
                           color: const Color(0xFFFEF2F2),
                           borderRadius: BorderRadius.circular(8),
-                          border:
-                              Border.all(color: const Color(0xFFFCA5A5)),
+                          border: Border.all(color: const Color(0xFFFCA5A5)),
                         ),
                         child: Text(
                           _errorMessage!,
@@ -346,48 +393,58 @@ class _VoiceRecordScreenState extends ConsumerState<VoiceRecordScreen> {
                   SingleChildScrollView(
                     scrollDirection: Axis.horizontal,
                     child: Row(
-                      children: _feelings.map((feeling) {
-                        final isSelected =
-                            _selectedFeeling == feeling['label'];
-                        return GestureDetector(
-                          onTap: isProcessing
-                              ? null
-                              : () => setState(() =>
-                                  _selectedFeeling =
-                                      feeling['label'] as String),
-                          child: Container(
-                            margin: const EdgeInsets.only(right: 10),
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 18, vertical: 10),
-                            decoration: BoxDecoration(
-                              color: feeling['color'] as Color,
-                              borderRadius: BorderRadius.circular(24),
-                              border: Border.all(
-                                color: isSelected
-                                    ? feeling['textColor'] as Color
-                                    : Colors.transparent,
-                                width: 2,
+                      children:
+                          _feelings.map((feeling) {
+                            final isSelected =
+                                _selectedFeeling == feeling['label'];
+                            return GestureDetector(
+                              onTap:
+                                  isProcessing
+                                      ? null
+                                      : () => setState(
+                                        () =>
+                                            _selectedFeeling =
+                                                feeling['label'] as String,
+                                      ),
+                              child: Container(
+                                margin: const EdgeInsets.only(right: 10),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 18,
+                                  vertical: 10,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: feeling['color'] as Color,
+                                  borderRadius: BorderRadius.circular(24),
+                                  border: Border.all(
+                                    color:
+                                        isSelected
+                                            ? feeling['textColor'] as Color
+                                            : Colors.transparent,
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Text(
+                                  feeling['label'] as String,
+                                  style: TextStyle(
+                                    color: feeling['textColor'] as Color,
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 14,
+                                  ),
+                                ),
                               ),
-                            ),
-                            child: Text(
-                              feeling['label'] as String,
-                              style: TextStyle(
-                                color: feeling['textColor'] as Color,
-                                fontWeight: FontWeight.w600,
-                                fontSize: 14,
-                              ),
-                            ),
-                          ),
-                        );
-                      }).toList(),
+                            );
+                          }).toList(),
                     ),
                   ),
                   const SizedBox(height: 16),
                   const Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.shield_outlined,
-                          size: 14, color: Color(0xFF9CA3AF)),
+                      Icon(
+                        Icons.shield_outlined,
+                        size: 14,
+                        color: Color(0xFF9CA3AF),
+                      ),
                       SizedBox(width: 6),
                       Text(
                         'ENCRYPTED PRIVACY VAULT',

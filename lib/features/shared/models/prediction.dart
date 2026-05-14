@@ -13,7 +13,7 @@ class Prediction {
   final String id;
   final String userId;
   final double averageMood; // 1.0–5.0
-  final String trend;        // 'improving' | 'stable' | 'declining'
+  final String trend; // 'improving' | 'stable' | 'declining'
   final bool alertNeeded;
   final DateTime generatedAt;
 
@@ -30,10 +30,10 @@ class Prediction {
   }
 
   Map<String, dynamic> toFirestore() => {
-        'userId': userId,
-        'averageMood': averageMood,
-        'trend': trend,
-        'alertNeeded': alertNeeded,
-        'generatedAt': Timestamp.fromDate(generatedAt),
-      };
+    'userId': userId,
+    'averageMood': averageMood,
+    'trend': trend,
+    'alertNeeded': alertNeeded,
+    'generatedAt': Timestamp.fromDate(generatedAt),
+  };
 }

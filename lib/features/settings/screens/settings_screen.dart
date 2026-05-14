@@ -1,20 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:mind_print/features/auth/providers/auth_provider.dart';
+import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
+import 'package:mind_print/features/shared/constants/route_names.dart';
 
-class SettingsScreen extends StatefulWidget {
+class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  bool _pushNotifications = true;
-  bool _offlineSync = true;
-  bool _biometricLogin = true;
+class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  Future<void> _updateProfileField(String field, dynamic value) async {
+    final user = ref.read(currentUserProvider);
+    if (user != null) {
+      await ref.read(profileServiceProvider).updateFields(user.uid, {
+        field: value,
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final profileAsync = ref.watch(userProfileProvider);
+    final profile = profileAsync.value;
+
+    final pushNotifications = profile?.notificationsEnabled ?? true;
+    final offlineSync = profile?.offlineSyncEnabled ?? true;
+    final biometricLogin = profile?.biometricEnabled ?? true;
+
+    final displayName = profile?.displayName ?? 'User';
+    final email = profile?.email ?? '';
+    final avatarUrl =
+        profile?.profilePhoto ??
+        'https://api.dicebear.com/7.x/avataaars/png?seed=$displayName';
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0FBFF),
       body: SafeArea(
@@ -45,29 +67,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
 
               // ── Profile Section ────────────────────────────────────────
-              _buildProfileSection(),
+              _buildProfileSection(displayName, email, avatarUrl),
               const SizedBox(height: 24),
 
               // ── Preferences Section ────────────────────────────────────
               _buildSectionTitle('PREFERENCES'),
-              _buildLanguageTile(),
               _buildToggleTile(
                 icon: Icons.notifications_active,
                 title: 'Push Notifications',
                 subtitle: 'Announcements, reminders, and more',
-                value: _pushNotifications,
-                onChanged: (value) {
-                  setState(() => _pushNotifications = value);
-                },
+                value: pushNotifications,
+                onChanged:
+                    (value) =>
+                        _updateProfileField('notificationsEnabled', value),
               ),
               _buildToggleTile(
                 icon: Icons.cloud_off,
                 title: 'Offline Sync',
-                subtitle: 'Automatically sync your data on',
-                value: _offlineSync,
-                onChanged: (value) {
-                  setState(() => _offlineSync = value);
-                },
+                subtitle: 'Automatically sync your data on connection',
+                value: offlineSync,
+                onChanged:
+                    (value) => _updateProfileField('offlineSyncEnabled', value),
               ),
               const SizedBox(height: 24),
 
@@ -77,22 +97,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 icon: Icons.fingerprint,
                 title: 'Biometric Login',
                 subtitle: 'Face ID or fingerprint',
-                value: _biometricLogin,
-                onChanged: (value) {
-                  setState(() => _biometricLogin = value);
-                },
+                value: biometricLogin,
+                onChanged:
+                    (value) => _updateProfileField('biometricEnabled', value),
               ),
               _buildSettingsTile(
                 icon: Icons.lock,
                 title: 'Change Password',
-                subtitle: 'Updated 3 months ago',
+                subtitle: 'Update your login credentials',
                 onTap: () => _showChangePasswordDialog(context),
               ),
               _buildSettingsTile(
                 icon: Icons.privacy_tip,
                 title: 'Privacy & Security',
                 subtitle: 'Update your security data controls',
-                onTap: () {},
+                onTap:
+                    () =>
+                        Navigator.pushNamed(context, AppRoutes.privacySecurity),
               ),
               const SizedBox(height: 24),
 
@@ -101,17 +122,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
               _buildSettingsTile(
                 icon: Icons.help_center,
                 title: 'Help Center',
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRoutes.helpCenter),
               ),
               _buildSettingsTile(
                 icon: Icons.description,
                 title: 'Privacy Policy',
-                onTap: () {},
+                onTap:
+                    () =>
+                        Navigator.pushNamed(context, AppRoutes.privacySecurity),
               ),
               _buildSettingsTile(
                 icon: Icons.info,
                 title: 'About MindPrint',
-                onTap: () {},
+                onTap: () => Navigator.pushNamed(context, AppRoutes.about),
               ),
               const SizedBox(height: 24),
 
@@ -152,7 +175,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   // ── Build Profile Section ──────────────────────────────────────────
-  Widget _buildProfileSection() {
+  Widget _buildProfileSection(String name, String email, String avatar) {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 20),
       padding: const EdgeInsets.all(16),
@@ -161,7 +184,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -169,19 +192,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ),
       child: Row(
         children: [
-          const CircleAvatar(
-            radius: 32,
-            backgroundImage: NetworkImage(
-              'https://api.dicebear.com/7.x/avataaars/png?seed=Ghanasi',
-            ),
-          ),
+          CircleAvatar(radius: 32, backgroundImage: NetworkImage(avatar)),
           const SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Ghanasi Buwanayake',
+                  name,
                   style: GoogleFonts.inter(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
@@ -190,7 +208,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  'ghanasibuwanayake@pst.ac.uk',
+                  email,
                   style: GoogleFonts.inter(
                     fontSize: 12,
                     color: const Color(0xFFACAEBD),
@@ -199,7 +217,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ],
             ),
           ),
-          Icon(Icons.chevron_right, color: const Color(0xFFACAEBD)),
+          const Icon(Icons.chevron_right, color: Color(0xFFACAEBD)),
         ],
       ),
     );
@@ -218,65 +236,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
             fontWeight: FontWeight.w600,
             color: const Color(0xFFACAEBD),
             letterSpacing: 0.5,
-          ),
-        ),
-      ),
-    );
-  }
-
-  // ── Build Language Tile ────────────────────────────────────────────
-  Widget _buildLanguageTile() {
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 20, vertical: 6),
-      child: Material(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
-        child: InkWell(
-          onTap: () => _showLanguageDialog(context),
-          borderRadius: BorderRadius.circular(8),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFE8EFFF),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  child: const Icon(
-                    Icons.language,
-                    color: Color(0xFF6A8DFF),
-                    size: 20,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Language',
-                        style: GoogleFonts.inter(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: const Color(0xFF1A1A2E),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Text(
-                  'English',
-                  style: GoogleFonts.inter(
-                    fontSize: 14,
-                    color: const Color(0xFFACAEBD),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                const Icon(Icons.chevron_right, color: Color(0xFFACAEBD)),
-              ],
-            ),
           ),
         ),
       ),
@@ -374,8 +333,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 Container(
                   padding: const EdgeInsets.all(8),
                   decoration: BoxDecoration(
-                    color: (titleColor ?? const Color(0xFF6A8DFF)).withOpacity(
-                      0.1,
+                    color: (titleColor ?? const Color(0xFF6A8DFF)).withValues(
+                      alpha: 0.1,
                     ),
                     borderRadius: BorderRadius.circular(8),
                   ),
@@ -422,32 +381,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   // ── Dialogs ────────────────────────────────────────────────────────
 
-  void _showLanguageDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder:
-          (context) => AlertDialog(
-            title: const Text('Select Language'),
-            content: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                ListTile(
-                  title: const Text('English'),
-                  onTap: () => Navigator.pop(context),
-                ),
-                ListTile(
-                  title: const Text('Spanish'),
-                  onTap: () => Navigator.pop(context),
-                ),
-                ListTile(
-                  title: const Text('French'),
-                  onTap: () => Navigator.pop(context),
-                ),
-              ],
-            ),
-          ),
-    );
-  }
+  final _newPasswordController = TextEditingController();
 
   void _showChangePasswordDialog(BuildContext context) {
     showDialog(
@@ -459,28 +393,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Current Password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  obscureText: true,
-                ),
-                const SizedBox(height: 16),
-                TextField(
+                  controller: _newPasswordController,
                   decoration: InputDecoration(
                     labelText: 'New Password',
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  obscureText: true,
-                ),
-                const SizedBox(height: 16),
-                TextField(
-                  decoration: InputDecoration(
-                    labelText: 'Confirm Password',
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
@@ -491,11 +406,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
             actions: [
               TextButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  _newPasswordController.clear();
+                  Navigator.pop(context);
+                },
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () async {
+                  final nav = Navigator.of(context);
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  try {
+                    await ref
+                        .read(authServiceProvider)
+                        .updatePassword(_newPasswordController.text);
+                    _newPasswordController.clear();
+                    nav.pop();
+                    scaffoldMessenger.showSnackBar(
+                      const SnackBar(
+                        content: Text('Password updated successfully.'),
+                      ),
+                    );
+                  } catch (e) {
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(content: Text('Failed to update password: $e')),
+                    );
+                  }
+                },
                 child: const Text('Update'),
               ),
             ],
@@ -516,7 +453,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  Navigator.pop(context);
+                  ref.read(authServiceProvider).signOut();
+                  Navigator.pushNamedAndRemoveUntil(
+                    context,
+                    AppRoutes.login,
+                    (r) => false,
+                  );
+                },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 child: const Text('Log Out'),
               ),
@@ -540,7 +485,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: const Text('Cancel'),
               ),
               ElevatedButton(
-                onPressed: () => Navigator.pop(context),
+                onPressed: () async {
+                  final nav = Navigator.of(context);
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  try {
+                    await ref.read(authServiceProvider).deleteAccount();
+                    nav.pushNamedAndRemoveUntil(AppRoutes.splash, (r) => false);
+                  } catch (e) {
+                    nav.pop();
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(content: Text('Failed to delete account: $e')),
+                    );
+                  }
+                },
                 style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
                 child: const Text('Delete'),
               ),

@@ -16,9 +16,9 @@ class HuggingFaceService {
   final String _apiKey;
 
   Map<String, String> get _headers => {
-        'Authorization': 'Bearer $_apiKey',
-        'Content-Type': 'application/json',
-      };
+    'Authorization': 'Bearer $_apiKey',
+    'Content-Type': 'application/json',
+  };
 
   // Makes a POST request, retrying once if the model is loading (503).
   Future<dynamic> _post(String model, Map<String, dynamic> body) async {
@@ -37,32 +37,32 @@ class HuggingFaceService {
           await Future.delayed(const Duration(seconds: 20));
           continue;
         }
-        throw Exception('HuggingFace model $model is unavailable (503).');
+        return null;
       }
 
       if (response.statusCode != 200) {
-        throw Exception(
-          'HuggingFace error ${response.statusCode}: ${response.body}',
-        );
+        return null; // Degrade gracefully on 4xx / unexpected errors
       }
 
       return jsonDecode(response.body);
     }
+    return null;
   }
 
   // text-classification models return [[{label, score}, ...]]
-  Future<List<Map<String, dynamic>>> _classify(
-      String model, String text) async {
+  Future<List<Map<String, dynamic>>?> _classify(
+    String model,
+    String text,
+  ) async {
     final raw = await _post(model, {'inputs': text});
+    if (raw == null) return null;
     final outer = raw as List<dynamic>;
     final inner = outer[0] as List<dynamic>;
-    return inner
-        .map((e) => Map<String, dynamic>.from(e as Map))
-        .toList();
+    return inner.map((e) => Map<String, dynamic>.from(e as Map)).toList();
   }
 
   // zero-shot classification returns {sequence, labels, scores}
-  Future<Map<String, dynamic>> _zeroShot(
+  Future<Map<String, dynamic>?> _zeroShot(
     String model,
     String text,
     List<String> candidates,
@@ -71,25 +71,32 @@ class HuggingFaceService {
       'inputs': text,
       'parameters': {'candidate_labels': candidates},
     });
+    if (raw == null) return null;
     return Map<String, dynamic>.from(raw as Map);
   }
 
   Future<_EmotionAnalysis> _analyzeEmotion(String text) async {
-    final results =
-        await _classify('j-hartmann/emotion-english-distilroberta-base', text);
+    final results = await _classify(
+      'j-hartmann/emotion-english-distilroberta-base',
+      text,
+    );
+
+    if (results == null || results.isEmpty) {
+      return _EmotionAnalysis('neutral', 0.5, []);
+    }
 
     results.sort(
-      (a, b) =>
-          (b['score'] as double).compareTo(a['score'] as double),
+      (a, b) => (b['score'] as double).compareTo(a['score'] as double),
     );
 
     final primary = results.first;
-    final secondaries = results
-        .skip(1)
-        .where((e) => (e['score'] as double) > 0.05)
-        .map((e) => e['label'] as String)
-        .take(3)
-        .toList();
+    final secondaries =
+        results
+            .skip(1)
+            .where((e) => (e['score'] as double) > 0.05)
+            .map((e) => e['label'] as String)
+            .take(3)
+            .toList();
 
     return _EmotionAnalysis(
       primary['label'] as String,
@@ -104,9 +111,10 @@ class HuggingFaceService {
       text,
     );
 
+    if (results == null || results.isEmpty) return 'neutral';
+
     results.sort(
-      (a, b) =>
-          (b['score'] as double).compareTo(a['score'] as double),
+      (a, b) => (b['score'] as double).compareTo(a['score'] as double),
     );
 
     final label = (results.first['label'] as String).toLowerCase();
@@ -125,7 +133,13 @@ class HuggingFaceService {
       'no cognitive distortion',
     ];
 
-    final result = await _zeroShot('facebook/bart-large-mnli', text, candidates);
+    final result = await _zeroShot(
+      'facebook/bart-large-mnli',
+      text,
+      candidates,
+    );
+
+    if (result == null) return null;
 
     final labels = List<String>.from(result['labels'] as List);
     final scores = List<double>.from(
@@ -141,13 +155,16 @@ class HuggingFaceService {
   }
 
   // Runs emotion, sentiment, and distortion analysis in parallel.
-  Future<({
-    String primaryEmotion,
-    double intensity,
-    List<String> secondaryEmotions,
-    String sentiment,
-    String? distortionType,
-  })> analyze(String text) async {
+  Future<
+    ({
+      String primaryEmotion,
+      double intensity,
+      List<String> secondaryEmotions,
+      String sentiment,
+      String? distortionType,
+    })
+  >
+  analyze(String text) async {
     final emotionFuture = _analyzeEmotion(text);
     final sentimentFuture = analyzeSentiment(text);
     final distortionFuture = detectDistortion(text);

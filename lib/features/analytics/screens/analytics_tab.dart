@@ -1,264 +1,390 @@
 import 'dart:math';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mind_print/features/analytics/providers/analytics_provider.dart';
+import 'package:mind_print/features/analytics/services/analytics_service.dart';
+import 'package:mind_print/features/shared/models/prediction.dart';
 
-class AnalyticsTab extends StatelessWidget {
+class AnalyticsTab extends ConsumerWidget {
   const AnalyticsTab({super.key});
 
+  static String _trendLabel(String trend) {
+    switch (trend) {
+      case 'improving':
+        return 'Improving ↑';
+      case 'declining':
+        return 'Declining ↓';
+      default:
+        return 'Stable +';
+    }
+  }
+
+  static Color _trendColor(String trend) {
+    switch (trend) {
+      case 'improving':
+        return const Color(0xFF2FAD58);
+      case 'declining':
+        return const Color(0xFFD94F4F);
+      default:
+        return const Color(0xFF2FAD58);
+    }
+  }
+
+  static Color _trendBg(String trend) {
+    switch (trend) {
+      case 'improving':
+        return const Color(0xFFE8F8E8);
+      case 'declining':
+        return const Color(0xFFFFECEC);
+      default:
+        return const Color(0xFFE8F8E8);
+    }
+  }
+
+  static String _trendDescription(String trend) {
+    switch (trend) {
+      case 'improving':
+        return 'Your mood has been improving over recent entries. Keep it up!';
+      case 'declining':
+        return 'Your mood has been declining recently. Consider trying a coping activity.';
+      default:
+        return 'Likely to remain stable for now based on your recent entries.';
+    }
+  }
+
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final summaryAsync = ref.watch(analyticsSummaryProvider);
+    final predictionAsync = ref.watch(latestPredictionProvider);
+
     return Scaffold(
       backgroundColor: const Color(0xFFF0FBFF),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Text(
-                    'Analytics',
-                    style: GoogleFonts.lora(
-                      fontSize: 24,
-                      fontWeight: FontWeight.w700,
-                      color: const Color(0xFF1A1A2E),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  children: const [
-                    Expanded(
-                      child: _SummaryCard(
-                        title: 'Journal Entries',
-                        value: '24',
-                        subtitle: 'Monthly total',
-                        icon: Icons.edit_note,
-                        accentColor: Color(0xFF5A8DFF),
+            child: summaryAsync.when(
+              loading:
+                  () => const SizedBox(
+                    height: 400,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        color: Color(0xFF5A8DFF),
                       ),
                     ),
-                    SizedBox(width: 12),
-                    Expanded(
-                      child: _SummaryCard(
-                        title: 'Avg Mood',
-                        value: '3.2',
-                        subtitle: 'Steady state',
-                        icon: Icons.sentiment_satisfied_alt,
-                        accentColor: Color(0xFF4E7CF4),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                const _WideSummaryCard(
-                  title: 'Best Day',
-                  value: 'Mon',
-                  subtitle: 'Peak productivity',
-                  icon: Icons.auto_awesome,
-                  accentColor: Color(0xFF4E7CF4),
-                ),
-                const SizedBox(height: 18),
-                Text(
-                  'Deeper Insights',
-                  style: GoogleFonts.inter(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                    color: const Color(0xFF5E6A8A),
                   ),
-                ),
-                const SizedBox(height: 12),
-                _InsightPanel(
-                  title: 'Emotional Fingerprint',
-                  onTap: () {},
-                  child: Column(
-                    children: [
-                      const SizedBox(height: 12),
-                      SizedBox(
-                        height: 210,
-                        child: Center(
-                          child: SizedBox(
-                            width: 180,
-                            height: 180,
-                            child: CustomPaint(
-                              painter: _RadarChartPainter(),
-                              child: Stack(
-                                alignment: Alignment.center,
-                                children: [
-                                  Container(
-                                    width: 74,
-                                    height: 74,
-                                    decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF9CC9FF,
-                                      ).withOpacity(0.18),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 28,
-                                    height: 28,
-                                    decoration: BoxDecoration(
-                                      color: const Color(
-                                        0xFF9CC9FF,
-                                      ).withOpacity(0.35),
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                  const Positioned(
-                                    top: 18,
-                                    child: _FingerprintLabel(
-                                      label: 'Anxiety',
-                                      value: '35%',
-                                    ),
-                                  ),
-                                  const Positioned(
-                                    left: 8,
-                                    top: 78,
-                                    child: _FingerprintLabel(
-                                      label: 'Anxiety',
-                                      value: '35%',
-                                      alignRight: true,
-                                    ),
-                                  ),
-                                  const Positioned(
-                                    right: 8,
-                                    top: 78,
-                                    child: _FingerprintLabel(
-                                      label: 'Anxiety',
-                                      value: '35%',
-                                    ),
-                                  ),
-                                  const Positioned(
-                                    bottom: 18,
-                                    child: _FingerprintLabel(
-                                      label: 'Anxiety',
-                                      value: '35%',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        'Analysis of recurring emotional states.',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          color: const Color(0xFF8FA1BF),
-                        ),
-                      ),
-                    ],
+              error:
+                  (_, __) =>
+                      _buildContent(context, AnalyticsSummary.empty(), null),
+              data:
+                  (summary) => _buildContent(
+                    context,
+                    summary,
+                    predictionAsync.valueOrNull,
                   ),
-                ),
-                const SizedBox(height: 12),
-                _InsightPanel(
-                  title: 'Mood Prediction',
-                  onTap: () {},
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8F8E8),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          'Stable +',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF2FAD58),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Likely to remain positive for the next 48 hours based on routine.',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          height: 1.5,
-                          color: const Color(0xFF8FA1BF),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(999),
-                        child: const LinearProgressIndicator(
-                          minHeight: 4,
-                          value: 0.78,
-                          backgroundColor: Color(0xFFE4EFFC),
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Color(0xFF27C16B),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: 12),
-                _InsightPanel(
-                  title: 'Cognitive Patterns',
-                  onTap: () {},
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 6),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFE8F0FF),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          '3 patterns',
-                          style: GoogleFonts.inter(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: const Color(0xFF5A8DFF),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-                      Text(
-                        'Identified links between evening studies and high cortisol markers.',
-                        style: GoogleFonts.inter(
-                          fontSize: 12,
-                          height: 1.5,
-                          color: const Color(0xFF8FA1BF),
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      Row(
-                        children: const [
-                          _PatternChip(label: 'A', tint: Color(0xFF8FB6FF)),
-                          SizedBox(width: 8),
-                          _PatternChip(label: 'B', tint: Color(0xFFC6D6F5)),
-                          SizedBox(width: 8),
-                          _PatternChip(label: 'C', tint: Color(0xFFE7D3A5)),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
             ),
           ),
         ),
       ),
     );
   }
+
+  Widget _buildContent(
+    BuildContext context,
+    AnalyticsSummary summary,
+    Prediction? prediction,
+  ) {
+    final trend = prediction?.trend ?? 'stable';
+    final avgMoodDisplay =
+        summary.avgMood > 0 ? summary.avgMood.toStringAsFixed(1) : '—';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Center(
+          child: Text(
+            'Analytics',
+            style: GoogleFonts.lora(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: const Color(0xFF1A1A2E),
+            ),
+          ),
+        ),
+        const SizedBox(height: 20),
+        Row(
+          children: [
+            Expanded(
+              child: _SummaryCard(
+                title: 'Journal Entries',
+                value: summary.totalEntries.toString(),
+                subtitle: 'Recent total',
+                icon: Icons.edit_note,
+                accentColor: const Color(0xFF5A8DFF),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _SummaryCard(
+                title: 'Avg Mood',
+                value: avgMoodDisplay,
+                subtitle:
+                    summary.totalEntries > 0
+                        ? 'Tracked mood'
+                        : 'No entries yet',
+                icon: Icons.sentiment_satisfied_alt,
+                accentColor: const Color(0xFF4E7CF4),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        _WideSummaryCard(
+          title: 'Best Day',
+          value: summary.bestDay,
+          subtitle: summary.bestDay == '—' ? 'No data yet' : 'Highest avg mood',
+          icon: Icons.auto_awesome,
+          accentColor: const Color(0xFF4E7CF4),
+        ),
+        const SizedBox(height: 18),
+        Text(
+          'Deeper Insights',
+          style: GoogleFonts.inter(
+            fontSize: 18,
+            fontWeight: FontWeight.w700,
+            color: const Color(0xFF5E6A8A),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Emotional Fingerprint
+        _InsightPanel(
+          title: 'Emotional Fingerprint',
+          onTap: () {},
+          child: Column(
+            children: [
+              const SizedBox(height: 12),
+              SizedBox(
+                height: 210,
+                child: Center(
+                  child: SizedBox(
+                    width: 180,
+                    height: 180,
+                    child: CustomPaint(
+                      painter: _RadarChartPainter(
+                        values: summary.emotionValues,
+                      ),
+                      child: Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 74,
+                            height: 74,
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFF9CC9FF,
+                              ).withValues(alpha: 0.18),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          Container(
+                            width: 28,
+                            height: 28,
+                            decoration: BoxDecoration(
+                              color: const Color(
+                                0xFF9CC9FF,
+                              ).withValues(alpha: 0.35),
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          Positioned(
+                            top: 18,
+                            child: _FingerprintLabel(
+                              label: summary.emotionLabels[0],
+                              value: _pct(summary.emotionValues[0]),
+                            ),
+                          ),
+                          Positioned(
+                            left: 8,
+                            top: 78,
+                            child: _FingerprintLabel(
+                              label: summary.emotionLabels[4],
+                              value: _pct(summary.emotionValues[4]),
+                              alignRight: true,
+                            ),
+                          ),
+                          Positioned(
+                            right: 8,
+                            top: 78,
+                            child: _FingerprintLabel(
+                              label: summary.emotionLabels[1],
+                              value: _pct(summary.emotionValues[1]),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 18,
+                            child: _FingerprintLabel(
+                              label: summary.emotionLabels[2],
+                              value: _pct(summary.emotionValues[2]),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'Analysis of recurring emotional states.',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: const Color(0xFF8FA1BF),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Mood Prediction
+        _InsightPanel(
+          title: 'Mood Prediction',
+          onTap: () {},
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: _trendBg(trend),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  _trendLabel(trend),
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: _trendColor(trend),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                _trendDescription(trend),
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  height: 1.5,
+                  color: const Color(0xFF8FA1BF),
+                ),
+              ),
+              const SizedBox(height: 14),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(999),
+                child: LinearProgressIndicator(
+                  minHeight: 4,
+                  value:
+                      prediction != null
+                          ? (prediction.averageMood / 5.0).clamp(0.0, 1.0)
+                          : 0.0,
+                  backgroundColor: const Color(0xFFE4EFFC),
+                  valueColor: AlwaysStoppedAnimation<Color>(_trendColor(trend)),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        // Cognitive Patterns
+        _InsightPanel(
+          title: 'Cognitive Patterns',
+          onTap: () {},
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const SizedBox(height: 6),
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFE8F0FF),
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  summary.distortionCounts.isEmpty
+                      ? 'No patterns yet'
+                      : '${summary.distortionCounts.length} pattern${summary.distortionCounts.length == 1 ? '' : 's'}',
+                  style: GoogleFonts.inter(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFF5A8DFF),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              Text(
+                summary.distortionCounts.isEmpty
+                    ? 'Write more journal entries to uncover cognitive patterns.'
+                    : 'Identified cognitive patterns from your journal history.',
+                style: GoogleFonts.inter(
+                  fontSize: 12,
+                  height: 1.5,
+                  color: const Color(0xFF8FA1BF),
+                ),
+              ),
+              if (summary.distortionCounts.isNotEmpty) ...[
+                const SizedBox(height: 14),
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children:
+                      _patternChipColors
+                          .take(summary.distortionCounts.length)
+                          .toList()
+                          .asMap()
+                          .entries
+                          .map((entry) {
+                            final name = summary.distortionCounts.keys
+                                .elementAt(entry.key);
+                            final short =
+                                name
+                                    .split('-')
+                                    .map((w) => w[0].toUpperCase())
+                                    .join();
+                            return _PatternChip(
+                              label: short,
+                              tint: entry.value,
+                            );
+                          })
+                          .toList(),
+                ),
+              ],
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  static const List<Color> _patternChipColors = [
+    Color(0xFF8FB6FF),
+    Color(0xFFC6D6F5),
+    Color(0xFFE7D3A5),
+    Color(0xFFA8D8B9),
+    Color(0xFFE8B4B8),
+  ];
+
+  static String _pct(double value) => '${(value * 100).round()}%';
 }
 
 class _SummaryCard extends StatelessWidget {
@@ -286,7 +412,7 @@ class _SummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFB6D4F5).withOpacity(0.15),
+            color: const Color(0xFFB6D4F5).withValues(alpha: 0.15),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -357,7 +483,7 @@ class _WideSummaryCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFB6D4F5).withOpacity(0.15),
+            color: const Color(0xFFB6D4F5).withValues(alpha: 0.15),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -400,7 +526,7 @@ class _WideSummaryCard extends StatelessWidget {
             width: 44,
             height: 44,
             decoration: BoxDecoration(
-              color: accentColor.withOpacity(0.12),
+              color: accentColor.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
             child: Icon(icon, color: accentColor),
@@ -431,7 +557,7 @@ class _InsightPanel extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFFB6D4F5).withOpacity(0.14),
+            color: const Color(0xFFB6D4F5).withValues(alpha: 0.14),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -521,11 +647,10 @@ class _PatternChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 22,
-      height: 22,
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       alignment: Alignment.center,
       decoration: BoxDecoration(
-        color: tint.withOpacity(0.35),
+        color: tint.withValues(alpha: 0.35),
         borderRadius: BorderRadius.circular(999),
       ),
       child: Text(
@@ -541,6 +666,10 @@ class _PatternChip extends StatelessWidget {
 }
 
 class _RadarChartPainter extends CustomPainter {
+  const _RadarChartPainter({required this.values});
+
+  final List<double> values;
+
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
@@ -555,7 +684,7 @@ class _RadarChartPainter extends CustomPainter {
     final fillPaint =
         Paint()
           ..style = PaintingStyle.fill
-          ..color = const Color(0xFF5A8DFF).withOpacity(0.18);
+          ..color = const Color(0xFF5A8DFF).withValues(alpha: 0.18);
 
     final outlinePaint =
         Paint()
@@ -567,8 +696,9 @@ class _RadarChartPainter extends CustomPainter {
       canvas.drawCircle(center, radius * (i / 3), gridPaint);
     }
 
-    for (var i = 0; i < 5; i++) {
-      final angle = -pi / 2 + (2 * pi * i / 5);
+    final axisCount = values.length;
+    for (var i = 0; i < axisCount; i++) {
+      final angle = -pi / 2 + (2 * pi * i / axisCount);
       final end = Offset(
         center.dx + radius * cos(angle),
         center.dy + radius * sin(angle),
@@ -577,13 +707,13 @@ class _RadarChartPainter extends CustomPainter {
     }
 
     final points = <Offset>[];
-    const values = [0.85, 0.78, 0.68, 0.73, 0.82];
     for (var i = 0; i < values.length; i++) {
+      final v = values[i].clamp(0.05, 1.0);
       final angle = -pi / 2 + (2 * pi * i / values.length);
       points.add(
         Offset(
-          center.dx + radius * values[i] * cos(angle),
-          center.dy + radius * values[i] * sin(angle),
+          center.dx + radius * v * cos(angle),
+          center.dy + radius * v * sin(angle),
         ),
       );
     }
@@ -598,5 +728,6 @@ class _RadarChartPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(covariant _RadarChartPainter old) =>
+      !listEquals(old.values, values);
 }

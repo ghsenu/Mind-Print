@@ -31,6 +31,16 @@ class ProfileService {
     });
   }
 
+  Future<String?> findEmailByUsername(String username) async {
+    final snap = await FirebaseFirestore.instance
+        .collection('users')
+        .where('username', isEqualTo: username)
+        .limit(1)
+        .get();
+    if (snap.docs.isEmpty) return null;
+    return snap.docs.first.data()['email'] as String?;
+  }
+
   Future<void> createInitialProfile(
     String userId,
     String email, {
@@ -38,7 +48,11 @@ class ProfileService {
   }) async {
     final existing = await getProfile(userId);
     if (existing != null) return;
-    final profile = UserProfile.initial(userId, email, displayName: displayName);
+    final profile = UserProfile.initial(
+      userId,
+      email,
+      displayName: displayName,
+    );
     await saveProfile(profile);
   }
 }

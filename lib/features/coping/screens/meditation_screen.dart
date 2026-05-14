@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/activity_models.dart';
+import '../services/audio_service.dart';
 
 class MeditationScreen extends StatefulWidget {
   const MeditationScreen({super.key});
@@ -125,7 +127,7 @@ class _MeditationScreenState extends State<MeditationScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 14,
                         offset: const Offset(0, 6),
                       ),
@@ -205,7 +207,7 @@ class _MeditationScreenState extends State<MeditationScreen> {
                     borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withOpacity(0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 14,
                         offset: const Offset(0, 6),
                       ),
@@ -277,7 +279,7 @@ class _MeditationScreenState extends State<MeditationScreen> {
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
-                    color: const Color(0xFF6B6B8A).withOpacity(0.7),
+                    color: const Color(0xFF6B6B8A).withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -325,7 +327,7 @@ class _SessionCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 14,
             offset: const Offset(0, 6),
           ),
@@ -337,7 +339,7 @@ class _SessionCard extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: session.color.withOpacity(0.15),
+              color: session.color.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
@@ -372,7 +374,7 @@ class _SessionCard extends StatelessWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: session.color.withOpacity(0.12),
+                    color: session.color.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
@@ -392,7 +394,7 @@ class _SessionCard extends StatelessWidget {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
               decoration: BoxDecoration(
-                color: session.color.withOpacity(0.15),
+                color: session.color.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: Text(
@@ -413,7 +415,7 @@ class _SessionCard extends StatelessWidget {
 
 // ── Active meditation timer ──────────────────────────────────────────────────
 
-class _ActiveMeditationScreen extends StatefulWidget {
+class _ActiveMeditationScreen extends ConsumerStatefulWidget {
   const _ActiveMeditationScreen({
     required this.session,
     required this.durationMinutes,
@@ -429,11 +431,12 @@ class _ActiveMeditationScreen extends StatefulWidget {
   final VoidCallback onQuit;
 
   @override
-  State<_ActiveMeditationScreen> createState() =>
+  ConsumerState<_ActiveMeditationScreen> createState() =>
       _ActiveMeditationScreenState();
 }
 
-class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
+class _ActiveMeditationScreenState
+    extends ConsumerState<_ActiveMeditationScreen>
     with SingleTickerProviderStateMixin {
   late int _secsLeft;
   Timer? _timer;
@@ -449,6 +452,17 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
       duration: const Duration(seconds: 4),
     )..repeat();
     _startTimer();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref
+          .read(audioServiceProvider)
+          .loadAudio(
+            'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
+          )
+          .then((_) {
+            ref.read(audioServiceProvider).play();
+          });
+    });
   }
 
   void _startTimer() {
@@ -456,6 +470,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
       if (_paused) return;
       if (_secsLeft <= 0) {
         _timer?.cancel();
+        ref.read(audioServiceProvider).stop();
         _showMoodAfterDialog();
         return;
       }
@@ -537,6 +552,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
   void dispose() {
     _timer?.cancel();
     _ripple.dispose();
+    ref.read(audioServiceProvider).stop();
     super.dispose();
   }
 
@@ -559,7 +575,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                     'Session: ${_format(_secsLeft)} remaining',
                     style: GoogleFonts.lora(
                       fontSize: 13,
-                      color: Colors.white.withOpacity(0.6),
+                      color: Colors.white.withValues(alpha: 0.6),
                     ),
                   ),
                   Icon(
@@ -589,7 +605,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                         decoration: BoxDecoration(
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: widget.session.color.withOpacity(0.2),
+                            color: widget.session.color.withValues(alpha: 0.2),
                             width: 1,
                           ),
                         ),
@@ -602,7 +618,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                       child: CircularProgressIndicator(
                         value: progress,
                         strokeWidth: 6,
-                        backgroundColor: Colors.white.withOpacity(0.08),
+                        backgroundColor: Colors.white.withValues(alpha: 0.08),
                         color: widget.session.color,
                       ),
                     ),
@@ -642,7 +658,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
               widget.session.description,
               style: GoogleFonts.lora(
                 fontSize: 14,
-                color: Colors.white.withOpacity(0.5),
+                color: Colors.white.withValues(alpha: 0.5),
               ),
               textAlign: TextAlign.center,
             ),
@@ -655,11 +671,18 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                 children: [
                   Expanded(
                     child: GestureDetector(
-                      onTap: () => setState(() => _paused = !_paused),
+                      onTap: () {
+                        setState(() => _paused = !_paused);
+                        if (_paused) {
+                          ref.read(audioServiceProvider).pause();
+                        } else {
+                          ref.read(audioServiceProvider).play();
+                        }
+                      },
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.12),
+                          color: Colors.white.withValues(alpha: 0.12),
                           borderRadius: BorderRadius.circular(26),
                         ),
                         child: Center(
@@ -682,10 +705,10 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                       child: Container(
                         height: 52,
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.08),
+                          color: Colors.white.withValues(alpha: 0.08),
                           borderRadius: BorderRadius.circular(26),
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withValues(alpha: 0.2),
                           ),
                         ),
                         child: Center(
@@ -694,7 +717,7 @@ class _ActiveMeditationScreenState extends State<_ActiveMeditationScreen>
                             style: GoogleFonts.lora(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white.withOpacity(0.7),
+                              color: Colors.white.withValues(alpha: 0.7),
                             ),
                           ),
                         ),

@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mind_print/features/auth/providers/auth_provider.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
+import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends ConsumerState<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeIn;
@@ -25,10 +28,24 @@ class _SplashScreenState extends State<SplashScreen>
     _fadeIn = CurvedAnimation(parent: _controller, curve: Curves.easeIn);
     _controller.forward();
 
-    Future<void>.delayed(const Duration(seconds: 8), () {
-      if (!mounted) return;
+    Future<void>.delayed(const Duration(seconds: 8), _navigate);
+  }
+
+  Future<void> _navigate() async {
+    if (!mounted) return;
+    final user = ref.read(currentUserProvider);
+    if (user == null) {
       Navigator.pushReplacementNamed(context, AppRoutes.onboarding);
-    });
+      return;
+    }
+    final profile =
+        await ref.read(profileServiceProvider).getProfile(user.uid);
+    if (!mounted) return;
+    if (profile?.onboardingCompleted == true) {
+      Navigator.pushReplacementNamed(context, AppRoutes.home);
+    } else {
+      Navigator.pushReplacementNamed(context, AppRoutes.onboardingQuestionnaire);
+    }
   }
 
   @override
@@ -93,7 +110,7 @@ class _SplashScreenState extends State<SplashScreen>
                     textAlign: TextAlign.center,
                     style: GoogleFonts.lora(
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.80),
+                      color: Colors.white.withValues(alpha: 0.80),
                       height: 1.6,
                       fontStyle: FontStyle.italic,
                     ),
@@ -109,25 +126,28 @@ class _SplashScreenState extends State<SplashScreen>
                   // Bottom row
                   Padding(
                     padding: const EdgeInsets.only(bottom: 36.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.lock_outline,
-                          size: 14,
-                          color: Colors.white.withOpacity(0.55),
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'PRIVATE   •   SECURE   •   OFFLINE',
-                          style: GoogleFonts.lora(
-                            fontSize: 11,
-                            letterSpacing: 1.8,
-                            color: Colors.white.withOpacity(0.55),
-                            fontWeight: FontWeight.w600,
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.lock_outline,
+                            size: 14,
+                            color: Colors.white.withValues(alpha: 0.55),
                           ),
-                        ),
-                      ],
+                          const SizedBox(width: 8),
+                          Text(
+                            'PRIVATE   •   SECURE   •   OFFLINE',
+                            style: GoogleFonts.lora(
+                              fontSize: 11,
+                              letterSpacing: 1.8,
+                              color: Colors.white.withValues(alpha: 0.55),
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ],

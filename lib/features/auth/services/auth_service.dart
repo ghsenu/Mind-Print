@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mind_print/core/config/env.dart';
 
 class AuthService {
   final FirebaseAuth _firebaseAuth;
@@ -17,7 +18,13 @@ class AuthService {
            googleSignIn ??
            (kIsWeb
                ? null
-               : GoogleSignIn(scopes: const <String>['email', 'profile'])),
+               : GoogleSignIn(
+                 scopes: const <String>['email', 'profile'],
+                 serverClientId:
+                     Env.googleWebClientId.isNotEmpty
+                         ? Env.googleWebClientId
+                         : null,
+               )),
        _firestore = firestore ?? FirebaseFirestore.instance;
 
   Stream<User?> get authStateChanges => _firebaseAuth.authStateChanges();
@@ -130,7 +137,18 @@ class AuthService {
         idToken: googleAuth.idToken,
       );
 
-      return await _firebaseAuth.signInWithCredential(credential);
+      final result = await _firebaseAuth.signInWithCredential(credential);
+      final firebaseUser = result.user;
+      if (firebaseUser != null) {
+        await _firestore.collection('users').doc(firebaseUser.uid).set({
+          'displayName': firebaseUser.displayName ?? '',
+          'email': firebaseUser.email ?? '',
+          'createdAt': FieldValue.serverTimestamp(),
+          'onboardingCompleted': false,
+          'biometricEnabled': false,
+        }, SetOptions(merge: true));
+      }
+      return result;
     } catch (e) {
       rethrow;
     }
@@ -149,6 +167,27 @@ class AuthService {
       await _firebaseAuth.signOut();
       if (_googleSignIn != null && await _googleSignIn.isSignedIn()) {
         await _googleSignIn.signOut();
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> updatePassword(String newPassword) async {
+    try {
+      if (currentUser != null) {
+        await currentUser!.updatePassword(newPassword);
+      }
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<void> deleteAccount() async {
+    try {
+      if (currentUser != null) {
+        await _firestore.collection('users').doc(currentUser!.uid).delete();
+        await currentUser!.delete();
       }
     } catch (e) {
       rethrow;

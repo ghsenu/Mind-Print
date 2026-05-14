@@ -47,13 +47,14 @@ class JournalService {
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map(
-          (snap) => snap.docs
-              .map(
-                (d) => JournalEntry.fromFirestore(
-                  d as DocumentSnapshot<Map<String, dynamic>>,
-                ),
-              )
-              .toList(),
+          (snap) =>
+              snap.docs
+                  .map(
+                    (d) => JournalEntry.fromFirestore(
+                      d as DocumentSnapshot<Map<String, dynamic>>,
+                    ),
+                  )
+                  .toList(),
         );
   }
 
@@ -80,16 +81,15 @@ class JournalService {
     final analysis = await _hf.analyze(content);
 
     final insight =
-        _emotionInsights[analysis.primaryEmotion] ?? _emotionInsights['neutral']!;
-    final reframe = analysis.distortionType != null
-        ? _distortionReframes[analysis.distortionType]
-        : null;
+        _emotionInsights[analysis.primaryEmotion] ??
+        _emotionInsights['neutral']!;
+    final reframe =
+        analysis.distortionType != null
+            ? _distortionReframes[analysis.distortionType]
+            : null;
 
-    final resultRef = _db
-        .journals(userId)
-        .doc(journalId)
-        .collection('emotionResults')
-        .doc();
+    final resultRef =
+        _db.journals(userId).doc(journalId).collection('emotionResults').doc();
 
     final result = EmotionResult(
       id: resultRef.id,
@@ -114,9 +114,9 @@ class JournalService {
   Future<EmotionResult> analyzeVoiceEntry(
     String userId,
     String transcript,
-    String voiceUrl,
-    int moodScore,
-  ) async {
+    int moodScore, {
+    String? voiceUrl,
+  }) async {
     final journalRef = _db.journals(userId).doc();
     final journalId = journalRef.id;
 
@@ -133,16 +133,15 @@ class JournalService {
 
     final analysis = await _hf.analyze(transcript);
     final insight =
-        _emotionInsights[analysis.primaryEmotion] ?? _emotionInsights['neutral']!;
-    final reframe = analysis.distortionType != null
-        ? _distortionReframes[analysis.distortionType]
-        : null;
+        _emotionInsights[analysis.primaryEmotion] ??
+        _emotionInsights['neutral']!;
+    final reframe =
+        analysis.distortionType != null
+            ? _distortionReframes[analysis.distortionType]
+            : null;
 
-    final resultRef = _db
-        .journals(userId)
-        .doc(journalId)
-        .collection('emotionResults')
-        .doc();
+    final resultRef =
+        _db.journals(userId).doc(journalId).collection('emotionResults').doc();
 
     final result = EmotionResult(
       id: resultRef.id,
@@ -165,5 +164,23 @@ class JournalService {
 
   Future<void> deleteEntry(String userId, String journalId) {
     return _db.journals(userId).doc(journalId).delete();
+  }
+
+  Future<EmotionResult?> getEmotionResult(
+    String userId,
+    String journalId,
+  ) async {
+    final snap =
+        await _db
+            .journals(userId)
+            .doc(journalId)
+            .collection('emotionResults')
+            .orderBy('analyzedAt', descending: true)
+            .limit(1)
+            .get();
+    if (snap.docs.isEmpty) return null;
+    return EmotionResult.fromFirestore(
+      snap.docs.first as DocumentSnapshot<Map<String, dynamic>>,
+    );
   }
 }

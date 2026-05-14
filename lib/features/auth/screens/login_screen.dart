@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:mind_print/features/auth/providers/auth_provider.dart';
 import 'package:mind_print/features/shared/constants/route_names.dart';
+import 'package:mind_print/features/shared/providers/user_profile_provider.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -25,12 +26,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   }
 
   Future<void> _handleEmailLogin() async {
-    final email = _emailController.text.trim();
+    String input = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    if (email.isEmpty || password.isEmpty) {
+    if (input.isEmpty || password.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter both email and password')),
+        const SnackBar(content: Text('Please enter both email/username and password')),
       );
       return;
     }
@@ -38,6 +39,22 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     setState(() => _isLoading = true);
 
     try {
+      String email = input;
+      if (!input.contains('@')) {
+        // Treat as username — look up the associated email
+        final found = await ref
+            .read(profileServiceProvider)
+            .findEmailByUsername(input);
+        if (found == null) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('No account found for that username')),
+          );
+          return;
+        }
+        email = found;
+      }
+
       final authService = ref.read(authServiceProvider);
       await authService.signInWithEmail(email: email, password: password);
 

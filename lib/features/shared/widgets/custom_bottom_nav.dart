@@ -7,7 +7,7 @@ import '../../chatbot/screens/chatbot_screen.dart';
 class CustomBottomNav extends StatelessWidget {
   final int selectedIndex;
 
-  const CustomBottomNav({Key? key, this.selectedIndex = 0}) : super(key: key);
+  const CustomBottomNav({super.key, this.selectedIndex = 0});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class CustomBottomNav extends StatelessWidget {
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 20,
             offset: const Offset(0, -5),
           ),
@@ -36,8 +36,9 @@ class CustomBottomNav extends StatelessWidget {
             label: 'Home',
             isSelected: selectedIndex == 0,
             onTap: () {
-              if (selectedIndex != 0)
+              if (selectedIndex != 0) {
                 Navigator.pushReplacementNamed(context, AppRoutes.home);
+              }
             },
           ),
           _NavIcon(
@@ -45,8 +46,9 @@ class CustomBottomNav extends StatelessWidget {
             label: 'Mood Predic',
             isSelected: selectedIndex == 1,
             onTap: () {
-              if (selectedIndex != 1)
+              if (selectedIndex != 1) {
                 Navigator.pushReplacementNamed(context, AppRoutes.coping);
+              }
             },
           ),
           // Middle Button
@@ -91,8 +93,9 @@ class CustomBottomNav extends StatelessWidget {
             label: 'Analytics',
             isSelected: selectedIndex == 3,
             onTap: () {
-              if (selectedIndex != 3)
+              if (selectedIndex != 3) {
                 Navigator.pushReplacementNamed(context, AppRoutes.analytics);
+              }
             },
           ),
           _NavIcon(
@@ -100,8 +103,9 @@ class CustomBottomNav extends StatelessWidget {
             label: 'Settings',
             isSelected: selectedIndex == 4,
             onTap: () {
-              if (selectedIndex != 4)
+              if (selectedIndex != 4) {
                 Navigator.pushReplacementNamed(context, AppRoutes.settings);
+              }
             },
           ),
         ],

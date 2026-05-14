@@ -11,11 +11,13 @@ class MoodCheckin {
 
   final String id;
   final String userId;
-  final int score;    // 1–5
+  final int score; // 1–5
   final String label; // 'Stressed' | 'Sad' | 'Neutral' | 'Happy' | 'Overjoy'
   final DateTime createdAt;
 
-  factory MoodCheckin.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory MoodCheckin.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     return MoodCheckin(
       id: doc.id,
@@ -27,9 +29,9 @@ class MoodCheckin {
   }
 
   Map<String, dynamic> toFirestore() => {
-        'userId': userId,
-        'score': score,
-        'label': label,
-        'createdAt': Timestamp.fromDate(createdAt),
-      };
+    'userId': userId,
+    'score': score,
+    'label': label,
+    'createdAt': Timestamp.fromDate(createdAt),
+  };
 }

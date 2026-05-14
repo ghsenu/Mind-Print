@@ -40,7 +40,7 @@ class _Dot extends StatelessWidget {
         color:
             active
                 ? PageIndicator.kBrandBlue
-                : PageIndicator.kBrandBlue.withOpacity(0.30),
+                : PageIndicator.kBrandBlue.withValues(alpha: 0.30),
         borderRadius: BorderRadius.circular(4),
       ),
     );

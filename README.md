@@ -1,7 +1,7 @@
 # Mind_Print
- 
+
 MindPrint Flutter application.
- 
+
 ## Environment and Database Setup
 
 1. Copy `.env.example` to `.env`.

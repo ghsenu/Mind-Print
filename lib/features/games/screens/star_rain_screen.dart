@@ -21,10 +21,11 @@ class _StarRainScreenState extends State<StarRainScreen>
   Size _screenSize = Size.zero;
 
   final _starPaint = Paint()..style = PaintingStyle.fill;
-  final _burstPaint = Paint()
-    ..style = PaintingStyle.stroke
-    ..strokeWidth = 1.5
-    ..color = Colors.white;
+  final _burstPaint =
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.5
+        ..color = Colors.white;
 
   @override
   void initState() {
@@ -44,13 +45,15 @@ class _StarRainScreenState extends State<StarRainScreen>
   void _initStars() {
     final rng = math.Random();
     for (int i = 0; i < _starCount; i++) {
-      _stars.add(_Star(
-        x: rng.nextDouble(),
-        y: rng.nextDouble(),
-        speed: 0.05 + rng.nextDouble() * 0.13,
-        size: 1.5 + rng.nextDouble() * 3.0,
-        twinklePhase: rng.nextDouble() * math.pi * 2,
-      ));
+      _stars.add(
+        _Star(
+          x: rng.nextDouble(),
+          y: rng.nextDouble(),
+          speed: 0.05 + rng.nextDouble() * 0.13,
+          size: 1.5 + rng.nextDouble() * 3.0,
+          twinklePhase: rng.nextDouble() * math.pi * 2,
+        ),
+      );
     }
   }
 
@@ -136,13 +139,17 @@ class _StarRainScreenState extends State<StarRainScreen>
             child: Column(
               children: [
                 Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   child: Row(
                     children: [
                       IconButton(
-                        icon: const Icon(Icons.arrow_back_ios_new,
-                            color: Colors.white),
+                        icon: const Icon(
+                          Icons.arrow_back_ios_new,
+                          color: Colors.white,
+                        ),
                         onPressed: () => Navigator.pop(context),
                       ),
                       const Spacer(),
@@ -156,7 +163,7 @@ class _StarRainScreenState extends State<StarRainScreen>
                     'Focus on the stars...',
                     style: GoogleFonts.lora(
                       fontSize: 16,
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -208,14 +215,14 @@ class _StarPainter extends CustomPainter {
       final sx = star.x * size.width;
       final sy = star.y * size.height;
 
-      starPaint.color = Colors.white.withOpacity(star.opacity);
+      starPaint.color = Colors.white.withValues(alpha: star.opacity);
       canvas.drawCircle(Offset(sx, sy), star.size, starPaint);
 
       if (star.isBursting) {
         final progress = star.burstProgress;
         final burstRadius = star.size + 20 * progress;
         final opacity = (1.0 - progress).clamp(0.0, 1.0);
-        burstPaint.color = Colors.white.withOpacity(opacity);
+        burstPaint.color = Colors.white.withValues(alpha: opacity);
 
         const rayCount = 8;
         for (int r = 0; r < rayCount; r++) {
@@ -223,10 +230,14 @@ class _StarPainter extends CustomPainter {
           final innerRadius = star.size + 4;
           final outerRadius = burstRadius;
           canvas.drawLine(
-            Offset(sx + math.cos(angle) * innerRadius,
-                sy + math.sin(angle) * innerRadius),
-            Offset(sx + math.cos(angle) * outerRadius,
-                sy + math.sin(angle) * outerRadius),
+            Offset(
+              sx + math.cos(angle) * innerRadius,
+              sy + math.sin(angle) * innerRadius,
+            ),
+            Offset(
+              sx + math.cos(angle) * outerRadius,
+              sy + math.sin(angle) * outerRadius,
+            ),
             burstPaint,
           );
         }

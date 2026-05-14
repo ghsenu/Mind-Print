@@ -13,48 +13,56 @@ class MusicTherapyScreen extends StatelessWidget {
       duration: '04:20',
       moodTag: 'ANXIOUS',
       moodColor: Color(0xFF6ACFEF),
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3',
     ),
     MusicTrack(
       title: 'Forest Rain',
       duration: '06:45',
       moodTag: 'STRESSED',
       moodColor: Color(0xFF22C55E),
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3',
     ),
     MusicTrack(
       title: 'Zen Focus',
       duration: '08:00',
       moodTag: 'RESTLESS',
       moodColor: Color(0xFFA855F7),
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3',
     ),
     MusicTrack(
       title: 'Deep Sleep',
       duration: '15:00',
       moodTag: 'INSOMNIA',
       moodColor: Color(0xFF0EA5E9),
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3',
     ),
     MusicTrack(
       title: 'Morning Light',
       duration: '05:30',
       moodTag: 'SAD',
       moodColor: Color(0xFFEAB308),
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3',
     ),
     MusicTrack(
       title: 'Gentle Flow',
       duration: '07:15',
       moodTag: 'TENSE',
       moodColor: Color(0xFFF97316),
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3',
     ),
     MusicTrack(
       title: 'Soft Horizon',
       duration: '09:00',
       moodTag: 'OVERWHELMED',
       moodColor: Color(0xFFEC4899),
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3',
     ),
     MusicTrack(
       title: 'Still Waters',
       duration: '11:20',
       moodTag: 'ANXIOUS',
       moodColor: Color(0xFF6ACFEF),
+      audioUrl: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3',
     ),
   ];
 
@@ -133,7 +141,7 @@ class MusicTherapyScreen extends StatelessWidget {
                               borderRadius: BorderRadius.circular(20),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Colors.black.withOpacity(0.04),
+                                  color: Colors.black.withValues(alpha: 0.04),
                                   blurRadius: 8,
                                   offset: const Offset(0, 3),
                                 ),
@@ -169,7 +177,7 @@ class MusicTherapyScreen extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
-                    color: const Color(0xFF6B6B8A).withOpacity(0.7),
+                    color: const Color(0xFF6B6B8A).withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -221,7 +229,7 @@ class _TrackRow extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 12,
             offset: const Offset(0, 5),
           ),
@@ -234,7 +242,7 @@ class _TrackRow extends StatelessWidget {
             width: 52,
             height: 52,
             decoration: BoxDecoration(
-              color: track.moodColor.withOpacity(0.15),
+              color: track.moodColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Center(
@@ -274,7 +282,7 @@ class _TrackRow extends StatelessWidget {
                     vertical: 3,
                   ),
                   decoration: BoxDecoration(
-                    color: track.moodColor.withOpacity(0.12),
+                    color: track.moodColor.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(

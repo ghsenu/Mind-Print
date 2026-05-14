@@ -12,9 +12,7 @@ class MemoryMatchScreen extends StatefulWidget {
 }
 
 class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
-  static const _emojis = [
-    '🌸', '🌊', '🍃', '🦋', '⭐', '🌙', '🌈', '🕊️',
-  ];
+  static const _emojis = ['🌸', '🌊', '🍃', '🦋', '⭐', '🌙', '🌈', '🕊️'];
 
   late List<_CardData> _cards;
   final List<int> _selected = [];
@@ -32,11 +30,7 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
     pairs.shuffle(math.Random());
     return List.generate(16, (i) {
       final emoji = pairs[i];
-      return _CardData(
-        id: i,
-        emoji: emoji,
-        pairId: _emojis.indexOf(emoji),
-      );
+      return _CardData(id: i, emoji: emoji, pairId: _emojis.indexOf(emoji));
     });
   }
 
@@ -65,8 +59,7 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
         b.isMatched = true;
         _selected.clear();
         if (_cards.every((c) => c.isMatched)) {
-          WidgetsBinding.instance
-              .addPostFrameCallback((_) => _showWinDialog());
+          WidgetsBinding.instance.addPostFrameCallback((_) => _showWinDialog());
         }
       });
     } else {
@@ -95,45 +88,48 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'You did it!',
-          style: GoogleFonts.lora(fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          'All pairs matched. Great focus!',
-          style: GoogleFonts.lora(color: const Color(0xFF6B6B8A)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Text(
-              'Done',
-              style: GoogleFonts.lora(
-                color: const Color(0xFF6A1B9A),
-                fontWeight: FontWeight.bold,
-              ),
+      builder:
+          (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              _restart();
-            },
-            child: Text(
-              'Play Again',
-              style: GoogleFonts.lora(
-                color: const Color(0xFFEC407A),
-                fontWeight: FontWeight.bold,
-              ),
+            title: Text(
+              'You did it!',
+              style: GoogleFonts.lora(fontWeight: FontWeight.bold),
             ),
+            content: Text(
+              'All pairs matched. Great focus!',
+              style: GoogleFonts.lora(color: const Color(0xFF6B6B8A)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Done',
+                  style: GoogleFonts.lora(
+                    color: const Color(0xFF6A1B9A),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  _restart();
+                },
+                child: Text(
+                  'Play Again',
+                  style: GoogleFonts.lora(
+                    color: const Color(0xFFEC407A),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -156,8 +152,10 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new,
-                        color: Colors.black),
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Colors.black,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Expanded(
@@ -197,10 +195,8 @@ class _MemoryMatchScreenState extends State<MemoryMatchScreen> {
                   crossAxisSpacing: 8,
                   children: List.generate(
                     16,
-                    (i) => _FlipCard(
-                      card: _cards[i],
-                      onTap: () => _onCardTap(i),
-                    ),
+                    (i) =>
+                        _FlipCard(card: _cards[i], onTap: () => _onCardTap(i)),
                   ),
                 ),
               ),
@@ -241,16 +237,17 @@ class _FlipCard extends StatelessWidget {
           curve: Curves.easeInOut,
           builder: (context, angle, _) {
             final isFrontVisible = angle >= math.pi / 2;
-            final displayAngle =
-                isFrontVisible ? angle - math.pi : angle;
+            final displayAngle = isFrontVisible ? angle - math.pi : angle;
             return Transform(
               alignment: Alignment.center,
-              transform: Matrix4.identity()
-                ..setEntry(3, 2, 0.001)
-                ..rotateY(displayAngle),
-              child: isFrontVisible
-                  ? _FrontFace(emoji: card.emoji)
-                  : const _BackFace(),
+              transform:
+                  Matrix4.identity()
+                    ..setEntry(3, 2, 0.001)
+                    ..rotateY(displayAngle),
+              child:
+                  isFrontVisible
+                      ? _FrontFace(emoji: card.emoji)
+                      : const _BackFace(),
             );
           },
         ),
@@ -274,7 +271,7 @@ class _BackFace extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6A1B9A).withOpacity(0.25),
+            color: const Color(0xFF6A1B9A).withValues(alpha: 0.25),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -300,15 +297,13 @@ class _FrontFace extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.08),
+            color: Colors.black.withValues(alpha: 0.08),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Center(
-        child: Text(emoji, style: const TextStyle(fontSize: 28)),
-      ),
+      child: Center(child: Text(emoji, style: const TextStyle(fontSize: 28))),
     );
   }
 }

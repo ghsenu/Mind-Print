@@ -18,16 +18,20 @@ class EmotionResult {
   final String id;
   final String journalId;
   final String userId;
-  final String primaryEmotion; // joy | sadness | anger | fear | surprise | disgust | neutral
-  final double intensity;       // 0.0–1.0
+  final String
+  primaryEmotion; // joy | sadness | anger | fear | surprise | disgust | neutral
+  final double intensity; // 0.0–1.0
   final List<String> secondaryEmotions;
-  final String sentiment;       // positive | negative | neutral
-  final String? distortionType; // overgeneralization | catastrophizing | black-and-white | personalization | mental-filtering
+  final String sentiment; // positive | negative | neutral
+  final String?
+  distortionType; // overgeneralization | catastrophizing | black-and-white | personalization | mental-filtering
   final String? aiInsight;
   final String? cbtReframe;
   final DateTime analyzedAt;
 
-  factory EmotionResult.fromFirestore(DocumentSnapshot<Map<String, dynamic>> doc) {
+  factory EmotionResult.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> doc,
+  ) {
     final data = doc.data()!;
     return EmotionResult(
       id: doc.id,
@@ -35,7 +39,9 @@ class EmotionResult {
       userId: data['userId'] as String,
       primaryEmotion: data['primaryEmotion'] as String,
       intensity: (data['intensity'] as num).toDouble(),
-      secondaryEmotions: List<String>.from(data['secondaryEmotions'] as List? ?? []),
+      secondaryEmotions: List<String>.from(
+        data['secondaryEmotions'] as List? ?? [],
+      ),
       sentiment: data['sentiment'] as String? ?? 'neutral',
       distortionType: data['distortionType'] as String?,
       aiInsight: data['aiInsight'] as String?,
@@ -45,15 +51,15 @@ class EmotionResult {
   }
 
   Map<String, dynamic> toFirestore() => {
-        'journalId': journalId,
-        'userId': userId,
-        'primaryEmotion': primaryEmotion,
-        'intensity': intensity,
-        'secondaryEmotions': secondaryEmotions,
-        'sentiment': sentiment,
-        if (distortionType != null) 'distortionType': distortionType,
-        if (aiInsight != null) 'aiInsight': aiInsight,
-        if (cbtReframe != null) 'cbtReframe': cbtReframe,
-        'analyzedAt': Timestamp.fromDate(analyzedAt),
-      };
+    'journalId': journalId,
+    'userId': userId,
+    'primaryEmotion': primaryEmotion,
+    'intensity': intensity,
+    'secondaryEmotions': secondaryEmotions,
+    'sentiment': sentiment,
+    if (distortionType != null) 'distortionType': distortionType,
+    if (aiInsight != null) 'aiInsight': aiInsight,
+    if (cbtReframe != null) 'cbtReframe': cbtReframe,
+    'analyzedAt': Timestamp.fromDate(analyzedAt),
+  };
 }

@@ -32,7 +32,7 @@ class GameCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: gradientColors.first.withOpacity(0.35),
+              color: gradientColors.first.withValues(alpha: 0.35),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -47,7 +47,7 @@ class GameCard extends StatelessWidget {
                 width: 52,
                 height: 52,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
+                  color: Colors.white.withValues(alpha: 0.2),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(icon, color: Colors.white, size: 26),
@@ -67,7 +67,7 @@ class GameCard extends StatelessWidget {
                 subtitle,
                 style: GoogleFonts.lora(
                   fontSize: 11,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
                 textAlign: TextAlign.center,
                 maxLines: 2,

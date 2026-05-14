@@ -149,7 +149,7 @@ class CbtScreen extends StatelessWidget {
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                     letterSpacing: 1.2,
-                    color: const Color(0xFF6B6B8A).withOpacity(0.7),
+                    color: const Color(0xFF6B6B8A).withValues(alpha: 0.7),
                   ),
                 ),
               ),
@@ -196,7 +196,7 @@ class _CbtCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 14,
               offset: const Offset(0, 6),
             ),
@@ -208,7 +208,7 @@ class _CbtCard extends StatelessWidget {
               width: 52,
               height: 52,
               decoration: BoxDecoration(
-                color: exercise.color.withOpacity(0.12),
+                color: exercise.color.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(14),
               ),
               child: Center(
@@ -338,7 +338,7 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
                           ? 0
                           : _completed.length / ex.steps.length,
                   minHeight: 6,
-                  backgroundColor: ex.color.withOpacity(0.12),
+                  backgroundColor: ex.color.withValues(alpha: 0.12),
                   color: ex.color,
                 ),
               ),
@@ -376,17 +376,22 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
                       margin: const EdgeInsets.only(bottom: 10),
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: done ? ex.color.withOpacity(0.08) : Colors.white,
+                        color:
+                            done
+                                ? ex.color.withValues(alpha: 0.08)
+                                : Colors.white,
                         borderRadius: BorderRadius.circular(16),
                         border: Border.all(
                           color:
                               done
-                                  ? ex.color.withOpacity(0.3)
+                                  ? ex.color.withValues(alpha: 0.3)
                                   : Colors.transparent,
                         ),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withOpacity(done ? 0.01 : 0.04),
+                            color: Colors.black.withValues(
+                              alpha: done ? 0.01 : 0.04,
+                            ),
                             blurRadius: 10,
                             offset: const Offset(0, 4),
                           ),
@@ -401,7 +406,9 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color:
-                                  done ? ex.color : ex.color.withOpacity(0.1),
+                                  done
+                                      ? ex.color
+                                      : ex.color.withValues(alpha: 0.1),
                             ),
                             child: Center(
                               child:
@@ -457,7 +464,7 @@ class _CbtDetailScreenState extends State<_CbtDetailScreen> {
                       borderRadius: BorderRadius.circular(16),
                       boxShadow: [
                         BoxShadow(
-                          color: ex.color.withOpacity(0.35),
+                          color: ex.color.withValues(alpha: 0.35),
                           blurRadius: 16,
                           offset: const Offset(0, 6),
                         ),

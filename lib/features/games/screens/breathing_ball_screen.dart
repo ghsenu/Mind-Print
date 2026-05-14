@@ -31,7 +31,9 @@ class _BreathingBallScreenState extends State<BreathingBallScreen>
         if (_roundsCompleted >= _totalRounds) {
           _isDone = true;
           _breathCtrl.stop();
-          WidgetsBinding.instance.addPostFrameCallback((_) => _showDoneDialog());
+          WidgetsBinding.instance.addPostFrameCallback(
+            (_) => _showDoneDialog(),
+          );
         } else {
           _breathCtrl.forward(from: 0.0);
         }
@@ -87,49 +89,52 @@ class _BreathingBallScreenState extends State<BreathingBallScreen>
     showDialog<void>(
       context: context,
       barrierDismissible: false,
-      builder: (_) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text(
-          'Well done!',
-          style: GoogleFonts.lora(fontWeight: FontWeight.bold),
-        ),
-        content: Text(
-          'You completed $_totalRounds breathing rounds.\nHow do you feel?',
-          style: GoogleFonts.lora(color: const Color(0xFF6B6B8A)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              Navigator.pop(context);
-            },
-            child: Text(
-              'Done',
-              style: GoogleFonts.lora(
-                color: const Color(0xFF43A047),
-                fontWeight: FontWeight.bold,
-              ),
+      builder:
+          (_) => AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20),
             ),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              setState(() {
-                _roundsCompleted = 0;
-                _isDone = false;
-              });
-              _breathCtrl.forward(from: 0.0);
-            },
-            child: Text(
-              'Again',
-              style: GoogleFonts.lora(
-                color: const Color(0xFF4776E6),
-                fontWeight: FontWeight.bold,
-              ),
+            title: Text(
+              'Well done!',
+              style: GoogleFonts.lora(fontWeight: FontWeight.bold),
             ),
+            content: Text(
+              'You completed $_totalRounds breathing rounds.\nHow do you feel?',
+              style: GoogleFonts.lora(color: const Color(0xFF6B6B8A)),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: Text(
+                  'Done',
+                  style: GoogleFonts.lora(
+                    color: const Color(0xFF43A047),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  setState(() {
+                    _roundsCompleted = 0;
+                    _isDone = false;
+                  });
+                  _breathCtrl.forward(from: 0.0);
+                },
+                child: Text(
+                  'Again',
+                  style: GoogleFonts.lora(
+                    color: const Color(0xFF4776E6),
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
     );
   }
 
@@ -151,8 +156,10 @@ class _BreathingBallScreenState extends State<BreathingBallScreen>
               child: Row(
                 children: [
                   IconButton(
-                    icon: const Icon(Icons.arrow_back_ios_new,
-                        color: Colors.white),
+                    icon: const Icon(
+                      Icons.arrow_back_ios_new,
+                      color: Colors.white,
+                    ),
                     onPressed: () => Navigator.pop(context),
                   ),
                   Expanded(
@@ -177,7 +184,7 @@ class _BreathingBallScreenState extends State<BreathingBallScreen>
                   'Round ${(_roundsCompleted + 1).clamp(1, _totalRounds)} of $_totalRounds',
                   style: GoogleFonts.lora(
                     fontSize: 14,
-                    color: Colors.white.withOpacity(0.6),
+                    color: Colors.white.withValues(alpha: 0.6),
                   ),
                 );
               },
@@ -219,7 +226,7 @@ class _BreathingBallScreenState extends State<BreathingBallScreen>
                           ),
                           boxShadow: [
                             BoxShadow(
-                              color: colors[0].withOpacity(0.5),
+                              color: colors[0].withValues(alpha: 0.5),
                               blurRadius: 40,
                               spreadRadius: 10,
                             ),
@@ -241,7 +248,7 @@ class _BreathingBallScreenState extends State<BreathingBallScreen>
                   child: Text(
                     'Stop Early',
                     style: GoogleFonts.lora(
-                      color: Colors.white.withOpacity(0.5),
+                      color: Colors.white.withValues(alpha: 0.5),
                       fontSize: 14,
                     ),
                   ),
